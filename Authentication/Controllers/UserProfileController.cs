@@ -14,7 +14,6 @@ namespace Authentication.Controllers
         [HttpPost("set-data")]
         public async Task<IActionResult> SetData(UserSetDatasRequest request)
         {
-            //TODO ellenőrzések, default values
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (auth == null)
                 return BadRequest("You most log in first.");
@@ -37,13 +36,13 @@ namespace Authentication.Controllers
             if (isNew)
                 _dataContext.userProfiles.Add(userProfile);
             await _dataContext.SaveChangesAsync();
-            return Ok($"{auth.username}'s data saved.");
+            return Ok($"{auth.username}'s data saved. Gender: {userProfile.gender}. Goal Weight: {userProfile.goalWeight}.");
         }
 
         private string CheckData(UserProfile userProfile)
         {
             if (Convert.ToDateTime(userProfile.birthDate) < DateTime.Now.AddYears(-100) || Convert.ToDateTime(userProfile.birthDate) > DateTime.Now.AddYears(-12))
-                return $"The user must be between 12 and 100 years old! {Convert.ToDateTime(userProfile.birthDate)},  -    {DateTime.Now.AddYears(-100)}";
+                return $"The user must be between 12 and 100 years old!";
             if (userProfile.weight < 20 || userProfile.weight > 1000)
                 return "The user weight must be over 20 and 1000!";
             if (userProfile.height < 40 || userProfile.height > 250)

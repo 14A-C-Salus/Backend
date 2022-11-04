@@ -1,5 +1,6 @@
 ﻿using Authentication.Controllers.Models.AuthModels;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 
 namespace Authentication.Controllers
@@ -64,7 +65,7 @@ namespace Authentication.Controllers
             if (auth == null || !VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt))
                 return BadRequest("Username or password is not correct!");
             if (auth.date == null)
-                return BadRequest("Not verified!");
+                return BadRequest($"Not verified! Token: {auth.verificationToken}.");
             return Ok($"Welcome back, {auth.username}!");
         }
 
@@ -91,7 +92,7 @@ namespace Authentication.Controllers
 
 
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(string email)
+        public async Task<IActionResult> ForgotPassword([Required, EmailAddress] string email)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
@@ -99,7 +100,7 @@ namespace Authentication.Controllers
             auth.passwordResetToken = CreateRandomToken();
             auth.resetTokenExpires = DateTime.Now.AddDays(1);
             await _dataContext.SaveChangesAsync();
-            return Ok("You may now reset your password.");
+            return Ok($"Hi {auth.username}, you may now reset your password. Token: {auth.passwordResetToken}.");
         }
 
         [HttpPost("reset-password")]
