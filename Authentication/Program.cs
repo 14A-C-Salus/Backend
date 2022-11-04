@@ -1,5 +1,6 @@
 global using Microsoft.EntityFrameworkCore;
-global using Authentication.Controllers.Models;
+global using Authentication.Controllers.Models.AuthModels;
+global using Authentication.Controllers.Models.UserProfileModels;
 global using Authentication.Data;
 
 var builder = WebApplication.CreateBuilder(args);

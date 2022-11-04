@@ -2,19 +2,23 @@
 {
     public class DataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {
-
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                .UseSqlServer("Server=SalusDB.mssql.somee.com;Database=SalusDB;User Id=AnoBlade_SQLLogin_1;Password=hmw5xto7f8;");
+                //.UseSqlServer("Server=SalusDB.mssql.somee.com;Database=SalusDB;User Id=AnoBlade_SQLLogin_1;Password=hmw5xto7f8;");
+                .UseSqlServer("Server=localhost;Database=master;Trusted_Connection=True;");
         }
-
         public DbSet<Auth> auths => Set<Auth>();
+        public DbSet<UserProfile> userProfiles => Set<UserProfile>();
+    
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Auth>()
+                .HasOne<UserProfile>(u => u.userProfile)
+                .WithOne(ad => ad.auth)
+                .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
+        }
     }
+
 }

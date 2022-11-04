@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Authentication.Controllers.Models.AuthModels;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 
 namespace Authentication.Controllers
@@ -59,7 +60,7 @@ namespace Authentication.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(AuthLoginRequest request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.username == request.username);
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (auth == null || !VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt))
                 return BadRequest("Username or password is not correct!");
             if (auth.date == null)

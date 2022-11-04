@@ -4,6 +4,7 @@ using Authentication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Authentication_temp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221103131231_GenderToEnum")]
+    partial class GenderToEnum
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,23 +76,22 @@ namespace Authentication_temp.Migrations
                     b.Property<int>("authOfProfileId")
                         .HasColumnType("int");
 
-                    b.Property<string>("birthDate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("birthDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int>("gender")
+                    b.Property<int?>("gender")
                         .HasColumnType("int");
 
-                    b.Property<double>("goalWeight")
+                    b.Property<double?>("goalWeight")
                         .HasColumnType("float");
 
-                    b.Property<double>("height")
+                    b.Property<double?>("height")
                         .HasColumnType("float");
 
                     b.Property<bool>("isAdmin")
                         .HasColumnType("bit");
 
-                    b.Property<double>("weight")
+                    b.Property<double?>("weight")
                         .HasColumnType("float");
 
                     b.HasKey("id");

@@ -1,4 +1,4 @@
-﻿namespace Authentication.Controllers.Models
+﻿namespace Authentication.Controllers.Models.AuthModels
 {
     public class Auth
     {
@@ -11,5 +11,6 @@
         public DateTime? date { get; set; }
         public string? passwordResetToken { get; set; }
         public DateTime? resetTokenExpires { get; set; }
+        public virtual UserProfile userProfile { get; set; }
     }
 }
