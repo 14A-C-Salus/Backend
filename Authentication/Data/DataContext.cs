@@ -6,8 +6,8 @@
         {
             base.OnConfiguring(optionsBuilder);
             optionsBuilder
-                //.UseSqlServer("Server=SalusDB.mssql.somee.com;Database=SalusDB;User Id=AnoBlade_SQLLogin_1;Password=hmw5xto7f8;");
-                .UseSqlServer("Server=localhost;Database=master;Trusted_Connection=True;");
+                .UseSqlServer("Server=SalusDB.mssql.somee.com;Database=SalusDB;User Id=AnoBlade_SQLLogin_1;Password=hmw5xto7f8;");
+                //.UseSqlServer("Server=localhost;Database=master;Trusted_Connection=True;");
         }
         public DbSet<Auth> auths => Set<Auth>();
         public DbSet<UserProfile> userProfiles => Set<UserProfile>();
