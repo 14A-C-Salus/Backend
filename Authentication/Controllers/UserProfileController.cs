@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace Authentication.Controllers
 {
@@ -11,6 +12,7 @@ namespace Authentication.Controllers
         {
             _dataContext = dataContext;
         }
+
         [HttpPost("set-data")]
         public async Task<IActionResult> SetData(UserSetDatasRequest request)
         {
@@ -49,6 +51,8 @@ namespace Authentication.Controllers
                 return "The user height must be between 40 and 250 cm!";
             if (userProfile.gender == genderEnum.nondefined)
                 return "You must select your gender!";
+            if (userProfile.gender < genderEnum.nondefined || userProfile.gender > genderEnum.other)
+                return "Invalid gender!";
             if (userProfile.goalWeight < 20 || userProfile.goalWeight > 1000)
                 return "The user goal weight must be over 20 and 1000!";
             return "Everything's okay.";
@@ -64,6 +68,47 @@ namespace Authentication.Controllers
             }
             double idealBMI = 21.75;
             return idealBMI * heightInMeter * heightInMeter;
+        }
+
+        [HttpPost("set-profile-picture")]
+        public async Task<IActionResult> SetProfilePicture(UserSetProfilePictureRequset request)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+            if (auth == null)
+                return BadRequest("You most log in first.");
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            if (userProfile == null)
+                return BadRequest("First set the data in \"set-data\".");
+            userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
+            userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
+            userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
+            userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
+            var check = CheckProfilePicture(userProfile);
+            if (check != "Everything's okay.")
+                return BadRequest(check);
+            await _dataContext.SaveChangesAsync();
+            return Ok($"Profile picture updated. (Hair: {userProfile.hairIndex}, Skin color: {userProfile.skinIndex}, Eye color: {userProfile.eyesIndex}, Mouth: {userProfile.mouthIndex})");
+        }
+
+        private string CheckProfilePicture(UserProfile userProfile)
+        {
+            if (userProfile.hairIndex < hairEnum.nondefined || userProfile.hairIndex > hairEnum.white)
+                return "Invalid hair!";
+            if (userProfile.skinIndex < skinEnum.nondefined || userProfile.skinIndex > skinEnum.lightest)
+                return "Invalid skin color!";
+            if (userProfile.eyesIndex < eyesEnum.nondefined || userProfile.eyesIndex > eyesEnum.brown)
+                return "Invalid eye color!";
+            if (userProfile.mouthIndex < mouthEnum.nondefined || userProfile.mouthIndex > mouthEnum.sad)
+                return "Invalid mouth!";
+            if (userProfile.hairIndex == hairEnum.nondefined)
+                return "Select a hair!";
+            if (userProfile.skinIndex == skinEnum.nondefined)
+                return "Select a skin color!";
+            if (userProfile.eyesIndex == eyesEnum.nondefined)
+                return "Select a eye!";
+            if (userProfile.mouthIndex == mouthEnum.nondefined)
+                return "Select a mouth!";
+            return "Everything's okay.";
         }
     }
 }
