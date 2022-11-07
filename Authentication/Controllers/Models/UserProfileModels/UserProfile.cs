@@ -1,7 +1,4 @@
-﻿
-using System.Diagnostics.CodeAnalysis;
-
-namespace Authentication.Controllers.Models.UserProfileModels
+﻿namespace Authentication.Controllers.Models.UserProfileModels
 {
     public enum genderEnum
     {
@@ -10,20 +7,55 @@ namespace Authentication.Controllers.Models.UserProfileModels
         female,
         other
     }
+    public enum hairEnum
+    {
+        nondefined,
+        blond,
+        brown,
+        ginger,
+        black,
+        white
+    }
+    public enum skinEnum
+    {
+        nondefined,
+        darkest,
+        dark,
+        light,
+        lightest
+    }
+    public enum eyesEnum
+    {
+        nondefined,
+        blue,
+        green,
+        brown
+    }
+    public enum mouthEnum
+    {
+        nondefined,
+        happy,
+        neutral,
+        sad
+    }
+
     public class UserProfile
     {
         public int id { get; set; }
-        [AllowNull]
         public double weight { get; set; }
-        [AllowNull]
         public double height { get; set; }
-        [AllowNull]
         public string birthDate { get; set; } = default(DateTime).ToString("yyyy.MM.dd");
-        [AllowNull]
         public genderEnum gender { get; set; }
         public bool isAdmin { get; set; } = false;
-        [AllowNull]
         public double goalWeight { get; set; }
+
+        //Profilepic data
+        public hairEnum hairIndex { get; set; }
+        public skinEnum skinIndex { get; set; }
+        public eyesEnum eyesIndex { get; set; }
+        public mouthEnum mouthIndex { get; set; }
+
+        //Connection with auth
         public virtual Auth auth { get; set; }
         public int authOfProfileId { get; set; }
     }
