@@ -1,7 +1,7 @@
-global using Microsoft.EntityFrameworkCore;
 global using Authentication.Controllers.Models.AuthModels;
 global using Authentication.Controllers.Models.UserProfileModels;
 global using Authentication.Data;
+global using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +18,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
