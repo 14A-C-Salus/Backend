@@ -1,5 +1,4 @@
-﻿using Authentication.Controllers.Models.AuthModels;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 
@@ -14,7 +13,6 @@ namespace Authentication.Controllers
         {
             _dataContext = dataContext;
         }
-
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(AuthRegisterRequest request)

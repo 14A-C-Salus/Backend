@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Reflection;
 
 namespace Authentication.Controllers
 {
@@ -18,8 +17,8 @@ namespace Authentication.Controllers
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (auth == null)
-                return BadRequest("You most log in first.");
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);        
+                return BadRequest("You must log in first.");
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
             bool isNew = userProfile == null;
             if (isNew)
             {
@@ -60,12 +59,10 @@ namespace Authentication.Controllers
 
         private double SetGoalWeight(double height, double weight)
         {
-            double heightInMeter = height/100;
-            double BMI = weight/(heightInMeter * heightInMeter);
+            double heightInMeter = height / 100;
+            double BMI = weight / (heightInMeter * heightInMeter);
             if (BMI > 18.5 && BMI < 25)
-            {
                 return weight;
-            }
             double idealBMI = 21.75;
             return idealBMI * heightInMeter * heightInMeter;
         }
@@ -75,7 +72,7 @@ namespace Authentication.Controllers
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (auth == null)
-                return BadRequest("You most log in first.");
+                return BadRequest("You must log in first.");
             var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
             if (userProfile == null)
                 return BadRequest("First set the data in \"set-data\".");
