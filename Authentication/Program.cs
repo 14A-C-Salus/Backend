@@ -2,6 +2,7 @@ global using Authentication.Controllers.Models.AuthModels;
 global using Authentication.Controllers.Models.UserProfileModels;
 global using Authentication.Data;
 global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
