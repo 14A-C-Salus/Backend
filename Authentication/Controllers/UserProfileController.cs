@@ -7,15 +7,19 @@ namespace Authentication.Controllers
     public class UserProfileController : Controller
     {
         private readonly DataContext _dataContext;
-        public UserProfileController(DataContext dataContext)
+        private readonly IAuthService _authService;
+
+        public UserProfileController(DataContext dataContext, IAuthService authService)
         {
             _dataContext = dataContext;
+            _authService = authService;
         }
 
         [HttpPost("set-data"), Authorize]
         public async Task<IActionResult> SetData(UserSetDatasRequest request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+            var email = _authService.GetEmail();
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
                 return BadRequest("You must log in first.");
             var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
@@ -70,7 +74,8 @@ namespace Authentication.Controllers
         [HttpPost("set-profile-picture"), Authorize]
         public async Task<IActionResult> SetProfilePicture(UserSetProfilePictureRequset request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+            var email = _authService.GetEmail();
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
                 return BadRequest("You must log in first.");
             var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
