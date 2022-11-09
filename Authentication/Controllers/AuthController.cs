@@ -20,6 +20,14 @@ namespace Authentication.Controllers
             _configuration = configuration;
         }
 
+        [HttpGet, Authorize]
+        public ActionResult<string> GetNameAndEmail()
+        {
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            return $"{userName};{email}";
+        }
+
         [HttpPost("register")]
         public async Task<IActionResult> Register(AuthRegisterRequest request)
         {
