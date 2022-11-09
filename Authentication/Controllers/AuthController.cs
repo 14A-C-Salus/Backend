@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Authentication.Controllers
 {
@@ -9,9 +13,11 @@ namespace Authentication.Controllers
     public class AuthController : Controller
     {
         private readonly DataContext _dataContext;
-        public AuthController(DataContext dataContext)
+        private readonly IConfiguration _configuration;
+        public AuthController(DataContext dataContext, IConfiguration configuration)
         {
             _dataContext = dataContext;
+            _configuration = configuration;
         }
 
         [HttpPost("register")]
@@ -64,7 +70,27 @@ namespace Authentication.Controllers
                 return BadRequest("Username or password is not correct!");
             if (auth.date == null)
                 return BadRequest($"Not verified! Token: {auth.verificationToken}.");
-            return Ok($"Welcome back, {auth.username}!");
+            string jwt = CreateToken(auth);
+            return Ok(jwt);
+        }
+
+        private string CreateToken(Auth auth)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(
+                ClaimTypes.Name, auth.username,
+                ClaimTypes.Email, auth.email)
+            };
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("Keys:JwtKey").Value));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var token = new JwtSecurityToken(
+                claims:claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds);
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwt;
         }
 
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
