@@ -58,7 +58,7 @@ namespace Authentication.Controllers
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
 
@@ -78,9 +78,8 @@ namespace Authentication.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(
-                ClaimTypes.Name, auth.username,
-                ClaimTypes.Email, auth.email)
+                new Claim(ClaimTypes.Name, auth.username),
+                new Claim(ClaimTypes.Email, auth.email),
             };
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
                 _configuration.GetSection("Keys:JwtKey").Value));

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Authentication.Controllers
 {
@@ -12,7 +13,7 @@ namespace Authentication.Controllers
             _dataContext = dataContext;
         }
 
-        [HttpPost("set-data")]
+        [HttpPost("set-data"), Authorize]
         public async Task<IActionResult> SetData(UserSetDatasRequest request)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
@@ -67,7 +68,7 @@ namespace Authentication.Controllers
             return idealBMI * heightInMeter * heightInMeter;
         }
 
-        [HttpPost("set-profile-picture")]
+        [HttpPost("set-profile-picture"), Authorize]
         public async Task<IActionResult> SetProfilePicture(UserSetProfilePictureRequset request)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
