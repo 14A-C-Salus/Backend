@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-
 namespace Authentication.Controllers
 {
     [Route("api/[controller]")]
@@ -25,6 +24,7 @@ namespace Authentication.Controllers
 
             var auth = _authService.NewAuth(request);
             _dataContext.auths.Add(auth);
+            _authService.SendToken(auth);
             await _dataContext.SaveChangesAsync();
             return Ok("User successfully created!");
         }
@@ -82,5 +82,6 @@ namespace Authentication.Controllers
             await _dataContext.SaveChangesAsync();
             return Ok("Password successfully reset.");
         }
+
     }
 }

@@ -8,5 +8,6 @@
         bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
         void SetTokenAndExpires(Auth auth);
         void UpdateAuthResetPasswordData(string password, Auth auth);
+        void SendToken(Auth auth);
     }
 }
