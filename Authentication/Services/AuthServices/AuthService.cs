@@ -74,6 +74,7 @@ namespace Authentication.Services.AuthServices
             auth.passwordResetToken = CreateRandomToken();
             auth.resetTokenExpires = DateTime.Now.AddDays(1);
         }
+
         public void UpdateAuthResetPasswordData(string password, Auth auth)
         {
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -82,6 +83,7 @@ namespace Authentication.Services.AuthServices
             auth.passwordResetToken = null;
             auth.resetTokenExpires = null;
         }
+
         //private methods
         private string CreateRandomToken()
         {

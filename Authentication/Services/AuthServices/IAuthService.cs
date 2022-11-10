@@ -1,10 +1,4 @@
-﻿using Authentication.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
-namespace Authentication.Services.AuthServices
+﻿namespace Authentication.Services.AuthServices
 {
     public interface IAuthService
     {
