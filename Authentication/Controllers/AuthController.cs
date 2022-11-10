@@ -21,9 +21,8 @@ namespace Authentication.Controllers
         public async Task<IActionResult> Register(AuthRegisterRequest request)
         {
             if (_dataContext.auths.Any(a => a.username == request.username) || _dataContext.auths.Any(a => a.email == request.email))
-            {
                 return BadRequest("Username or email already exists.");
-            }
+
             var auth = _authService.NewAuth(request);
             _dataContext.auths.Add(auth);
             await _dataContext.SaveChangesAsync();
@@ -34,10 +33,13 @@ namespace Authentication.Controllers
         public async Task<IActionResult> Login(AuthLoginRequest request)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+
             if (auth == null || !_authService.VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt))
                 return BadRequest("Username or password is not correct!");
+
             if (auth.date == null)
                 return BadRequest($"Not verified! Token: {auth.verificationToken}.");
+
             string jwt = _authService.CreateToken(auth);
             return Ok(jwt);
         }
@@ -48,6 +50,7 @@ namespace Authentication.Controllers
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.verificationToken == token);
             if (auth == null)
                 return BadRequest("Invalid token!");
+
             auth.date = DateTime.Now;
             await _dataContext.SaveChangesAsync();
             return Ok($"{auth.username} verified!");
@@ -60,7 +63,9 @@ namespace Authentication.Controllers
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
                 return BadRequest("User not found!");
+
             _authService.SetTokenAndExpires(auth);
+
             await _dataContext.SaveChangesAsync();
             return Ok($"Hi {auth.username}, you may now reset your password. Token: {auth.passwordResetToken}.");
         }
@@ -71,7 +76,9 @@ namespace Authentication.Controllers
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
             if (auth == null || auth.resetTokenExpires < DateTime.Now)
                 return BadRequest("Invalid Token!");
+
             _authService.UpdateAuthResetPasswordData(request.password, auth);
+
             await _dataContext.SaveChangesAsync();
             return Ok("Password successfully reset.");
         }

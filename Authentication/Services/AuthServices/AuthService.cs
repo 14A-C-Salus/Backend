@@ -21,8 +21,10 @@ namespace Authentication.Services.AuthServices
         public string GetEmail()
         {
             var result = string.Empty;
+
             if (_httpContextAccessor.HttpContext != null)
                 result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+
             return result;
         }
 
@@ -31,6 +33,7 @@ namespace Authentication.Services.AuthServices
             CreatePasswordHash(request.password,
             out byte[] passwordHash,
             out byte[] passwordSalt);
+
             var auth = new Auth
             {
                 username = request.username,
@@ -39,6 +42,7 @@ namespace Authentication.Services.AuthServices
                 passwordSalt = passwordSalt,
                 verificationToken = CreateRandomToken()
             };
+
             return auth;
         }
 
@@ -49,13 +53,17 @@ namespace Authentication.Services.AuthServices
                 new Claim(ClaimTypes.Name, auth.username),
                 new Claim(ClaimTypes.Email, auth.email),
             };
+
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
                 _configuration.GetSection("Keys:JwtKey").Value));
+
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
             var token = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddDays(1),
                 signingCredentials: creds);
+
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
         }
