@@ -4,6 +4,7 @@ global using Authentication.Data;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Authorization;
 global using Authentication.Services.AuthServices;
+global using Authentication.Services.UserProfileServices;
 global using System.Security.Claims;
 global using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,6 +20,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {
