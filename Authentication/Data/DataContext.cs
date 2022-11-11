@@ -13,9 +13,9 @@
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            string connectionString = "Server=sql.bsite.net\\MSSQL2016;Database=salus_DB;User Id=salus_DB;Password=hmw5xto7f8;";
+            string connectionString = _configuration.GetConnectionString("BsiteDB");
             if (_configuration.GetSection("Host:IsLocalHost").Value == "Yes")
-                connectionString = "Server=localhost;Database=master;Trusted_Connection=True;";
+                connectionString = _configuration.GetConnectionString("LocalDB");
             optionsBuilder
                 .UseSqlServer(connectionString);
         }
