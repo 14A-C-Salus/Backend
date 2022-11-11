@@ -19,8 +19,8 @@ namespace Authentication.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(AuthRegisterRequest request)
         {
-            if (_dataContext.auths.Any(a => a.username == request.username) || _dataContext.auths.Any(a => a.email == request.email))
-                return BadRequest("Username or email already exists.");
+            if (_dataContext.auths.Any(a => a.email == request.email))
+                return BadRequest("Email already exists.");
 
             var auth = _authService.NewAuth(request);
             _dataContext.auths.Add(auth);
