@@ -73,14 +73,15 @@ namespace Authentication.Services.AuthServices
                 $"  padding: 3px;\r\n" +
                 $"  cursor: pointer;\r\n" +
                 $"  margin-top: 5vw;\r\n" +
-                $"  margin-left: 7.5vw;\r\n" +
+                $"  margin-left: 10vw;\r\n" +
+                $"  width: 30vw;\r\n" +
                 $"}}\r\n" +
                 $"\r\n" +
                 $"#button span {{\r\n" +
                 $"  background-color: #005734;\r\n" +
                 $"  padding: 16px 24px;\r\n" +
                 $"  border-radius: 20px;\r\n" +
-                $"  width: 30vw;\r\n" +
+                $"  width: 100%;\r\n" +
                 $"  height: 3vw;\r\n" +
                 $"}}\r\n" +
                 $"\r\n" +
@@ -131,12 +132,6 @@ namespace Authentication.Services.AuthServices
                 $"    </div>\r\n" +
                 $"</body>\r\n" +
                 $"</html>";
-            //string body =
-            //        $"<form name='myForm' target=\"_blank\" action='{url}' method='post'>\r\n" +
-            //        $"  <button type=\"submit\" name=\"submit_param\" value=\"submit_value\" class=\"link-button\">\r\n" +
-            //        $"    VERIFY\r\n" +
-            //        $"  </button>\r\n" +
-            //        $"</form>";
 
             SmtpClient client = new SmtpClient
             {
