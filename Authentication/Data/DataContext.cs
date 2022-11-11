@@ -4,13 +4,20 @@
     {
         public DbSet<Auth> auths => Set<Auth>();
         public DbSet<UserProfile> userProfiles => Set<UserProfile>();
+        private readonly IConfiguration _configuration;
 
+        public DataContext(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
+            string connectionString = "Server=sql.bsite.net\\MSSQL2016;Database=salus_DB;User Id=salus_DB;Password=hmw5xto7f8;";
+            if (_configuration.GetSection("Host:IsLocalHost").Value == "Yes")
+                connectionString = "Server=localhost;Database=master;Trusted_Connection=True;";
             optionsBuilder
-                //.UseSqlServer("Server=sql.bsite.net\\MSSQL2016;Database=salus_DB;User Id=salus_DB;Password=hmw5xto7f8;");
-                .UseSqlServer("Server=localhost;Database=master;Trusted_Connection=True;");
+                .UseSqlServer(connectionString);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

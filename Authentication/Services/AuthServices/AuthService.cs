@@ -1,6 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
+using static System.Net.WebRequestMethods;
 
 namespace Authentication.Services.AuthServices
 {
@@ -18,6 +21,46 @@ namespace Authentication.Services.AuthServices
         }
 
         //public methods
+        public void SendToken(Auth auth)
+        {
+            string to = auth.email;
+            string from = _configuration.GetSection("MailSettings:From").Value;
+            string password = _configuration.GetSection("MailSettings:Password").Value;
+            string subject = "Verify your account";
+            string url = $"https://salus.bsite.net/api/Auth/verify?token={auth.verificationToken}";
+            if (_configuration.GetSection("Host:IsLocalHost").Value == "Yes")
+                url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
+
+            string body =
+                    $"<form name='myForm' target=\"_blank\" action='{url}' method='post'>\r\n" +
+                    $"  <button type=\"submit\" name=\"submit_param\" value=\"submit_value\" class=\"link-button\">\r\n" +
+                    $"    VERIFY\r\n" +
+                    $"  </button>\r\n" +
+                    $"</form>";
+
+            SmtpClient client = new SmtpClient
+            {
+                Port = int.Parse(_configuration.GetSection("MailSettings:Port").Value),
+                Host = _configuration.GetSection("MailSettings:Host").Value,
+                EnableSsl = true,
+                Timeout = 10000,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(from, password)
+            };
+
+            var send_mail = new MailMessage
+            {
+                Body = body,
+                Subject = subject,
+                From = new MailAddress(from),
+                IsBodyHtml = true
+            };
+
+            send_mail.To.Add(new MailAddress(to));
+
+            client.Send(send_mail);
+        }
         public string GetEmail()
         {
             var result = string.Empty;
