@@ -28,7 +28,7 @@ namespace Authentication.Services.AuthServices
             string password = _configuration.GetSection("MailSettings:Password").Value;
             string subject = "Verify your account";
             string url = $"https://salus.bsite.net/api/Auth/verify?token={auth.verificationToken}";
-            string imgUrl = "https://i.ibb.co/Mcz2mRc/logo.png";
+            string imgUrl = "https://i.ibb.co/Dg5h4zK/logo.png";
             if (_configuration.GetSection("Host:IsLocalHost").Value == "Yes")
                 url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
             string body = 
