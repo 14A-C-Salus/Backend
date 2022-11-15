@@ -24,7 +24,8 @@ namespace Authentication.Controllers
 
             var auth = _authService.NewAuth(request);
             _dataContext.auths.Add(auth);
-            _authService.SendToken(auth);
+            if (_configuration.GetSection("Host:Use").Value != "LocalDB")
+                _authService.SendToken(auth);
             await _dataContext.SaveChangesAsync();
             return Ok("User successfully created!");
         }

@@ -1,10 +1,15 @@
+//models
 global using Authentication.Controllers.Models.AuthModels;
 global using Authentication.Controllers.Models.UserProfileModels;
+global using Authentication.Controllers.Models.SocialMediaModels;
+global using Authentication.Controllers.Models.JoiningEntity;
+//services
+global using Authentication.Services.UserProfileServices;
+global using Authentication.Services.AuthServices;
+
 global using Authentication.Data;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Authorization;
-global using Authentication.Services.AuthServices;
-global using Authentication.Services.UserProfileServices;
 global using System.Security.Claims;
 global using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

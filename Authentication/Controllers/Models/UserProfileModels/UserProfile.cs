@@ -16,8 +16,9 @@
         public eyesEnum eyesIndex { get; set; }
         public mouthEnum mouthIndex { get; set; }
 
-        //Connection with auth
-        public virtual Auth auth { get; set; }
+        //Connections
+        public virtual Auth? auth { get; set; }
         public int authOfProfileId { get; set; }
+        public IList<FollowUserProfile>? followUserProfile { get; set; }
     }
 }
