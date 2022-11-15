@@ -3,7 +3,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
-using static System.Net.WebRequestMethods;
 
 namespace Authentication.Services.AuthServices
 {
@@ -27,10 +26,12 @@ namespace Authentication.Services.AuthServices
             string from = _configuration.GetSection("MailSettings:From").Value;
             string password = _configuration.GetSection("MailSettings:Password").Value;
             string subject = "Verify your account";
-            string url = $"https://salus.bsite.net/api/Auth/verify?token={auth.verificationToken}";
+            string url = $"http://salus.bsite.net/api/Auth/verify?token={auth.verificationToken}";
             string imgUrl = "https://i.ibb.co/Dg5h4zK/logo.png";
-            if (_configuration.GetSection("Host:IsLocalHost").Value == "Yes")
+            if (_configuration.GetSection("Host:Use").Value == "LocalDB")
                 url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
+            else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
+                url = $"http://anoblade-001-site1.atempurl.com/api/Auth/verify?token={auth.verificationToken}";
             string body = 
                 $"<div style=\"background-color:#01a36269;\r\n" +
                 $"            height: 100%;\r\n" +
