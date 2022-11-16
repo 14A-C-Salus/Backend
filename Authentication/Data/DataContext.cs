@@ -4,8 +4,7 @@
     {
         public DbSet<Auth> auths => Set<Auth>();
         public DbSet<UserProfile> userProfiles => Set<UserProfile>();
-        public DbSet<Follow> follows => Set<Follow>();
-        public DbSet<FollowUserProfile> followUserProfiles => Set<FollowUserProfile>();
+        public DbSet<UserProfileToUserProfile> userProfileToUserProfile => Set<UserProfileToUserProfile>();
 
         private readonly IConfiguration _configuration;
 
@@ -36,16 +35,16 @@
             
             //many-to-many
             modelBuilder
-                .Entity<FollowUserProfile>()
-                .HasKey(fu => new { fu.followId, fu.userProfileId });
-            modelBuilder.Entity<FollowUserProfile>()
-                .HasOne<Follow>(fu => fu.follow)
-                .WithMany(f => f.followUserProfile)
-                .HasForeignKey(fu => fu.followId);
-            modelBuilder.Entity<FollowUserProfile>()
-                .HasOne<UserProfile>(fu => fu.userProfile)
-                .WithMany(u => u.followUserProfile)
-                .HasForeignKey(fu => fu.userProfileId);
+                .Entity<UserProfileToUserProfile>()
+                .HasKey(fu => new { fu.followedId, fu.followerId });
+            modelBuilder.Entity<UserProfileToUserProfile>()
+                .HasOne<UserProfile>(fu => fu.follower)
+                .WithMany(f => f.followerUserProfileToUserProfiles)
+                .HasForeignKey(fu => fu.followerId);
+            modelBuilder.Entity<UserProfileToUserProfile>()
+                .HasOne<UserProfile>(fu => fu.followed)
+                .WithMany(u => u.followedUserProfileToUserProfiles)
+                .HasForeignKey(fu => fu.followedId);
         }
     }
 }

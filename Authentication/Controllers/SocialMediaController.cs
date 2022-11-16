@@ -29,19 +29,13 @@ namespace Authentication.Controllers
             if (followedUserProfile == null)
                 return BadRequest($"{followerAuth.username} has no user profile!");
 
-            var follow = new Follow {
+            var follow = new UserProfileToUserProfile {
+                followerId = followerUserProfile.id,
                 followedId = followedUserProfile.id,
                 followDate = DateTime.Now.ToString("yyyy.MM.dd")
             };
 
-            _dataContext.follows.Add(follow);
-            await _dataContext.SaveChangesAsync();
-            var followUserProfile = new FollowUserProfile
-            {
-                followId = follow.id,
-                userProfileId = followerUserProfile.id
-            };
-            _dataContext.followUserProfiles.Add(followUserProfile);
+            _dataContext.userProfileToUserProfile.Add(follow);
             await _dataContext.SaveChangesAsync();
             return Ok($"{followerAuth.username} started following {followedAuth.username}!");
         }
