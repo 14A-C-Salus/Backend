@@ -38,13 +38,13 @@
                 .Entity<UserProfileToUserProfile>()
                 .HasKey(fu => new { fu.followedId, fu.followerId });
             modelBuilder.Entity<UserProfileToUserProfile>()
-                .HasOne<UserProfile>(fu => fu.follower)
+                .HasOne(fu => fu.follower)
                 .WithMany(f => f.followerUserProfileToUserProfiles)
-                .HasForeignKey(fu => fu.followerId);
+                .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<UserProfileToUserProfile>()
-                .HasOne<UserProfile>(fu => fu.followed)
-                .WithMany(u => u.followedUserProfileToUserProfiles)
-                .HasForeignKey(fu => fu.followedId);
+                .HasOne(fu => fu.followed)
+                .WithMany(f => f.followedUserProfileToUserProfiles)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
