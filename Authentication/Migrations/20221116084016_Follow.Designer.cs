@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Authentication_temp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221115171531_FixFollowTable")]
-    partial class FixFollowTable
+    [Migration("20221116084016_Follow")]
+    partial class Follow
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -65,35 +65,26 @@ namespace Authentication_temp.Migrations
                     b.ToTable("auths");
                 });
 
-            modelBuilder.Entity("Authentication.Controllers.Models.JoiningEntity.FollowUserProfile", b =>
+            modelBuilder.Entity("Authentication.Controllers.Models.JoiningEntity.UserProfileToUserProfile", b =>
                 {
-                    b.Property<int>("followId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("userProfileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("followId", "userProfileId");
-
-                    b.HasIndex("userProfileId");
-
-                    b.ToTable("followUserProfiles");
-                });
-
-            modelBuilder.Entity("Authentication.Controllers.Models.SocialMediaModels.Follow", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<int>("followedId")
                         .HasColumnType("int");
 
-                    b.HasKey("id");
+                    b.Property<int>("followerId")
+                        .HasColumnType("int");
 
-                    b.ToTable("follows");
+                    b.Property<string>("followDate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("id")
+                        .HasColumnType("int");
+
+                    b.HasKey("followedId", "followerId");
+
+                    b.HasIndex("followerId");
+
+                    b.ToTable("userProfileToUserProfile");
                 });
 
             modelBuilder.Entity("Authentication.Controllers.Models.UserProfileModels.UserProfile", b =>
@@ -146,23 +137,23 @@ namespace Authentication_temp.Migrations
                     b.ToTable("userProfiles");
                 });
 
-            modelBuilder.Entity("Authentication.Controllers.Models.JoiningEntity.FollowUserProfile", b =>
+            modelBuilder.Entity("Authentication.Controllers.Models.JoiningEntity.UserProfileToUserProfile", b =>
                 {
-                    b.HasOne("Authentication.Controllers.Models.SocialMediaModels.Follow", "follow")
-                        .WithMany("followUserProfile")
-                        .HasForeignKey("followId")
+                    b.HasOne("Authentication.Controllers.Models.UserProfileModels.UserProfile", "followed")
+                        .WithMany("followedUserProfileToUserProfiles")
+                        .HasForeignKey("followedId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Authentication.Controllers.Models.UserProfileModels.UserProfile", "userProfile")
-                        .WithMany("followUserProfile")
-                        .HasForeignKey("userProfileId")
+                    b.HasOne("Authentication.Controllers.Models.UserProfileModels.UserProfile", "follower")
+                        .WithMany("followerUserProfileToUserProfiles")
+                        .HasForeignKey("followerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("follow");
+                    b.Navigation("followed");
 
-                    b.Navigation("userProfile");
+                    b.Navigation("follower");
                 });
 
             modelBuilder.Entity("Authentication.Controllers.Models.UserProfileModels.UserProfile", b =>
@@ -181,14 +172,11 @@ namespace Authentication_temp.Migrations
                     b.Navigation("userProfile");
                 });
 
-            modelBuilder.Entity("Authentication.Controllers.Models.SocialMediaModels.Follow", b =>
-                {
-                    b.Navigation("followUserProfile");
-                });
-
             modelBuilder.Entity("Authentication.Controllers.Models.UserProfileModels.UserProfile", b =>
                 {
-                    b.Navigation("followUserProfile");
+                    b.Navigation("followedUserProfileToUserProfiles");
+
+                    b.Navigation("followerUserProfileToUserProfiles");
                 });
 #pragma warning restore 612, 618
         }
