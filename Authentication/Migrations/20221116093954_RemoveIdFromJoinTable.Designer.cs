@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Authentication_temp.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221116084016_Follow")]
-    partial class Follow
+    [Migration("20221116093954_RemoveIdFromJoinTable")]
+    partial class RemoveIdFromJoinTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -77,9 +77,6 @@ namespace Authentication_temp.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("id")
-                        .HasColumnType("int");
-
                     b.HasKey("followedId", "followerId");
 
                     b.HasIndex("followerId");
@@ -142,13 +139,13 @@ namespace Authentication_temp.Migrations
                     b.HasOne("Authentication.Controllers.Models.UserProfileModels.UserProfile", "followed")
                         .WithMany("followedUserProfileToUserProfiles")
                         .HasForeignKey("followedId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Authentication.Controllers.Models.UserProfileModels.UserProfile", "follower")
                         .WithMany("followerUserProfileToUserProfiles")
                         .HasForeignKey("followerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("followed");

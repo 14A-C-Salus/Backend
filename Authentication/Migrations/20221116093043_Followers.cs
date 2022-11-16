@@ -4,7 +4,7 @@
 
 namespace Authentication_temp.Migrations
 {
-    public partial class Follow : Migration
+    public partial class Followers : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,13 +25,13 @@ namespace Authentication_temp.Migrations
                         column: x => x.followedId,
                         principalTable: "userProfiles",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_userProfileToUserProfile_userProfiles_followerId",
                         column: x => x.followerId,
                         principalTable: "userProfiles",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
