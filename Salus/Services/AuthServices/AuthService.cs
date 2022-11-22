@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
@@ -11,12 +12,14 @@ namespace Salus.Services.AuthServices
         private readonly DataContext _dataContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
+        public readonly IAuthService _authService;
 
-        public AuthService(IHttpContextAccessor httpContextAccessor, DataContext dataContext, IConfiguration configuration)
+        public AuthService(IHttpContextAccessor httpContextAccessor, DataContext dataContext, IConfiguration configuration, IAuthService authService)
         {
             _httpContextAccessor = httpContextAccessor;
             _dataContext = dataContext;
             _configuration = configuration;
+            _authService = authService;
         }
 
         //public methods
