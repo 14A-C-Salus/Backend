@@ -1,25 +1,29 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Moq;
-using MySqlConnector;
 using Salus.Controllers.Models.AuthModels;
-using Salus.Data;
 using Salus.Services.AuthServices;
-using System.Data.Entity.Migrations;
-
+using Salus.Data;
 
 namespace Tests
 {
-    public class AuthTests
+    public class AuthTests 
     {
-        string connectionString;
-        string dbName;
-        private readonly IConfiguration configuration;
+        protected readonly IConfiguration _configuration;
+
+        private readonly AuthService _authService;
+
+        private readonly DataContext _dataContext;
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
         public AuthTests()
         {
-            configuration = InitConfiguration();
+            var context = new DefaultHttpContext();
+            _httpContextAccessorMock.Setup(_ => _.HttpContext).Returns(context);
+            _configuration = InitConfiguration();
+            _dataContext = new DataContext(_configuration);
+            _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
         }
-
         [Fact]
         public void NewAuth()
         {
@@ -30,9 +34,8 @@ namespace Tests
                 password = "belabela",
                 confirmPassword = "belabela"
             };
-            Auth auth = new Auth();
-            var mockAuthServices = new Mock<IAuthService>();
-            mockAuthServices.Setup(x => x.NewAuth(request)).Returns(auth);
+
+            var auth = _authService.NewAuth(request);
 
             Assert.Equal("belabela", auth.username);
             Assert.Equal("bela@bela.bela", auth.email);
@@ -44,8 +47,7 @@ namespace Tests
         public static IConfiguration InitConfiguration()
         {
             var config = new ConfigurationBuilder()
-               .AddJsonFile("appsettings.test.json")
-                .AddEnvironmentVariables()
+                .AddJsonFile("appsettings.test.json")
                 .Build();
             return config;
         }

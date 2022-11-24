@@ -12,14 +12,12 @@ namespace Salus.Services.AuthServices
         private readonly DataContext _dataContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
-        public readonly IAuthService _authService;
 
-        public AuthService(IHttpContextAccessor httpContextAccessor, DataContext dataContext, IConfiguration configuration, IAuthService authService)
+        public AuthService(IHttpContextAccessor httpContextAccessor, DataContext dataContext, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _dataContext = dataContext;
             _configuration = configuration;
-            _authService = authService;
         }
 
         //public methods
