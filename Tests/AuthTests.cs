@@ -4,6 +4,7 @@ using Moq;
 using Salus.Controllers.Models.AuthModels;
 using Salus.Services.AuthServices;
 using Salus.Data;
+using System.Net;
 
 namespace Tests
 {
@@ -24,8 +25,9 @@ namespace Tests
             _dataContext = new DataContext(_configuration);
             _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
         }
+
         [Fact]
-        public void NewAuth()
+        public void NewAuthWithRequest()
         {
             var request = new AuthRegisterRequest()
             {
@@ -42,6 +44,32 @@ namespace Tests
             Assert.Null(auth.date);
             Assert.Null(auth.passwordResetToken);
             Assert.Null(auth.resetTokenExpires);
+        }
+
+        [Fact]
+        public void NewAuthWithEmptyRequest()
+        {
+            Assert.ThrowsAny<Exception>(()=> TryCreateNewAuthWithEmptyRequest());
+        }
+
+
+        [Fact]
+        public void SendEmailToInvalidAddress()
+        {
+            var auth = new Auth()
+            {
+                email = "notvalidemail@exist.not",
+                username = "Just need to test",
+                verificationToken = "Also need to test"
+            };
+            Exception ex = Assert.Throws<Exception>(() => _authService.SendToken(auth));
+            Assert.Equal("Email address doesn't exist.", ex.Message);
+        }
+
+        private void TryCreateNewAuthWithEmptyRequest()
+        {
+            var request = new AuthRegisterRequest();
+            var auth = _authService.NewAuth(request);
         }
 
         public static IConfiguration InitConfiguration()

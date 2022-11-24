@@ -118,8 +118,14 @@ namespace Salus.Services.AuthServices
             };
 
             send_mail.To.Add(new MailAddress(to));
-
-            client.Send(send_mail);
+            try
+            {
+                client.Send(send_mail);
+            }
+            catch
+            {
+                throw new Exception("Email address doesn't exist.");
+            }
         }
         public string GetEmail()
         {
@@ -133,6 +139,7 @@ namespace Salus.Services.AuthServices
 
         public Auth NewAuth(AuthRegisterRequest request)
         {
+            CheckRegisterRequest(request);
             CreatePasswordHash(request.password,
             out byte[] passwordHash,
             out byte[] passwordSalt);
@@ -147,6 +154,18 @@ namespace Salus.Services.AuthServices
             };
 
             return auth;
+        }
+
+        private void CheckRegisterRequest(AuthRegisterRequest request)
+        {
+            if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
+                throw new Exception("Invalid email!");
+            if (request.username.Length < 8 || request.username.Length > 20)
+                throw new Exception("Invalid username!");
+            if (request.password.Length < 8 || request.password.Length > 20)
+                throw new Exception("Invalid password!");
+            if (request.confirmPassword != request.password)
+                throw new Exception("Invalid confirm password!");
         }
 
         public string CreateToken(Auth auth)
