@@ -2,13 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Salus.Controllers.Models.AuthModels;
-using Salus.Services.AuthServices;
 using Salus.Data;
-using System.Net;
+using Salus.Services.AuthServices;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Tests
 {
-    public class AuthTests 
+    public class AuthTests
     {
         protected readonly IConfiguration _configuration;
 
@@ -49,7 +50,8 @@ namespace Tests
         [Fact]
         public void NewAuthWithEmptyRequest()
         {
-            Assert.ThrowsAny<Exception>(()=> TryCreateNewAuthWithEmptyRequest());
+            var request = new AuthRegisterRequest();
+            Assert.ThrowsAny<Exception>(() => _authService.NewAuth(request));
         }
 
 
@@ -66,10 +68,29 @@ namespace Tests
             Assert.Equal("Email address doesn't exist.", ex.Message);
         }
 
-        private void TryCreateNewAuthWithEmptyRequest()
+        [Fact]
+        public void CreateTokenWithValidData()
         {
-            var request = new AuthRegisterRequest();
-            var auth = _authService.NewAuth(request);
+            var auth = new Auth()
+            {
+                email = "notvalidemail@exist.not",
+                username = "Just need to test"
+            };
+            var jwt = _authService.CreateToken(auth);
+            Assert.Equal("notvalidemail@exist.not", GetEmailfromJwt(jwt));
+        }
+
+        [Fact]
+        public void CreateTokenWithEmptyAuth()
+        {
+            var auth = new Auth();
+            Assert.Throws<Exception>(() => _authService.CreateToken(auth));
+        }
+
+        [Fact]
+        public void VerifyPasswordHash()
+        {
+            //Todo
         }
 
         public static IConfiguration InitConfiguration()
@@ -78,6 +99,22 @@ namespace Tests
                 .AddJsonFile("appsettings.test.json")
                 .Build();
             return config;
+        }
+
+        public string GetEmailfromJwt(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
+            List<Claim> claims = securityToken.Claims.ToList();
+            return claims[1].Value.ToString();
+        }
+
+        private AuthRegisterRequest CreateValidAuthRegisterRequest()
+        {
+            return new AuthRegisterRequest()
+            {
+                //todo
+            };
         }
     }
 }

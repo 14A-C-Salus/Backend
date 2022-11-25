@@ -156,20 +156,9 @@ namespace Salus.Services.AuthServices
             return auth;
         }
 
-        private void CheckRegisterRequest(AuthRegisterRequest request)
-        {
-            if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
-                throw new Exception("Invalid email!");
-            if (request.username.Length < 8 || request.username.Length > 20)
-                throw new Exception("Invalid username!");
-            if (request.password.Length < 8 || request.password.Length > 20)
-                throw new Exception("Invalid password!");
-            if (request.confirmPassword != request.password)
-                throw new Exception("Invalid confirm password!");
-        }
-
         public string CreateToken(Auth auth)
         {
+            CheckAuthData(auth);
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, auth.username),
@@ -194,7 +183,7 @@ namespace Salus.Services.AuthServices
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
-                var computedPasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedPasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedPasswordHash.SequenceEqual(passwordHash);
             }
         }
@@ -232,6 +221,26 @@ namespace Salus.Services.AuthServices
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
+        }
+        private void CheckAuthData(Auth auth)
+        {
+            if (auth == null)
+                throw new Exception("Empty auth.");
+            if (auth.username.Length < 8 || auth.username.Length > 20)
+                throw new Exception("Invalid username.");
+            if (auth.email.Length < 8 || auth.email.Length > 200)
+                throw new Exception("Invalid email.");
+        }
+        private void CheckRegisterRequest(AuthRegisterRequest request)
+        {
+            if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
+                throw new Exception("Invalid email!");
+            if (request.username.Length < 8 || request.username.Length > 20)
+                throw new Exception("Invalid username!");
+            if (request.password.Length < 8 || request.password.Length > 20)
+                throw new Exception("Invalid password!");
+            if (request.confirmPassword != request.password)
+                throw new Exception("Invalid confirm password!");
         }
     }
 }
