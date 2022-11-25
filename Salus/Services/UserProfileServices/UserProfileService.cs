@@ -18,7 +18,8 @@ namespace Salus.Services.UserProfileServices
             userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate.ToString("yyyy.MM.dd.");
             userProfile.gender = request.gender == genderEnum.nondefined ? userProfile.gender : request.gender;
             userProfile.goalWeight = request.goalWeight == 0 ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
-
+            if (CheckData(userProfile) != "Everything's okay.")
+                throw new Exception("Invalid userProfile");
             return userProfile;
         }
 
@@ -51,6 +52,8 @@ namespace Salus.Services.UserProfileServices
             userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
             userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
             userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
+            if (CheckProfilePicture(userProfile) != "Everything's okay.")
+                throw new Exception("Invalid profile picture.");
             return userProfile;
         }
         public string CheckProfilePicture(UserProfile userProfile)
