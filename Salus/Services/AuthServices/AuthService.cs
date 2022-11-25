@@ -32,7 +32,7 @@ namespace Salus.Services.AuthServices
                 url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
             else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
                 url = $"http://anoblade-001-site1.atempurl.com/api/Auth/verify?token={auth.verificationToken}";
-            string body = 
+            string body =
                 $"<div style=\"background-color:#01a36269;\r\n" +
                 $"            height: 100%;\r\n" +
                 $"            scroll-behavior: smooth;\">\r\n" +
@@ -117,8 +117,14 @@ namespace Salus.Services.AuthServices
             };
 
             send_mail.To.Add(new MailAddress(to));
-
-            client.Send(send_mail);
+            try
+            {
+                client.Send(send_mail);
+            }
+            catch
+            {
+                throw new Exception("Email address doesn't exist.");
+            }
         }
         public string GetEmail()
         {
@@ -132,6 +138,7 @@ namespace Salus.Services.AuthServices
 
         public Auth NewAuth(AuthRegisterRequest request)
         {
+            CheckRegisterRequest(request);
             CreatePasswordHash(request.password,
             out byte[] passwordHash,
             out byte[] passwordSalt);
@@ -150,6 +157,7 @@ namespace Salus.Services.AuthServices
 
         public string CreateToken(Auth auth)
         {
+            CheckAuthData(auth);
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, auth.username),
@@ -174,7 +182,7 @@ namespace Salus.Services.AuthServices
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
-                var computedPasswordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var computedPasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedPasswordHash.SequenceEqual(passwordHash);
             }
         }
@@ -207,11 +215,39 @@ namespace Salus.Services.AuthServices
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
+            CheckPassword(password);
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
+        }
+
+        private void CheckPassword(string password)
+        {
+            if (password.Length > 20 || password.Length < 8)
+                throw new Exception("Invalid password!");
+        }
+
+        private void CheckAuthData(Auth auth)
+        {
+            if (auth == null)
+                throw new Exception("Empty auth.");
+            if (auth.username.Length < 8 || auth.username.Length > 20)
+                throw new Exception("Invalid username.");
+            if (auth.email.Length < 8 || auth.email.Length > 200)
+                throw new Exception("Invalid email.");
+        }
+        private void CheckRegisterRequest(AuthRegisterRequest request)
+        {
+            if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
+                throw new Exception("Invalid email!");
+            if (request.username.Length < 8 || request.username.Length > 20)
+                throw new Exception("Invalid username!");
+            if (request.password.Length < 8 || request.password.Length > 20)
+                throw new Exception("Invalid password!");
+            if (request.confirmPassword != request.password)
+                throw new Exception("Invalid confirm password!");
         }
     }
 }

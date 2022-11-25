@@ -1,4 +1,6 @@
-﻿namespace Salus.Data
+﻿using Microsoft.Extensions.Configuration;
+
+namespace Salus.Data
 {
     public class DataContext : DbContext
     {
@@ -8,23 +10,34 @@
 
         private readonly IConfiguration _configuration;
 
+        string connectionString;
+
         public DataContext(IConfiguration configuration)
         {
             _configuration = configuration;
+            connectionString = GetConnectionString(_configuration);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
 
-            string connectionString = _configuration.GetConnectionString("BsiteDB");
-            if (_configuration.GetSection("Host:Use").Value == "LocalDB")
-                connectionString = _configuration.GetConnectionString("LocalDB");
-            else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
-                connectionString = _configuration.GetConnectionString("MyAspDB");
-
             optionsBuilder
                 .UseSqlServer(connectionString);
         }
+
+        public static string GetConnectionString(IConfiguration config)
+        {
+            if (config.GetSection("Host:Use").Value == "BsiteDB")
+                return config.GetConnectionString("BsiteDB");
+            if (config.GetSection("Host:Use").Value == "LocalDB")
+                return config.GetConnectionString("LocalDB");
+            else if (config.GetSection("Host:Use").Value == "MyAspDB")
+                return config.GetConnectionString("MyAspDB");
+            else
+                throw new Exception("Invalid option in appsettings in 'Host:Use' value.");
+        }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //one-to-one
@@ -46,5 +59,7 @@
                 .WithMany(f => f.followedUserProfileToUserProfiles)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
+
     }
 }
