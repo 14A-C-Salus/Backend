@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
@@ -33,7 +32,7 @@ namespace Salus.Services.AuthServices
                 url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
             else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
                 url = $"http://anoblade-001-site1.atempurl.com/api/Auth/verify?token={auth.verificationToken}";
-            string body = 
+            string body =
                 $"<div style=\"background-color:#01a36269;\r\n" +
                 $"            height: 100%;\r\n" +
                 $"            scroll-behavior: smooth;\">\r\n" +
@@ -216,12 +215,20 @@ namespace Salus.Services.AuthServices
 
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
+            CheckPassword(password);
             using (var hmac = new HMACSHA512())
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
+
+        private void CheckPassword(string password)
+        {
+            if (password.Length > 20 || password.Length < 8)
+                throw new Exception("Invalid password!");
+        }
+
         private void CheckAuthData(Auth auth)
         {
             if (auth == null)

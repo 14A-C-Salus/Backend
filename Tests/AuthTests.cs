@@ -30,18 +30,10 @@ namespace Tests
         [Fact]
         public void NewAuthWithRequest()
         {
-            var request = new AuthRegisterRequest()
-            {
-                email = "bela@bela.bela",
-                username = "belabela",
-                password = "belabela",
-                confirmPassword = "belabela"
-            };
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
 
-            var auth = _authService.NewAuth(request);
-
-            Assert.Equal("belabela", auth.username);
-            Assert.Equal("bela@bela.bela", auth.email);
+            Assert.Equal(CreateValidAuthRegisterRequest().username, auth.username);
+            Assert.Equal(CreateValidAuthRegisterRequest().email, auth.email);
             Assert.Null(auth.date);
             Assert.Null(auth.passwordResetToken);
             Assert.Null(auth.resetTokenExpires);
@@ -54,13 +46,12 @@ namespace Tests
             Assert.ThrowsAny<Exception>(() => _authService.NewAuth(request));
         }
 
-
         [Fact]
         public void SendEmailToInvalidAddress()
         {
             var auth = new Auth()
             {
-                email = "notvalidemail@exist.not",
+                email = "notvadfgdfgdfglidemail@exist.not",
                 username = "Just need to test",
                 verificationToken = "Also need to test"
             };
@@ -71,13 +62,9 @@ namespace Tests
         [Fact]
         public void CreateTokenWithValidData()
         {
-            var auth = new Auth()
-            {
-                email = "notvalidemail@exist.not",
-                username = "Just need to test"
-            };
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var jwt = _authService.CreateToken(auth);
-            Assert.Equal("notvalidemail@exist.not", GetEmailfromJwt(jwt));
+            Assert.Equal(CreateValidAuthRegisterRequest().email, GetEmailfromJwt(jwt));
         }
 
         [Fact]
@@ -90,10 +77,35 @@ namespace Tests
         [Fact]
         public void VerifyPasswordHash()
         {
-            //Todo
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+            Assert.True(_authService.VerifyPasswordHash(CreateValidAuthRegisterRequest().password, auth.passwordHash, auth.passwordSalt));
         }
 
-        public static IConfiguration InitConfiguration()
+        [Fact]
+        public void SetTokenAndExpires()
+        {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+            _authService.SetTokenAndExpires(auth);
+            Assert.NotNull(auth.resetTokenExpires);
+            Assert.NotNull(auth.passwordResetToken);
+        }
+
+        [Fact]
+        public void UpdateAuthResetPasswordData()
+        {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+            var oldPasswordHash = auth.passwordHash;
+            var oldPasswordSalt = auth.passwordSalt;
+            _authService.SetTokenAndExpires(auth);
+            _authService.UpdateAuthResetPasswordData("newpassword",auth);
+            Assert.Null(auth.resetTokenExpires);
+            Assert.Null(auth.passwordResetToken);
+            Assert.NotEqual(oldPasswordHash, auth.passwordHash);
+            Assert.NotEqual(oldPasswordSalt, auth.passwordSalt);
+        }
+
+        //private methods
+        private static IConfiguration InitConfiguration()
         {
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.test.json")
@@ -101,7 +113,7 @@ namespace Tests
             return config;
         }
 
-        public string GetEmailfromJwt(string token)
+        private string GetEmailfromJwt(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
@@ -113,7 +125,10 @@ namespace Tests
         {
             return new AuthRegisterRequest()
             {
-                //todo
+                email = "test@emailaddress.test",
+                username = "testtest",
+                password = "testtest",
+                confirmPassword = "testtest"
             };
         }
     }
