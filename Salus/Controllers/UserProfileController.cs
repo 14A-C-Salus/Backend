@@ -32,10 +32,6 @@ namespace Salus.Controllers
 
             userProfile = _userProfileService.SetUserProfileData(request, userProfile, auth.id);
 
-            var check = _userProfileService.CheckData(userProfile);
-            if (check != "Everything's okay.")
-                return BadRequest(check);
-
             if (isNew)
                 _dataContext.userProfiles.Add(userProfile);
 
@@ -57,10 +53,6 @@ namespace Salus.Controllers
                 return BadRequest("First set the data in \"set-data\".");
 
             userProfile = _userProfileService.SetUserProfilePicture(request, userProfile);
-
-            var check = _userProfileService.CheckProfilePicture(userProfile);
-            if (check != "Everything's okay.")
-                return BadRequest(check);
 
             await _dataContext.SaveChangesAsync();
             return Ok($"Profile picture updated. (Hair: {userProfile.hairIndex}, Skin color: {userProfile.skinIndex}, Eye color: {userProfile.eyesIndex}, Mouth: {userProfile.mouthIndex})");

@@ -23,7 +23,20 @@ namespace Salus.Services.UserProfileServices
             return userProfile;
         }
 
-        public string CheckData(UserProfile userProfile)
+        public UserProfile SetUserProfilePicture(UserSetProfilePictureRequset request, UserProfile userProfile)
+        {
+            userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
+            userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
+            userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
+            userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
+            if (CheckProfilePicture(userProfile) != "Everything's okay.")
+                throw new Exception("Invalid profile picture.");
+            return userProfile;
+        }
+
+
+        //private methods
+        private string CheckData(UserProfile userProfile)
         {
             if (Convert.ToDateTime(userProfile.birthDate) < DateTime.Now.AddYears(-100) || Convert.ToDateTime(userProfile.birthDate) > DateTime.Now.AddYears(-12))
                 return $"The user must be between 12 and 100 years old!";
@@ -45,18 +58,7 @@ namespace Salus.Services.UserProfileServices
 
             return "Everything's okay.";
         }
-
-        public UserProfile SetUserProfilePicture(UserSetProfilePictureRequset request, UserProfile userProfile)
-        {
-            userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
-            userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
-            userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
-            userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
-            if (CheckProfilePicture(userProfile) != "Everything's okay.")
-                throw new Exception("Invalid profile picture.");
-            return userProfile;
-        }
-        public string CheckProfilePicture(UserProfile userProfile)
+        private string CheckProfilePicture(UserProfile userProfile)
         {
             if (userProfile.hairIndex < hairEnum.nondefined || userProfile.hairIndex > hairEnum.white)
                 return "Invalid hair!";
@@ -85,8 +87,6 @@ namespace Salus.Services.UserProfileServices
             return "Everything's okay.";
         }
 
-
-        //private methods
         private double SetGoalWeight(double height, double weight)
         {
             double heightInMeter = height / 100;
