@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Salus.Controllers.Models.JoiningEntity
+﻿namespace Salus.Controllers.Models.JoiningEntity
 {
     public class UserProfileToUserProfile
     {

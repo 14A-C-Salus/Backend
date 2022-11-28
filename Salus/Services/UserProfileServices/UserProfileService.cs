@@ -1,5 +1,4 @@
-﻿
-namespace Salus.Services.UserProfileServices
+﻿namespace Salus.Services.UserProfileServices
 {
     public class UserProfileService : IUserProfileService
     {
@@ -90,11 +89,11 @@ namespace Salus.Services.UserProfileServices
         private double SetGoalWeight(double height, double weight)
         {
             double heightInMeter = height / 100;
-            
+
             double minimumIdealBMI = 18.5;
             double maximumIdealBMI = 25;
 
-            double idealBMI = (minimumIdealBMI+ maximumIdealBMI) /2;
+            double idealBMI = (minimumIdealBMI + maximumIdealBMI) / 2;
             double BMI = weight / (heightInMeter * heightInMeter);
 
             if (BMI > minimumIdealBMI && BMI < maximumIdealBMI)

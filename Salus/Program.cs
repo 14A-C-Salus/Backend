@@ -6,6 +6,8 @@ global using Salus.Controllers.Models.JoiningEntity;
 //services
 global using Salus.Services.UserProfileServices;
 global using Salus.Services.AuthServices;
+//templates
+global using Salus.Templates;
 
 global using Salus.Data;
 global using Microsoft.EntityFrameworkCore;
@@ -34,7 +36,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Start Authorization header using the Bearer scheme (\"bearer {token}\"!)",
         In = ParameterLocation.Header,
         Name = "Authorization",
-        Type=SecuritySchemeType.ApiKey
+        Type = SecuritySchemeType.ApiKey
     });
 
     options.OperationFilter<SecurityRequirementsOperationFilter>();
