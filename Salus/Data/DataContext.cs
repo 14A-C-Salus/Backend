@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace Salus.Data
+﻿namespace Salus.Data
 {
     public class DataContext : DbContext
     {
@@ -45,7 +43,7 @@ namespace Salus.Data
                 .HasOne<UserProfile>(a => a.userProfile)
                 .WithOne(ad => ad.auth)
                 .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
-            
+
             //many-to-many
             modelBuilder
                 .Entity<UserProfileToUserProfile>()

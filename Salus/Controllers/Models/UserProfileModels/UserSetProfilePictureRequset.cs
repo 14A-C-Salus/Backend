@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Salus.Controllers.Models.UserProfileModels
+﻿namespace Salus.Controllers.Models.UserProfileModels
 {
     public class UserSetProfilePictureRequset
     {

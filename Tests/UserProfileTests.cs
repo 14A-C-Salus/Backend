@@ -1,13 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Moq;
-using Salus.Controllers.Models.AuthModels;
-using Salus.Controllers.Models.UserProfileModels;
-using Salus.Data;
-using Salus.Services.AuthServices;
+﻿using Salus.Controllers.Models.UserProfileModels;
 using Salus.Services.UserProfileServices;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Tests
 {
@@ -23,7 +15,7 @@ namespace Tests
         }
 
         [Fact]
-        void CreateUserProfile()
+        private void CreateUserProfile()
         {
             var request = CreateValidUserProfileRequest();
 
@@ -40,7 +32,7 @@ namespace Tests
 
 
         [Fact]
-        void UpdateUserProfile()
+        private void UpdateUserProfile()
         {
             var oldRequest = CreateValidUserProfileRequest();
             var newRequest = CreateValidUserProfileRequestForUpdate();
@@ -60,7 +52,7 @@ namespace Tests
         }
 
         [Fact]
-        void CreateUserProfileWithEmptyRequest()
+        private void CreateUserProfileWithEmptyRequest()
         {
             var request = new UserSetDatasRequest();
             Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfileData(request, null, 1));
@@ -68,7 +60,7 @@ namespace Tests
         }
 
         [Fact]
-        void CreateProfilePicture()
+        private void CreateProfilePicture()
         {
             var userProfileRequest = CreateValidUserProfileRequest();
             var profilePictureRequest = CreateValidProfilePictureRequest();
@@ -83,7 +75,7 @@ namespace Tests
         }
 
         [Fact]
-        void UpdateProfilePicture()
+        private void UpdateProfilePicture()
         {
             var userProfileRequest = CreateValidUserProfileRequest();
             var oldProfilePictureRequest = CreateValidProfilePictureRequest();
@@ -103,7 +95,7 @@ namespace Tests
         }
 
         [Fact]
-        void CreateProfilePictureWithEmpty()
+        private void CreateProfilePictureWithEmpty()
         {
             var userProfileRequest = CreateValidUserProfileRequest();
             var profilePictureRequest = new UserSetProfilePictureRequset();
@@ -113,7 +105,7 @@ namespace Tests
             Assert.Equal("Invalid profile picture.", ex.Message);
         }
 
-        //private methods
+        //not Fact methods
         private UserSetDatasRequest CreateValidUserProfileRequest()
         {
             return new UserSetDatasRequest()
