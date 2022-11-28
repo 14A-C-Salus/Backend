@@ -4,6 +4,7 @@ using Moq;
 using Salus.Controllers.Models.AuthModels;
 using Salus.Data;
 using Salus.Services.AuthServices;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -75,10 +76,17 @@ namespace Tests
         }
 
         [Fact]
-        public void VerifyPasswordHash()
+        public void VerifyPasswordHashWithValidData()
         {
             var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             Assert.True(_authService.VerifyPasswordHash(CreateValidAuthRegisterRequest().password, auth.passwordHash, auth.passwordSalt));
+        }
+
+        [Fact]
+        public void VerifyPasswordHashWithWrongPassword()
+        {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+            Assert.False(_authService.VerifyPasswordHash("wrongpassword", auth.passwordHash, auth.passwordSalt));
         }
 
         [Fact]
@@ -88,6 +96,17 @@ namespace Tests
             _authService.SetTokenAndExpires(auth);
             Assert.NotNull(auth.resetTokenExpires);
             Assert.NotNull(auth.passwordResetToken);
+        }
+
+
+        [Fact]
+        public void SetTokenAndExpiresnWithEmptyAuth()
+        {
+            var auth = new Auth();
+            Exception ex = Assert.Throws<Exception>(() => _authService.SetTokenAndExpires(auth));
+            Assert.Equal("Auth doesn't exist.", ex.Message);
+            Assert.Null(auth.resetTokenExpires);
+            Assert.Null(auth.passwordResetToken);
         }
 
         [Fact]
@@ -102,6 +121,20 @@ namespace Tests
             Assert.Null(auth.passwordResetToken);
             Assert.NotEqual(oldPasswordHash, auth.passwordHash);
             Assert.NotEqual(oldPasswordSalt, auth.passwordSalt);
+        }
+
+        [Fact]
+        public void UpdateAuthResetPasswordDataWithoutSetTokenAndExpires()
+        {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+            var oldPasswordHash = auth.passwordHash;
+            var oldPasswordSalt = auth.passwordSalt;
+            Exception ex = Assert.Throws<Exception>(() => _authService.UpdateAuthResetPasswordData("newpassword", auth));
+            Assert.Equal("You need first use the 'forgoted-password' service!", ex.Message);
+            Assert.Null(auth.resetTokenExpires);
+            Assert.Null(auth.passwordResetToken);
+            Assert.Equal(oldPasswordHash, auth.passwordHash);
+            Assert.Equal(oldPasswordSalt, auth.passwordSalt);
         }
 
         //private methods

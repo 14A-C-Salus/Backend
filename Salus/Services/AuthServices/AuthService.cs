@@ -189,12 +189,16 @@ namespace Salus.Services.AuthServices
 
         public void SetTokenAndExpires(Auth auth)
         {
+            if (auth.id == 0)
+                throw new Exception("Auth doesn't exist.");
             auth.passwordResetToken = CreateRandomToken();
             auth.resetTokenExpires = DateTime.Now.AddDays(1);
         }
 
         public void UpdateAuthResetPasswordData(string password, Auth auth)
         {
+            if (auth.resetTokenExpires == null || auth.passwordResetToken == null)
+                throw new Exception("You need first use the 'forgoted-password' service!");
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
             auth.passwordHash = passwordHash;
             auth.passwordSalt = passwordSalt;
