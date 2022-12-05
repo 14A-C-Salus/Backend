@@ -45,7 +45,6 @@ namespace Salus.Controllers
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
                 return BadRequest("You must log in first.");
-
             if (auth.userProfile == null)
                 return BadRequest("First set the data in \"set-data\".");
 

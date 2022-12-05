@@ -15,7 +15,7 @@ namespace Tests
         private readonly AuthService _authService;
 
         private readonly DataContext _dataContext;
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
 
         public UserProfileTests()
         {
@@ -125,7 +125,7 @@ namespace Tests
         }
 
         //not Fact methods
-        private UserSetDatasRequest CreateValidUserProfileRequest()
+        private static UserSetDatasRequest CreateValidUserProfileRequest()
         {
             return new UserSetDatasRequest()
             {
@@ -137,7 +137,7 @@ namespace Tests
             };
         }
 
-        private UserSetDatasRequest CreateValidUserProfileRequestForUpdate()
+        private static UserSetDatasRequest CreateValidUserProfileRequestForUpdate()
         {
             return new UserSetDatasRequest()
             {
@@ -147,7 +147,7 @@ namespace Tests
             };
         }
 
-        private UserSetProfilePictureRequset CreateValidProfilePictureRequest()
+        private static UserSetProfilePictureRequset CreateValidProfilePictureRequest()
         {
             return new UserSetProfilePictureRequset()
             {
@@ -157,7 +157,7 @@ namespace Tests
                 skinIndex = skinEnum.light
             };
         }
-        private UserSetProfilePictureRequset CreateValidProfilePictureRequestForUpdate()
+        private static UserSetProfilePictureRequset CreateValidProfilePictureRequestForUpdate()
         {
             return new UserSetProfilePictureRequset()
             {
@@ -173,7 +173,7 @@ namespace Tests
 
             return config;
         }
-        private AuthRegisterRequest CreateValidAuthRegisterRequest()
+        private static AuthRegisterRequest CreateValidAuthRegisterRequest()
         {
             return new AuthRegisterRequest()
             {
