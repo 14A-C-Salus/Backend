@@ -12,7 +12,8 @@
         public string? passwordResetToken { get; set; }
         public DateTime? resetTokenExpires { get; set; }
 
+
         //Connections
-        public virtual UserProfile? userProfile { get; set; }
+        public UserProfile? userProfile { get; set; }
     }
 }

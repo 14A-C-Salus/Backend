@@ -1,4 +1,8 @@
-﻿using Salus.Controllers.Models.UserProfileModels;
+﻿using Microsoft.Extensions.Configuration;
+using Salus.Controllers.Models.AuthModels;
+using Salus.Controllers.Models.UserProfileModels;
+using Salus.Data;
+using Salus.Services.AuthServices;
 using Salus.Services.UserProfileServices;
 
 namespace Tests
@@ -6,23 +10,33 @@ namespace Tests
     public class UserProfileTests
     {
         private readonly UserProfileService _userProfileService;
+        protected readonly IConfiguration _configuration;
+
+        private readonly AuthService _authService;
+
+        private readonly DataContext _dataContext;
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
 
         public UserProfileTests()
         {
             var context = new DefaultHttpContext();
-
+            _httpContextAccessorMock.Setup(_ => _.HttpContext).Returns(context);
+            _configuration = InitConfiguration();
+            _dataContext = new DataContext(_configuration);
+            _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
             _userProfileService = new UserProfileService();
         }
 
         [Fact]
         private void CreateUserProfile()
         {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var request = CreateValidUserProfileRequest();
 
-            var userProfile = _userProfileService.SetUserProfileData(request, null, 1);
+            var userProfile = _userProfileService.SetUserProfileData(request, null, auth);
 
             Assert.False(userProfile.isAdmin);
-            Assert.Equal(1, userProfile.authOfProfileId);
+            Assert.Equal(auth.id, userProfile.authOfProfileId);
             Assert.Equal(userProfile.height, request.height);
             Assert.Equal(userProfile.weight, request.weight);
             Assert.Equal(userProfile.goalWeight, request.goalWeight);
@@ -34,15 +48,16 @@ namespace Tests
         [Fact]
         private void UpdateUserProfile()
         {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var oldRequest = CreateValidUserProfileRequest();
+            var userProfile = _userProfileService.SetUserProfileData(oldRequest, null, auth);
             var newRequest = CreateValidUserProfileRequestForUpdate();
-            var userProfile = _userProfileService.SetUserProfileData(oldRequest, null, 1);
 
             //Update the birthDate, gender, height and auto generate the new goalWeight
-            userProfile = _userProfileService.SetUserProfileData(newRequest, userProfile, 1);
+            userProfile = _userProfileService.SetUserProfileData(newRequest, userProfile, auth);
 
             Assert.False(userProfile.isAdmin);
-            Assert.Equal(1, userProfile.authOfProfileId);
+            Assert.Equal(auth.id, userProfile.authOfProfileId);
             Assert.Equal(userProfile.weight, oldRequest.weight);
             Assert.NotEqual(userProfile.goalWeight, oldRequest.goalWeight);
 
@@ -54,17 +69,19 @@ namespace Tests
         [Fact]
         private void CreateUserProfileWithEmptyRequest()
         {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var request = new UserSetDatasRequest();
-            Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfileData(request, null, 1));
+            Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfileData(request, null, auth));
             Assert.Equal("Invalid userProfile", ex.Message);
         }
 
         [Fact]
         private void CreateProfilePicture()
         {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var userProfileRequest = CreateValidUserProfileRequest();
             var profilePictureRequest = CreateValidProfilePictureRequest();
-            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, 1);
+            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
 
             userProfile = _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile);
 
@@ -77,10 +94,11 @@ namespace Tests
         [Fact]
         private void UpdateProfilePicture()
         {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var userProfileRequest = CreateValidUserProfileRequest();
             var oldProfilePictureRequest = CreateValidProfilePictureRequest();
             var newProfilePictureRequest = CreateValidProfilePictureRequestForUpdate();
-            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, 1);
+            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
 
             userProfile = _userProfileService.SetUserProfilePicture(oldProfilePictureRequest, userProfile);
             //Update the eyes and the hair
@@ -97,9 +115,10 @@ namespace Tests
         [Fact]
         private void CreateProfilePictureWithEmpty()
         {
+            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var userProfileRequest = CreateValidUserProfileRequest();
             var profilePictureRequest = new UserSetProfilePictureRequset();
-            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, 1);
+            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
 
             Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile));
             Assert.Equal("Invalid profile picture.", ex.Message);
@@ -144,6 +163,24 @@ namespace Tests
             {
                 eyesIndex = eyesEnum.green,
                 hairIndex = hairEnum.ginger
+            };
+        }
+        private static IConfiguration InitConfiguration()
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.test.json")
+                .Build();
+
+            return config;
+        }
+        private AuthRegisterRequest CreateValidAuthRegisterRequest()
+        {
+            return new AuthRegisterRequest()
+            {
+                email = "test@emailaddress.test",
+                username = "testtest",
+                password = "testtest",
+                confirmPassword = "testtest"
             };
         }
     }

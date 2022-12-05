@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Salus.Controllers.Models.AuthModels
+﻿namespace Salus.Controllers.Models.AuthModels
 {
     public class AuthResetPasswordRequest
     {
