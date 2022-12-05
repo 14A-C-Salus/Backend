@@ -1,6 +1,6 @@
 ﻿namespace Salus.Controllers.Models.JoiningEntity
 {
-    public class UserProfileToUserProfile
+    public class Following
     {
         public int followerId { get; set; }
         public UserProfile? follower { get; set; }

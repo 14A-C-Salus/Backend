@@ -33,15 +33,15 @@ namespace Salus.Controllers
 
 
             string startStop;
-            if (await _dataContext.userProfileToUserProfile.FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id) != null)
+            if (await _dataContext.followings.FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id) != null)
             {
-                _dataContext.userProfileToUserProfile.Remove(await _dataContext.userProfileToUserProfile.FirstAsync(
+                _dataContext.followings.Remove(await _dataContext.followings.FirstAsync(
                     f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id));
                 startStop = "stopped";
             }
             else
             {
-                _dataContext.userProfileToUserProfile.Add(new UserProfileToUserProfile
+                _dataContext.followings.Add(new Following
                 {
                     followedId = followedUserProfile.id,
                     followerId = followerUserProfile.id,
