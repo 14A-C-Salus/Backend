@@ -13,7 +13,7 @@ namespace Tests
         private readonly AuthService _authService;
 
         private readonly DataContext _dataContext;
-        private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new Mock<IHttpContextAccessor>();
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
 
         public AuthTests()
         {
@@ -162,7 +162,7 @@ namespace Tests
             return config;
         }
 
-        private string GetEmailfromJwt(string token)
+        private static string GetEmailfromJwt(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var securityToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
@@ -172,7 +172,7 @@ namespace Tests
             return claims[1].Value.ToString();
         }
 
-        private AuthRegisterRequest CreateValidAuthRegisterRequest()
+        private static AuthRegisterRequest CreateValidAuthRegisterRequest()
         {
             return new AuthRegisterRequest()
             {

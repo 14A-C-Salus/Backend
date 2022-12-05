@@ -9,6 +9,7 @@ global using Salus.Services.AuthServices;
 //templates
 global using Salus.Templates;
 
+global using System.ComponentModel.DataAnnotations;
 global using Salus.Data;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Authorization;

@@ -3,13 +3,13 @@
     public class UserProfileService : IUserProfileService
     {
         //public methods
-        public UserProfile SetUserProfileData(UserSetDatasRequest request, UserProfile? userProfile, int id)
+        public UserProfile SetUserProfileData(UserSetDatasRequest request, UserProfile? userProfile, Auth auth)
         {
             if (userProfile == null)
             {
                 userProfile = new UserProfile();
                 userProfile.isAdmin = false;
-                userProfile.authOfProfileId = id;
+                userProfile.auth = auth;
             }
 
             userProfile.weight = request.weight == 0 ? userProfile.weight : request.weight;

@@ -23,18 +23,19 @@ namespace Salus.Controllers
             var followedAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (followedAuth == null)
                 return BadRequest("Auth to follow doesn't exist.");
-
             var followerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followerAuth.id);
+            var followedUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
+
             if (followerUserProfile == null)
                 return BadRequest("You need to create a user profile first!");
 
-            var followedUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
             if (followedUserProfile == null)
                 return BadRequest($"{followerAuth.username} has no user profile!");
 
 
             string startStop;
-            if (await _dataContext.followings.FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id) != null)
+            if (await _dataContext.followings
+                .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id) != null)
             {
                 _dataContext.followings.Remove(await _dataContext.followings.FirstAsync(
                     f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id));
@@ -44,8 +45,8 @@ namespace Salus.Controllers
             {
                 _dataContext.followings.Add(new Following
                 {
-                    followedId = followedUserProfile.id,
-                    followerId = followerUserProfile.id,
+                    followed = followedUserProfile,
+                    follower = followerUserProfile,
                     followDate = DateTime.Now.ToString("yyyy.MM.dd")
                 });
                 startStop = "started";
@@ -63,12 +64,11 @@ namespace Salus.Controllers
             var toAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (toAuth == null)
                 return BadRequest("'toAuth' doesn't exist.");
-
             var writerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == writerAuth.id);
+            var toUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
             if (writerUserProfile == null)
                 return BadRequest("You need to create a user profile first!");
 
-            var toUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
             if (toUserProfile == null)
                 return BadRequest($"{toAuth.username} has no user profile!");
 
@@ -83,6 +83,27 @@ namespace Salus.Controllers
             _dataContext.comments.Add(comment);
             await _dataContext.SaveChangesAsync();
             return Ok($"{writerAuth.username} sended a comment to {toAuth.username}!");
+        }
+
+        [HttpPost("delete-comment"), Authorize]
+        public async Task<IActionResult> DeleteComment(int commentId)
+        {
+            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            if (userProfile == null)
+                return BadRequest("You need to create a user profile first!");
+
+            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == commentId);
+
+            if (comment == null)
+                return BadRequest("Comment doesn't exist.");
+
+            if (userProfile.id != comment.toId)
+                return BadRequest("You do not have the right to delete the comment.");
+            _dataContext.comments.Remove(comment);
+            await _dataContext.SaveChangesAsync();
+            return Ok($"{comment.id} deleted by {auth.username}!");
         }
     }
 }

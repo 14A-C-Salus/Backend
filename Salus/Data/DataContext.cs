@@ -9,7 +9,7 @@
 
         private readonly IConfiguration _configuration;
 
-        string connectionString;
+        readonly string connectionString;
 
         public DataContext(IConfiguration configuration)
         {

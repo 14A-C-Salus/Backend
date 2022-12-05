@@ -17,7 +17,8 @@
         public mouthEnum mouthIndex { get; set; }
 
         //Connections
-        public virtual Auth? auth { get; set; }
+        [Required]
+        public Auth? auth { get; set; }
         public int authOfProfileId { get; set; }
         public IList<Following>? followerUserProfileToUserProfiles { get; set; }
         public IList<Following>? followedUserProfileToUserProfiles { get; set; }

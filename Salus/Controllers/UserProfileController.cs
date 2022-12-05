@@ -26,17 +26,15 @@ namespace Salus.Controllers
             if (auth == null)
                 return BadRequest("You must log in first.");
 
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            bool isNew = auth.userProfile == null;
 
-            bool isNew = userProfile == null;
-
-            userProfile = _userProfileService.SetUserProfileData(request, userProfile, auth.id);
+            auth.userProfile = _userProfileService.SetUserProfileData(request, auth.userProfile, auth);
 
             if (isNew)
-                _dataContext.userProfiles.Add(userProfile);
+                _dataContext.userProfiles.Add(auth.userProfile);
 
             await _dataContext.SaveChangesAsync();
-            return Ok($"{auth.username}'s data saved. Gender: {userProfile.gender}. Goal Weight: {userProfile.goalWeight}.");
+            return Ok($"{auth.username}'s data saved. Gender: {auth.userProfile.gender}. Goal Weight: {auth.userProfile.goalWeight}.");
         }
 
         [HttpPost("set-profile-picture"), Authorize]
@@ -47,15 +45,13 @@ namespace Salus.Controllers
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
                 return BadRequest("You must log in first.");
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
+            if (auth.userProfile == null)
                 return BadRequest("First set the data in \"set-data\".");
 
-            userProfile = _userProfileService.SetUserProfilePicture(request, userProfile);
+            auth.userProfile = _userProfileService.SetUserProfilePicture(request, auth.userProfile);
 
             await _dataContext.SaveChangesAsync();
-            return Ok($"Profile picture updated. (Hair: {userProfile.hairIndex}, Skin color: {userProfile.skinIndex}, Eye color: {userProfile.eyesIndex}, Mouth: {userProfile.mouthIndex})");
+            return Ok($"Profile picture updated. (Hair: {auth.userProfile.hairIndex}, Skin color: {auth.userProfile.skinIndex}, Eye color: {auth.userProfile.eyesIndex}, Mouth: {auth.userProfile.mouthIndex})");
         }
     }
 }
