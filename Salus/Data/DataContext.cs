@@ -5,6 +5,7 @@
         public DbSet<Auth> auths => Set<Auth>();
         public DbSet<UserProfile> userProfiles => Set<UserProfile>();
         public DbSet<Following> followings => Set<Following>();
+        public DbSet<Comment> comments => Set<Comment>();
 
         private readonly IConfiguration _configuration;
 
@@ -44,7 +45,7 @@
                 .WithOne(ad => ad.auth)
                 .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
 
-            //one-to-many
+            //many-to-many unable duplicate
             modelBuilder
                 .Entity<Following>()
                 .HasKey(fu => new { fu.followedId, fu.followerId });
@@ -55,6 +56,22 @@
             modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.followed)
                 .WithMany(f => f.followedUserProfileToUserProfiles)
+                .OnDelete(DeleteBehavior.Restrict);
+            //many-to-many
+            modelBuilder
+                .Entity<Comment>()
+                .HasKey(c => c.id);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.commentFrom)
+                .WithMany(c => c.commenterUserProfileToUserProfiles)
+                .HasForeignKey(c => c.fromId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.commentTo)
+                .WithMany(c => c.commentedUserProfileToUserProfiles)
+                .HasForeignKey(c => c.toId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

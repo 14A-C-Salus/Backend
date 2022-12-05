@@ -21,5 +21,8 @@
         public int authOfProfileId { get; set; }
         public IList<Following>? followerUserProfileToUserProfiles { get; set; }
         public IList<Following>? followedUserProfileToUserProfiles { get; set; }
+        public IList<Comment>? commenterUserProfileToUserProfiles { get; set; }
+        public IList<Comment>? commentedUserProfileToUserProfiles { get; set; }
+
     }
 }

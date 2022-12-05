@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Salus.Controllers.Models.AuthModels;
 
 namespace Salus.Controllers
 {
@@ -21,7 +22,7 @@ namespace Salus.Controllers
             var followerAuth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
             var followedAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (followedAuth == null)
-                return BadRequest("You must log in first.");
+                return BadRequest("Auth to follow doesn't exist.");
 
             var followerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followerAuth.id);
             if (followerUserProfile == null)
@@ -52,6 +53,36 @@ namespace Salus.Controllers
 
             await _dataContext.SaveChangesAsync();
             return Ok($"{followerAuth.username} {startStop} following {followedAuth.username}!");
+        }
+
+
+        [HttpPost("write-a-comment"), Authorize]
+        public async Task<IActionResult> WriteComment(WriteCommentRequest request)
+        {
+            var writerAuth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            var toAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+            if (toAuth == null)
+                return BadRequest("'toAuth' doesn't exist.");
+
+            var writerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == writerAuth.id);
+            if (writerUserProfile == null)
+                return BadRequest("You need to create a user profile first!");
+
+            var toUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
+            if (toUserProfile == null)
+                return BadRequest($"{toAuth.username} has no user profile!");
+
+            var comment = new Comment
+            {
+                commentFrom = writerUserProfile,
+                commentTo = toUserProfile,
+                body = request.body,
+                sendDate = DateTime.Now.ToString("yyyy.MM.dd")
+            };
+
+            _dataContext.comments.Add(comment);
+            await _dataContext.SaveChangesAsync();
+            return Ok($"{writerAuth.username} sended a comment to {toAuth.username}!");
         }
     }
 }
