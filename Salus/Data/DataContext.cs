@@ -4,7 +4,7 @@
     {
         public DbSet<Auth> auths => Set<Auth>();
         public DbSet<UserProfile> userProfiles => Set<UserProfile>();
-        public DbSet<UserProfileToUserProfile> userProfileToUserProfile => Set<UserProfileToUserProfile>();
+        public DbSet<Following> followings => Set<Following>();
 
         private readonly IConfiguration _configuration;
 
@@ -44,15 +44,15 @@
                 .WithOne(ad => ad.auth)
                 .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
 
-            //many-to-many
+            //one-to-many
             modelBuilder
-                .Entity<UserProfileToUserProfile>()
+                .Entity<Following>()
                 .HasKey(fu => new { fu.followedId, fu.followerId });
-            modelBuilder.Entity<UserProfileToUserProfile>()
+            modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.follower)
                 .WithMany(f => f.followerUserProfileToUserProfiles)
                 .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<UserProfileToUserProfile>()
+            modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.followed)
                 .WithMany(f => f.followedUserProfileToUserProfiles)
                 .OnDelete(DeleteBehavior.Restrict);

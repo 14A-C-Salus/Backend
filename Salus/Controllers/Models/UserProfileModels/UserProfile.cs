@@ -19,7 +19,7 @@
         //Connections
         public virtual Auth? auth { get; set; }
         public int authOfProfileId { get; set; }
-        public IList<UserProfileToUserProfile>? followerUserProfileToUserProfiles { get; set; }
-        public IList<UserProfileToUserProfile>? followedUserProfileToUserProfiles { get; set; }
+        public IList<Following>? followerUserProfileToUserProfiles { get; set; }
+        public IList<Following>? followedUserProfileToUserProfiles { get; set; }
     }
 }
