@@ -44,8 +44,8 @@ namespace Salus.Controllers
             {
                 _dataContext.followings.Add(new Following
                 {
-                    followedId = followedUserProfile.id,
-                    followerId = followerUserProfile.id,
+                    followed = followedUserProfile,
+                    follower = followerUserProfile,
                     followDate = DateTime.Now.ToString("yyyy.MM.dd")
                 });
                 startStop = "started";

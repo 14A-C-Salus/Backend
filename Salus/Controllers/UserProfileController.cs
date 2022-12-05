@@ -30,7 +30,7 @@ namespace Salus.Controllers
 
             bool isNew = userProfile == null;
 
-            userProfile = _userProfileService.SetUserProfileData(request, userProfile, auth.id);
+            userProfile = _userProfileService.SetUserProfileData(request, userProfile, auth);
 
             if (isNew)
                 _dataContext.userProfiles.Add(userProfile);
