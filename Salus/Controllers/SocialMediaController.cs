@@ -108,7 +108,7 @@ namespace Salus.Controllers
         }
 
 
-        [HttpPost("get-all-comment-by-authenticated-email"), Authorize]
+        [HttpGet("get-all-comment-by-authenticated-email"), Authorize]
         public async Task<IActionResult> GetAllComment()
         {
             var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
