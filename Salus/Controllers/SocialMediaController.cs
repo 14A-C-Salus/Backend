@@ -109,14 +109,13 @@ namespace Salus.Controllers
 
 
         [HttpPost("get-all-comment-by-authenticated-email"), Authorize]
-        public async Task<List<Comment>> GetAllComment()
+        public async Task<IActionResult> GetAllComment()
         {
             var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
             var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
             if (userProfile == null)
-                throw new Exception ("You need to create a user profile first!");
-
-            return await Task.FromResult(_dataContext.comments.Where(c => c.toId == userProfile.id).ToList());
+                return BadRequest("You need to create a user profile first!");
+            return Ok(_dataContext.comments.Where(c => c.toId == userProfile.id).ToList());
         }
     }
 }
