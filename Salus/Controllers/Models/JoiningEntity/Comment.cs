@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Salus.Controllers.Models.JoiningEntity
 {
@@ -8,9 +9,9 @@ namespace Salus.Controllers.Models.JoiningEntity
         public int fromId { get; set; }
         public int toId { get; set; }
 
-        [Required]
+        [Required, JsonIgnore]
         public virtual UserProfile? commentFrom { get; set; }
-        [Required]
+        [Required, JsonIgnore]
         public virtual UserProfile? commentTo { get; set; }
         [MaxLength(1000)]
         public string body { get; set; } = string.Empty;

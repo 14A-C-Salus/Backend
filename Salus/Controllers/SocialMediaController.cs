@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Salus.Controllers.Models.AuthModels;
 
 namespace Salus.Controllers
@@ -99,11 +100,23 @@ namespace Salus.Controllers
             if (comment == null)
                 return BadRequest("Comment doesn't exist.");
 
-            if (userProfile.id != comment.toId)
+            if (userProfile.id != comment.toId && userProfile.id != comment.fromId)
                 return BadRequest("You do not have the right to delete the comment.");
             _dataContext.comments.Remove(comment);
             await _dataContext.SaveChangesAsync();
             return Ok($"{comment.id} deleted by {auth.username}!");
+        }
+
+
+        [HttpPost("get-all-comment-by-authenticated-email"), Authorize]
+        public async Task<List<Comment>> GetAllComment()
+        {
+            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            if (userProfile == null)
+                throw new Exception ("You need to create a user profile first!");
+
+            return await Task.FromResult(_dataContext.comments.Where(c => c.toId == userProfile.id).ToList());
         }
     }
 }
