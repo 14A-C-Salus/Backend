@@ -14,13 +14,32 @@ namespace Salus.Services.SocialMediaServices
 
 
         //public methods
+        public List<Comment> CreateCommentListByAuthenticatedEmail()
+        {
+            var checkResult = CheckAuthenticatedAuthHasUserProfile();
+            if (checkResult != "")
+                throw new Exception(checkResult);
+
+            var userProfile = GetAuthenticatedAuthUserProfile().Result;
+
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            List<Comment> comments = _dataContext.comments.Where(c => c.toId == userProfile.id).ToList();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+            return comments;
+        }
+
+        public string CheckAuthenticatedAuthHasUserProfile()
+        {
+            var userProfile = GetAuthenticatedAuthUserProfile().Result;
+            return userProfile == null ? "" : "You need to create a user profile first!";
+        }
 
         public async Task<string> DeleteCommentById(int commentId)
         {
-            string exception = CheckDeleteCommentRequest(commentId);
+            string checkResult = CheckDeleteCommentRequest(commentId);
 
-            if (exception != "")
-                throw new Exception(exception);
+            if (checkResult != "")
+                throw new Exception(checkResult);
 
             var data = GetDataFromDeleteCommentRequest(commentId).Result;
 
@@ -54,9 +73,9 @@ namespace Salus.Services.SocialMediaServices
 
         public async Task<string> StartOrStopFollow(UnFollowFollowRequest request)
         {
-            var exception = CheckUnFollowFollowRequest(request);
-            if (exception != "")
-                throw new Exception(exception);
+            var checkResult = CheckUnFollowFollowRequest(request);
+            if (checkResult != "")
+                throw new Exception(checkResult);
 
             var data = GetDataFromFollowRequest(request).Result;
 
@@ -153,9 +172,8 @@ namespace Salus.Services.SocialMediaServices
 
         private async Task<DataFromCommentRequest> GetDataFromCommentRequest(WriteCommentRequest request)
         {
-            var writerAuth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
             var toAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
-            var writerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == writerAuth.id);
+            var writerUserProfile = GetAuthenticatedAuthUserProfile().Result;
             var toUserProfile =
                 toAuth == null ? null
                 : await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
@@ -169,9 +187,8 @@ namespace Salus.Services.SocialMediaServices
 
         private async Task<DataFromFollowRequest> GetDataFromFollowRequest(UnFollowFollowRequest request)
         {
-            var followerAuth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
             var followedAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
-            var followerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followerAuth.id);
+            var followerUserProfile = GetAuthenticatedAuthUserProfile().Result;
             var followedUserProfile =
                 followedAuth == null ? null
                 : await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
@@ -185,14 +202,19 @@ namespace Salus.Services.SocialMediaServices
 
         private async Task<DataFromDeleteCommentRequest> GetDataFromDeleteCommentRequest(int commentId)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            var userProfile = GetAuthenticatedAuthUserProfile().Result;
             var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == commentId);
             return new DataFromDeleteCommentRequest()
             {
                 userProfile = userProfile,
                 comment = comment
             };
+        }
+        private async Task<UserProfile?> GetAuthenticatedAuthUserProfile()
+        {
+            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            return userProfile;
         }
     }
 }

@@ -5,11 +5,13 @@ namespace Salus.Services.SocialMediaServices
 {
     public interface ISocialMediaService
     {
-        string CheckUnFollowFollowRequest(UnFollowFollowRequest request);
         Task<string> StartOrStopFollow(UnFollowFollowRequest request);
-        string CheckWriteCommentRequest(WriteCommentRequest request);
+        string CheckUnFollowFollowRequest(UnFollowFollowRequest request);
         Task<string> SendComment(WriteCommentRequest request);
-        string CheckDeleteCommentRequest(int commentId);
+        string CheckWriteCommentRequest(WriteCommentRequest request);
         Task<string> DeleteCommentById(int commentId);
+        string CheckDeleteCommentRequest(int commentId);
+        string CheckAuthenticatedAuthHasUserProfile();
+        List<Comment> CreateCommentListByAuthenticatedEmail();
     }
 }

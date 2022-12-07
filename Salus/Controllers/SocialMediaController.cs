@@ -72,13 +72,12 @@ namespace Salus.Controllers
         }
 
         [HttpGet("get-all-comment-by-authenticated-email"), Authorize]
-        public async Task<IActionResult> GetAllComment()
+        public IActionResult GetAllComment()
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                return BadRequest("You need to create a user profile first!");
-            return Ok(_dataContext.comments.Where(c => c.toId == userProfile.id).ToList());
+            var badRequest = _socialMediaService.CheckAuthenticatedAuthHasUserProfile();
+            if (badRequest != "")
+                return BadRequest(badRequest);
+            return Ok(_socialMediaService.CreateCommentListByAuthenticatedEmail());
         }
     }
 }
