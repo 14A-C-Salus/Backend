@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Salus.Controllers.Models.AuthModels;
 
 namespace Salus.Controllers
 {
@@ -10,84 +8,50 @@ namespace Salus.Controllers
     {
         private readonly DataContext _dataContext;
         private readonly IAuthService _authService;
+        private readonly ISocialMediaService _socialMediaService;
 
-        public SocialMediaController(DataContext dataContext, IAuthService authService)
+        public SocialMediaController(DataContext dataContext, IAuthService authService, ISocialMediaService socialMediaService)
         {
             _dataContext = dataContext;
             _authService = authService;
+            _socialMediaService = socialMediaService;
         }
 
         [HttpPost("un-follow/follow"), Authorize]
-        public async Task<IActionResult> UnFollowFollow(UnFollowFollowRequest request)
+        public IActionResult UnFollowFollow(UnFollowFollowRequest request)
         {
-            var followerAuth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-            var followedAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
-            if (followedAuth == null)
-                return BadRequest("Auth to follow doesn't exist.");
-            var followerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followerAuth.id);
-            var followedUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
+            string badRequest = _socialMediaService.CheckUnFollowFollowRequest(request);
+            if (badRequest == "")
+                return BadRequest(badRequest);
 
-            if (followerUserProfile == null)
-                return BadRequest("You need to create a user profile first!");
-
-            if (followedUserProfile == null)
-                return BadRequest($"{followerAuth.username} has no user profile!");
-
-
-            string startStop;
-            if (await _dataContext.followings
-                .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id) != null)
-            {
-                _dataContext.followings.Remove(await _dataContext.followings.FirstAsync(
-                    f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id));
-                startStop = "stopped";
-            }
-            else
-            {
-                _dataContext.followings.Add(new Following
-                {
-                    followed = followedUserProfile,
-                    follower = followerUserProfile,
-                    followDate = DateTime.Now.ToString("yyyy.MM.dd")
-                });
-                startStop = "started";
-            }
-
-            await _dataContext.SaveChangesAsync();
-            return Ok($"{followerAuth.username} {startStop} following {followedAuth.username}!");
+            return Ok(_socialMediaService.StartOrStopFollow(request).Result);
         }
 
 
         [HttpPost("write-a-comment"), Authorize]
-        public async Task<IActionResult> WriteComment(WriteCommentRequest request)
+        public IActionResult WriteComment(WriteCommentRequest request)
         {
-            var writerAuth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-            var toAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
-            if (toAuth == null)
-                return BadRequest("'toAuth' doesn't exist.");
-            var writerUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == writerAuth.id);
-            var toUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
-            if (writerUserProfile == null)
-                return BadRequest("You need to create a user profile first!");
+            string badRequest = _socialMediaService.CheckWriteCommentRequest(request);
 
-            if (toUserProfile == null)
-                return BadRequest($"{toAuth.username} has no user profile!");
-
-            var comment = new Comment
-            {
-                commentFrom = writerUserProfile,
-                commentTo = toUserProfile,
-                body = request.body,
-                sendDate = DateTime.Now.ToString("yyyy.MM.dd")
-            };
-
-            _dataContext.comments.Add(comment);
-            await _dataContext.SaveChangesAsync();
-            return Ok($"{writerAuth.username} sended a comment to {toAuth.username}!");
+            if (badRequest != "")
+                return BadRequest(badRequest);
+            
+            return Ok(_socialMediaService.SendComment(request).Result);
         }
 
         [HttpPost("delete-comment"), Authorize]
-        public async Task<IActionResult> DeleteComment(int commentId)
+        public IActionResult DeleteComment(int commentId)
+        {
+            string badRequest = _socialMediaService.CheckDeleteCommentRequest(commentId);
+
+            if (badRequest != "")
+                return BadRequest(badRequest);
+
+            return Ok(_socialMediaService.DeleteCommentById(commentId));
+        }
+
+        [HttpPost("modify-comment"), Authorize]
+        public async Task<IActionResult> ModifyComment(ModifyCommentRequest request)
         {
             var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
 
@@ -95,18 +59,17 @@ namespace Salus.Controllers
             if (userProfile == null)
                 return BadRequest("You need to create a user profile first!");
 
-            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == commentId);
+            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == request.commentId);
 
             if (comment == null)
                 return BadRequest("Comment doesn't exist.");
 
-            if (userProfile.id != comment.toId && userProfile.id != comment.fromId)
-                return BadRequest("You do not have the right to delete the comment.");
-            _dataContext.comments.Remove(comment);
+            if (userProfile.id != comment.fromId)
+                return BadRequest("You do not have permission to modify the comment.");
+            comment.body = request.body;
             await _dataContext.SaveChangesAsync();
-            return Ok($"{comment.id} deleted by {auth.username}!");
+            return Ok($"{comment.id} modified by {auth.username}!");
         }
-
 
         [HttpGet("get-all-comment-by-authenticated-email"), Authorize]
         public async Task<IActionResult> GetAllComment()

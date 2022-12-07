@@ -6,6 +6,7 @@ global using Salus.Controllers.Models.JoiningEntity;
 //services
 global using Salus.Services.UserProfileServices;
 global using Salus.Services.AuthServices;
+global using Salus.Services.SocialMediaServices;
 //templates
 global using Salus.Templates;
 
@@ -30,6 +31,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<ISocialMediaService, SocialMediaService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {
