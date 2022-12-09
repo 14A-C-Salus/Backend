@@ -11,7 +11,6 @@ namespace Salus.Services.SocialMediaServices
         string CheckWriteCommentRequest(WriteCommentRequest request);
         Task<string> DeleteCommentById(int commentId);
         string CheckDeleteCommentRequest(int commentId);
-        string CheckAuthenticatedAuthHasUserProfile();
         List<Comment> CreateCommentListByAuthenticatedEmail();
     }
 }

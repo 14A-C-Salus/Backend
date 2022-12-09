@@ -16,10 +16,6 @@ namespace Salus.Services.SocialMediaServices
         //public methods
         public List<Comment> CreateCommentListByAuthenticatedEmail()
         {
-            var checkResult = CheckAuthenticatedAuthHasUserProfile();
-            if (checkResult != "")
-                throw new Exception(checkResult);
-
             var userProfile = GetAuthenticatedAuthUserProfile().Result;
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
@@ -28,11 +24,6 @@ namespace Salus.Services.SocialMediaServices
             return comments;
         }
 
-        public string CheckAuthenticatedAuthHasUserProfile()
-        {
-            var userProfile = GetAuthenticatedAuthUserProfile().Result;
-            return userProfile == null ? "" : "You need to create a user profile first!";
-        }
 
         public async Task<string> DeleteCommentById(int commentId)
         {
@@ -210,10 +201,12 @@ namespace Salus.Services.SocialMediaServices
                 comment = comment
             };
         }
-        private async Task<UserProfile?> GetAuthenticatedAuthUserProfile()
+        private async Task<UserProfile> GetAuthenticatedAuthUserProfile()
         {
             var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
             var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            if (userProfile == null)
+                throw new Exception("You need to create a user profile first!");
             return userProfile;
         }
     }

@@ -74,10 +74,14 @@ namespace Salus.Controllers
         [HttpGet("get-all-comment-by-authenticated-email"), Authorize]
         public IActionResult GetAllComment()
         {
-            var badRequest = _socialMediaService.CheckAuthenticatedAuthHasUserProfile();
-            if (badRequest != "")
-                return BadRequest(badRequest);
-            return Ok(_socialMediaService.CreateCommentListByAuthenticatedEmail());
+            try
+            {
+                return Ok(_socialMediaService.CreateCommentListByAuthenticatedEmail());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
