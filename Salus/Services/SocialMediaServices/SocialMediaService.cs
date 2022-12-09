@@ -76,6 +76,9 @@
             if (followedUserProfile == null)
                 throw new Exception($"{followedAuth.username} has no user profile!");
 
+            if (followedUserProfile.id == followerUserProfile.id)
+                throw new Exception($"You can't follow yourself.");
+
             var follow = await _dataContext.followings
                 .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id);
 

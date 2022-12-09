@@ -49,7 +49,7 @@ namespace Salus.Controllers
         {
             try
             {
-                return Ok(_socialMediaService.DeleteCommentById(commentId));
+                return Ok(_socialMediaService.DeleteCommentById(commentId).Result);
             }
             catch (Exception ex)
             {
@@ -62,7 +62,7 @@ namespace Salus.Controllers
         {
             try
             {
-                return Ok(_socialMediaService.ModifyComment(request));
+                return Ok(_socialMediaService.ModifyComment(request).Result);
             }
             catch (Exception ex)
             {
