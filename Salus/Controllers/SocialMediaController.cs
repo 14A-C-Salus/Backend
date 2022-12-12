@@ -18,7 +18,7 @@ namespace Salus.Controllers
             _socialMediaService = socialMediaService;
         }
 
-        [HttpPost("unfollow-follow"), Authorize]
+        [HttpPatch("unfollow-follow"), Authorize]
         public IActionResult UnFollowFollow(UnFollowFollowRequest request)
         {
             return this.Run(() =>
@@ -48,7 +48,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPost("modify-comment"), Authorize]
+        [HttpPatch("modify-comment"), Authorize]
         public IActionResult ModifyComment(ModifyCommentRequest request)
         {
             return this.Run(() =>

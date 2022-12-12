@@ -24,7 +24,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPost("modify-profile"), Authorize]
+        [HttpPatch("modify-profile"), Authorize]
         public IActionResult ModifyProfile(UserSetDatasRequest request)
         {
             return this.Run(() =>
@@ -33,7 +33,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPost("set-profile-picture"), Authorize]
+        [HttpPatch("set-profile-picture"), Authorize]
         public IActionResult SetProfilePicture(UserSetProfilePictureRequset request)
         {
             return this.Run(() =>
