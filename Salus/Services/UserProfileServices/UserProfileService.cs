@@ -2,25 +2,41 @@
 {
     public class UserProfileService : IUserProfileService
     {
-        //public methods
-        public UserProfile SetUserProfileData(UserSetDatasRequest request, UserProfile? userProfile, Auth auth)
-        {
-            if (userProfile == null)
-            {
-                userProfile = new UserProfile();
-                userProfile.isAdmin = false;
-                userProfile.auth = auth;
-            }
+        private readonly DataContext _dataContext;
+        private readonly IAuthService _authService;
 
-            userProfile.weight = request.weight == 0 ? userProfile.weight : request.weight;
-            userProfile.height = request.height == 0 ? userProfile.height : request.height;
-            userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate.ToString("yyyy.MM.dd.");
-            userProfile.gender = request.gender == genderEnum.nondefined ? userProfile.gender : request.gender;
-            userProfile.goalWeight = request.goalWeight == 0 ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
-            var checkResult = CheckData(userProfile);
+        public UserProfileService(DataContext dataContext, IAuthService authService)
+        {
+            _dataContext = dataContext;
+            _authService = authService;
+        }
+        //public methods
+        public async Task<string> CreateProfile(UserSetDatasRequest request)
+        {
+            var email = _authService.GetEmail();
+
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
+            if (auth == null)
+                throw new Exception("You must log in first.");
+
+            var checkResult = CheckData(request);
             if (checkResult != "Everything's okay.")
                 throw new Exception(checkResult);
-            return userProfile;
+
+
+            var userProfile = new UserProfile();
+            userProfile.isAdmin = false;
+            userProfile.auth = auth;
+
+
+            userProfile.weight = request.weight;
+            userProfile.height = request.height;
+            userProfile.birthDate = request.birthDate.ToString("yyyy.MM.dd.");
+            userProfile.gender = request.gender;
+            userProfile.goalWeight = request.goalWeight == 0 ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
+
+            await _dataContext.SaveChangesAsync();
+            return $"{auth.username}'s data saved. Gender: {userProfile.gender}. Goal Weight: {userProfile.goalWeight}.";
         }
 
         public UserProfile SetUserProfilePicture(UserSetProfilePictureRequset request, UserProfile userProfile)
@@ -29,7 +45,7 @@
             userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
             userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
             userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
-            var checkResult = CheckData(userProfile);
+            var checkResult = CheckProfilePicture(userProfile);
             if (checkResult != "Everything's okay.")
                 throw new Exception(checkResult);
             return userProfile;
@@ -37,24 +53,24 @@
 
 
         //private methods
-        private string CheckData(UserProfile userProfile)
+        private string CheckData(UserSetDatasRequest request)
         {
-            if (Convert.ToDateTime(userProfile.birthDate) < DateTime.Now.AddYears(-100) || Convert.ToDateTime(userProfile.birthDate) > DateTime.Now.AddYears(-12))
+            if (Convert.ToDateTime(request.birthDate) < DateTime.Now.AddYears(-100) || Convert.ToDateTime(request.birthDate) > DateTime.Now.AddYears(-12))
                 return $"The user must be between 12 and 100 years old!";
 
-            if (userProfile.weight < 20 || userProfile.weight > 1000)
+            if (request.weight < 20 || request.weight > 1000)
                 return "The user weight must be over 20 and 1000!";
 
-            if (userProfile.height < 40 || userProfile.height > 250)
+            if (request.height < 40 || request.height > 250)
                 return "The user height must be between 40 and 250 cm!";
 
-            if (userProfile.gender == genderEnum.nondefined)
+            if (request.gender == genderEnum.nondefined)
                 return "You must select your gender!";
 
-            if (userProfile.gender < genderEnum.nondefined || userProfile.gender > genderEnum.other)
+            if (request.gender < genderEnum.nondefined || request.gender > genderEnum.other)
                 return "Invalid gender!";
 
-            if (userProfile.goalWeight < 20 || userProfile.goalWeight > 1000)
+            if (request.goalWeight < 20 || request.goalWeight > 1000)
                 return "The user goal weight must be over 20 and 1000!";
 
             return "Everything's okay.";

@@ -2,7 +2,7 @@
 {
     public interface IUserProfileService
     {
-        public UserProfile SetUserProfileData(UserSetDatasRequest request, UserProfile? userProfile, Auth auth);
+        Task<string> CreateProfile(UserSetDatasRequest request);
         public UserProfile SetUserProfilePicture(UserSetProfilePictureRequset request, UserProfile userProfile);
     }
 }

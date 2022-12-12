@@ -17,24 +17,18 @@ namespace Salus.Controllers
             _userProfileService = userProfileService;
         }
 
-        [HttpPost("set-data"), Authorize]
-        public async Task<IActionResult> SetData(UserSetDatasRequest request)
+        [HttpPost("create-profile"), Authorize]
+        public async Task<IActionResult> CreateProfile(UserSetDatasRequest request)
         {
-            var email = _authService.GetEmail();
+            try
+            {
+                return Ok(_userProfileService.CreateProfile(request).Result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
-            if (auth == null)
-                return BadRequest("You must log in first.");
-
-            bool isNew = auth.userProfile == null;
-
-            auth.userProfile = _userProfileService.SetUserProfileData(request, auth.userProfile, auth);
-
-            if (isNew)
-                _dataContext.userProfiles.Add(auth.userProfile);
-
-            await _dataContext.SaveChangesAsync();
-            return Ok($"{auth.username}'s data saved. Gender: {auth.userProfile.gender}. Goal Weight: {auth.userProfile.goalWeight}.");
         }
 
         [HttpPost("set-profile-picture"), Authorize]

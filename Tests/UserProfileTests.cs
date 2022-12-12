@@ -24,7 +24,7 @@ namespace Tests
             _configuration = InitConfiguration();
             _dataContext = new DataContext(_configuration);
             _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
-            _userProfileService = new UserProfileService();
+            _userProfileService = new UserProfileService(_dataContext, _authService);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Tests
             var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var request = CreateValidUserProfileRequest();
 
-            var userProfile = _userProfileService.SetUserProfileData(request, null, auth);
+            var userProfile = _userProfileService.CreateProfile(request);
 
             Assert.False(userProfile.isAdmin);
             Assert.Equal(auth.id, userProfile.authOfProfileId);
