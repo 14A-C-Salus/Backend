@@ -29,27 +29,6 @@ namespace Salus.Services.AuthServices
 
             return result;
         }
-
-        public void SetTokenAndExpires(Auth auth)
-        {
-            CheckAuthData(auth);
-
-            auth.passwordResetToken = CreateRandomToken();
-            auth.resetTokenExpires = DateTime.Now.AddDays(1);
-        }
-
-        public void UpdateAuthResetPasswordData(string password, Auth auth)
-        {
-            if (auth.resetTokenExpires == null || auth.passwordResetToken == null)
-                throw new Exception("You need first use the 'forgoted-password' service!");
-
-            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-
-            auth.passwordHash = passwordHash;
-            auth.passwordSalt = passwordSalt;
-            auth.passwordResetToken = null;
-            auth.resetTokenExpires = null;
-        }
         public async Task<Auth> Register(AuthRegisterRequest request)
         {
             if (_dataContext.auths.Any(a => a.email == request.email))
@@ -76,6 +55,41 @@ namespace Salus.Services.AuthServices
             return jwt;
         }
 
+        public async Task<Auth> Verify(string token)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.verificationToken == token);
+            if (auth == null)
+                throw new Exception("Invalid token!");
+
+            auth.date = DateTime.Now;
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+
+        public async Task<Auth> ForgotPassword(string email)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
+            if (auth == null)
+                throw new Exception("User not found!");
+
+            SetTokenAndExpires(auth);
+
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+
+        public async Task<Auth> ResetPassword(AuthResetPasswordRequest request)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
+            if (auth == null || auth.resetTokenExpires < DateTime.Now)
+                throw new Exception("Invalid Token!");
+
+            UpdateAuthResetPasswordData(request.password, auth);
+
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+
         //private methods
         private string CreateRandomToken()
         {
@@ -86,7 +100,6 @@ namespace Salus.Services.AuthServices
             }
             return randomToken;
         }
-
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             CheckPassword(password);
@@ -97,13 +110,11 @@ namespace Salus.Services.AuthServices
                 passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             }
         }
-
         private void CheckPassword(string password)
         {
             if (password.Length > 20 || password.Length < 8)
                 throw new Exception("Invalid password!");
         }
-
         private void CheckAuthData(Auth auth)
         {
             if (auth == null)
@@ -124,7 +135,6 @@ namespace Salus.Services.AuthServices
             if (request.confirmPassword != request.password)
                 throw new Exception("Invalid confirm password!");
         }
-
         private Auth NewAuth(AuthRegisterRequest request)
         {
             CheckRegisterRequest(request);
@@ -220,6 +230,25 @@ namespace Salus.Services.AuthServices
                 var computedPasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return computedPasswordHash.SequenceEqual(passwordHash);
             }
+        }
+        private void SetTokenAndExpires(Auth auth)
+        {
+            CheckAuthData(auth);
+
+            auth.passwordResetToken = CreateRandomToken();
+            auth.resetTokenExpires = DateTime.Now.AddDays(1);
+        }
+        private void UpdateAuthResetPasswordData(string password, Auth auth)
+        {
+            if (auth.resetTokenExpires == null || auth.passwordResetToken == null)
+                throw new Exception("You need first use the 'forgoted-password' service!");
+
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            auth.passwordHash = passwordHash;
+            auth.passwordSalt = passwordSalt;
+            auth.passwordResetToken = null;
+            auth.resetTokenExpires = null;
         }
     }
 }

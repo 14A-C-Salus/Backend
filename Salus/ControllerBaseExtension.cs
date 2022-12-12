@@ -32,7 +32,6 @@ namespace Salus.WebAPI
                     stackTrace = ex.StackTrace
                 });
 #else
-                //TODO: exception Log-olása fájlba
                 return controller.StatusCode(500, new
                 {
                     error = "Belső hiba"

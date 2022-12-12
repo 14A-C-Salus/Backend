@@ -17,7 +17,6 @@ namespace Salus.Controllers
             _configuration = configuration;
             _authService = authService;
         }
-
         [HttpPut("register")]
         public IActionResult Register(AuthRegisterRequest request)
         {
@@ -33,43 +32,31 @@ namespace Salus.Controllers
             {
                 return Ok(_authService.Login(request).Result);
             });
-
         }
         [HttpPatch("verify")]
-        public async Task<IActionResult> Verify(string token)
+        public IActionResult Verify(string token)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.verificationToken == token);
-            if (auth == null)
-                return BadRequest("Invalid token!");
-
-            auth.date = DateTime.Now;
-            await _dataContext.SaveChangesAsync();
-            return Ok($"{auth.username} verified!");
+            return this.Run(() =>
+            { 
+                return Ok(_authService.Verify(token).Result);
+            });
         }
         [HttpPatch("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([Required, EmailAddress] string email)
+        public IActionResult ForgotPassword([Required, EmailAddress] string email)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
-            if (auth == null)
-                return BadRequest("User not found!");
+            return this.Run(() =>
+            {
+                return Ok(_authService.ForgotPassword(email).Result);
+            });
 
-            _authService.SetTokenAndExpires(auth);
-
-            await _dataContext.SaveChangesAsync();
-            return Ok($"Hi {auth.username}, you may now reset your password. Token: {auth.passwordResetToken}.");
         }
-
         [HttpPatch("reset-password")]
-        public async Task<IActionResult> ResetPassword(AuthResetPasswordRequest request)
+        public IActionResult ResetPassword(AuthResetPasswordRequest request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
-            if (auth == null || auth.resetTokenExpires < DateTime.Now)
-                return BadRequest("Invalid Token!");
-
-            _authService.UpdateAuthResetPasswordData(request.password, auth);
-
-            await _dataContext.SaveChangesAsync();
-            return Ok("Password successfully reset.");
+            return this.Run(() =>
+            {
+                return Ok(_authService.ResetPassword(request).Result);
+            });
         }
     }
 }
