@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using System.ComponentModel.DataAnnotations;
 namespace Salus.Controllers
 {
@@ -16,7 +17,7 @@ namespace Salus.Controllers
             _authService = authService;
         }
 
-        [HttpPost("register")]
+        [HttpPut("register")]
         public async Task<IActionResult> Register(AuthRegisterRequest request)
         {
             if (_dataContext.auths.Any(a => a.email == request.email))
@@ -30,7 +31,7 @@ namespace Salus.Controllers
             return Ok("User successfully created!");
         }
 
-        [HttpPost("login")]
+        [HttpGet("login")]
         public async Task<IActionResult> Login(AuthLoginRequest request)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
