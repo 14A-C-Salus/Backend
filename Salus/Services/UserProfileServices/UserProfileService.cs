@@ -11,6 +11,29 @@
             _authService = authService;
         }
         //public methods
+        public async Task<UserProfile> SetProfilePicture(UserSetProfilePictureRequset request)
+        {
+            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            if (auth == null)
+                throw new Exception("You must log in first.");
+
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            if (userProfile == null)
+                throw new Exception("You need to create a profile first!");
+
+            userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
+            userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
+            userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
+            userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
+            
+            var checkResult = CheckProfilePicture(userProfile);
+            if (checkResult != "Everything's okay.")
+                throw new Exception(checkResult);
+
+            await _dataContext.SaveChangesAsync();
+            return userProfile;
+        }
+
         public async Task<UserProfile> CreateProfile(UserSetDatasRequest request)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == _authService.GetEmail());
@@ -58,18 +81,6 @@
             userProfile.goalWeight = request.goalWeight == default(double) ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
             _dataContext.userProfiles.Update(userProfile);
             await _dataContext.SaveChangesAsync();
-            return userProfile;
-        }
-
-        public UserProfile SetUserProfilePicture(UserSetProfilePictureRequset request, UserProfile userProfile)
-        {
-            userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
-            userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
-            userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
-            userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
-            var checkResult = CheckProfilePicture(userProfile);
-            if (checkResult != "Everything's okay.")
-                throw new Exception(checkResult);
             return userProfile;
         }
 

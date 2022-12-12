@@ -31,7 +31,7 @@ namespace Salus.Controllers
             return Ok("User successfully created!");
         }
 
-        [HttpGet("login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(AuthLoginRequest request)
         {
             var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
