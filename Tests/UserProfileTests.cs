@@ -28,12 +28,14 @@ namespace Tests
         }
 
         [Fact]
-        private void CreateUserProfile()
+        private async void CreateUserProfile()
         {
             var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
             var request = CreateValidUserProfileRequest();
 
-            var userProfile = _userProfileService.CreateProfile(request);
+            await _userProfileService.CreateProfile(request);
+
+            var userProfile = (UserProfile) _dataContext.userProfiles.ToList().Where(u => u.authOfProfileId == auth.id);
 
             Assert.False(userProfile.isAdmin);
             Assert.Equal(auth.id, userProfile.authOfProfileId);
@@ -44,86 +46,84 @@ namespace Tests
             Assert.Equal(userProfile.birthDate, request.birthDate.ToString("yyyy.MM.dd."));
         }
 
+        //[Fact]
+        //private void UpdateUserProfile()
+        //{
+        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+        //    var oldRequest = CreateValidUserProfileRequest();
+        //    var userProfile = _userProfileService.SetUserProfileData(oldRequest, null, auth);
+        //    var newRequest = CreateValidUserProfileRequestForUpdate();
 
-        [Fact]
-        private void UpdateUserProfile()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var oldRequest = CreateValidUserProfileRequest();
-            var userProfile = _userProfileService.SetUserProfileData(oldRequest, null, auth);
-            var newRequest = CreateValidUserProfileRequestForUpdate();
+        //    //Update the birthDate, gender, height and auto generate the new goalWeight
+        //    userProfile = _userProfileService.SetUserProfileData(newRequest, userProfile, auth);
 
-            //Update the birthDate, gender, height and auto generate the new goalWeight
-            userProfile = _userProfileService.SetUserProfileData(newRequest, userProfile, auth);
+        //    Assert.False(userProfile.isAdmin);
+        //    Assert.Equal(auth.id, userProfile.authOfProfileId);
+        //    Assert.Equal(userProfile.weight, oldRequest.weight);
+        //    Assert.NotEqual(userProfile.goalWeight, oldRequest.goalWeight);
 
-            Assert.False(userProfile.isAdmin);
-            Assert.Equal(auth.id, userProfile.authOfProfileId);
-            Assert.Equal(userProfile.weight, oldRequest.weight);
-            Assert.NotEqual(userProfile.goalWeight, oldRequest.goalWeight);
+        //    Assert.Equal(userProfile.height, newRequest.height);
+        //    Assert.Equal(userProfile.birthDate, newRequest.birthDate.ToString("yyyy.MM.dd."));
+        //    Assert.Equal(userProfile.gender, newRequest.gender);
+        //}
 
-            Assert.Equal(userProfile.height, newRequest.height);
-            Assert.Equal(userProfile.birthDate, newRequest.birthDate.ToString("yyyy.MM.dd."));
-            Assert.Equal(userProfile.gender, newRequest.gender);
-        }
+        //[Fact]
+        //private void CreateUserProfileWithEmptyRequest()
+        //{
+        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+        //    var request = new UserSetDatasRequest();
+        //    Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfileData(request, null, auth));
+        //    Assert.Equal("Invalid userProfile", ex.Message);
+        //}
 
-        [Fact]
-        private void CreateUserProfileWithEmptyRequest()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var request = new UserSetDatasRequest();
-            Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfileData(request, null, auth));
-            Assert.Equal("Invalid userProfile", ex.Message);
-        }
+        //[Fact]
+        //private void CreateProfilePicture()
+        //{
+        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+        //    var userProfileRequest = CreateValidUserProfileRequest();
+        //    var profilePictureRequest = CreateValidProfilePictureRequest();
+        //    var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
 
-        [Fact]
-        private void CreateProfilePicture()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var userProfileRequest = CreateValidUserProfileRequest();
-            var profilePictureRequest = CreateValidProfilePictureRequest();
-            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
+        //    userProfile = _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile);
 
-            userProfile = _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile);
+        //    Assert.Equal(userProfile.eyesIndex, profilePictureRequest.eyesIndex);
+        //    Assert.Equal(userProfile.hairIndex, profilePictureRequest.hairIndex);
+        //    Assert.Equal(userProfile.mouthIndex, profilePictureRequest.mouthIndex);
+        //    Assert.Equal(userProfile.skinIndex, profilePictureRequest.skinIndex);
+        //}
 
-            Assert.Equal(userProfile.eyesIndex, profilePictureRequest.eyesIndex);
-            Assert.Equal(userProfile.hairIndex, profilePictureRequest.hairIndex);
-            Assert.Equal(userProfile.mouthIndex, profilePictureRequest.mouthIndex);
-            Assert.Equal(userProfile.skinIndex, profilePictureRequest.skinIndex);
-        }
+        //[Fact]
+        //private void UpdateProfilePicture()
+        //{
+        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+        //    var userProfileRequest = CreateValidUserProfileRequest();
+        //    var oldProfilePictureRequest = CreateValidProfilePictureRequest();
+        //    var newProfilePictureRequest = CreateValidProfilePictureRequestForUpdate();
+        //    var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
 
-        [Fact]
-        private void UpdateProfilePicture()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var userProfileRequest = CreateValidUserProfileRequest();
-            var oldProfilePictureRequest = CreateValidProfilePictureRequest();
-            var newProfilePictureRequest = CreateValidProfilePictureRequestForUpdate();
-            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
+        //    userProfile = _userProfileService.SetUserProfilePicture(oldProfilePictureRequest, userProfile);
+        //    //Update the eyes and the hair
+        //    userProfile = _userProfileService.SetUserProfilePicture(newProfilePictureRequest, userProfile);
 
-            userProfile = _userProfileService.SetUserProfilePicture(oldProfilePictureRequest, userProfile);
-            //Update the eyes and the hair
-            userProfile = _userProfileService.SetUserProfilePicture(newProfilePictureRequest, userProfile);
+        //    Assert.Equal(userProfile.eyesIndex, newProfilePictureRequest.eyesIndex);
+        //    Assert.Equal(userProfile.hairIndex, newProfilePictureRequest.hairIndex);
+        //    Assert.NotEqual(userProfile.eyesIndex, oldProfilePictureRequest.eyesIndex);
+        //    Assert.NotEqual(userProfile.hairIndex, oldProfilePictureRequest.hairIndex);
+        //    Assert.Equal(userProfile.mouthIndex, oldProfilePictureRequest.mouthIndex);
+        //    Assert.Equal(userProfile.skinIndex, oldProfilePictureRequest.skinIndex);
+        //}
 
-            Assert.Equal(userProfile.eyesIndex, newProfilePictureRequest.eyesIndex);
-            Assert.Equal(userProfile.hairIndex, newProfilePictureRequest.hairIndex);
-            Assert.NotEqual(userProfile.eyesIndex, oldProfilePictureRequest.eyesIndex);
-            Assert.NotEqual(userProfile.hairIndex, oldProfilePictureRequest.hairIndex);
-            Assert.Equal(userProfile.mouthIndex, oldProfilePictureRequest.mouthIndex);
-            Assert.Equal(userProfile.skinIndex, oldProfilePictureRequest.skinIndex);
-        }
+        //[Fact]
+        //private void CreateProfilePictureWithEmpty()
+        //{
+        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
+        //    var userProfileRequest = CreateValidUserProfileRequest();
+        //    var profilePictureRequest = new UserSetProfilePictureRequset();
+        //    var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
 
-        [Fact]
-        private void CreateProfilePictureWithEmpty()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var userProfileRequest = CreateValidUserProfileRequest();
-            var profilePictureRequest = new UserSetProfilePictureRequset();
-            var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
-
-            Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile));
-            Assert.Equal("Invalid profile picture.", ex.Message);
-        }
-
+        //    Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile));
+        //    Assert.Equal("Invalid profile picture.", ex.Message);
+        //}
         //not Fact methods
         private static UserSetDatasRequest CreateValidUserProfileRequest()
         {

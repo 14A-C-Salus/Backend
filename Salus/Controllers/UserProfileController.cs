@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ReceptionHour.WebAPI;
 
 namespace Salus.Controllers
 {
@@ -17,18 +18,13 @@ namespace Salus.Controllers
             _userProfileService = userProfileService;
         }
 
-        [HttpPost("create-profile"), Authorize]
-        public async Task<IActionResult> CreateProfile(UserSetDatasRequest request)
+        [HttpPut("create-profile"), Authorize]
+        public IActionResult CreateProfile(UserSetDatasRequest request)
         {
-            try
+            return this.Run(() =>
             {
                 return Ok(_userProfileService.CreateProfile(request).Result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            });
         }
 
         [HttpPost("set-profile-picture"), Authorize]

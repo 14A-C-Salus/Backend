@@ -12,7 +12,7 @@
 
 
         //public methods
-        public async Task<string> ModifyComment(ModifyCommentRequest request)
+        public async Task<Comment> ModifyComment(ModifyCommentRequest request)
         {
             var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
 
@@ -29,7 +29,7 @@
                 throw new Exception("You do not have permission to modify the comment.");
             comment.body = request.body;
             await _dataContext.SaveChangesAsync();
-            return $"{comment.id} modified by {auth.username}!";
+            return comment;
         }
 
 
@@ -42,7 +42,7 @@
         }
 
 
-        public async Task<string> DeleteCommentById(int commentId)
+        public async void DeleteCommentById(int commentId)
         {
             var userProfile = GetAuthenticatedAuthUserProfile().Result;
             if (userProfile == null)
@@ -57,12 +57,9 @@
 
             _dataContext.comments.Remove(comment);
             await _dataContext.SaveChangesAsync();
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            return $"{comment.id} deleted by {userProfile.auth.username}!";
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        }
+       }
 
-        public async Task<string> StartOrStopFollow(UnFollowFollowRequest request)
+        public async void StartOrStopFollow(UnFollowFollowRequest request)
         {
             var followedAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (followedAuth == null)
@@ -82,12 +79,9 @@
             var follow = await _dataContext.followings
                 .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id);
 
-            string startStop;
-
             if (follow != null)
             {
                 _dataContext.followings.Remove(follow);
-                startStop = "stopped";
             }
             else
             {
@@ -97,18 +91,13 @@
                     follower = followerUserProfile,
                     followDate = DateTime.Now.ToString("yyyy.MM.dd")
                 });
-                startStop = "started";
             }
 
 
             await _dataContext.SaveChangesAsync();
+       }
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            return $"{followerUserProfile.auth.username} {startStop} following {followedAuth.username}!";
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        }
-
-        public async Task<string> SendComment(WriteCommentRequest request)
+        public async Task<Comment> SendComment(WriteCommentRequest request)
         {
             var toAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
             if (toAuth == null)
@@ -133,11 +122,8 @@
 
             _dataContext.comments.Add(comment);
             await _dataContext.SaveChangesAsync();
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            return $"{writerUserProfile.auth.username} sended a comment to {toUserProfile.auth.username}!";
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-        }
+            return comment;
+      }
 
         //private methods
         private async Task<UserProfile> GetAuthenticatedAuthUserProfile()

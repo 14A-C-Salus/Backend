@@ -5,10 +5,10 @@ namespace Salus.Services.SocialMediaServices
 {
     public interface ISocialMediaService
     {
-        Task<string> StartOrStopFollow(UnFollowFollowRequest request);
-        Task<string> SendComment(WriteCommentRequest request);
-        Task<string> DeleteCommentById(int commentId);
+        void StartOrStopFollow(UnFollowFollowRequest request);
+        Task<Comment> SendComment(WriteCommentRequest request);
+        void DeleteCommentById(int commentId);
         List<Comment> CreateCommentListByAuthenticatedEmail();
-        Task<string> ModifyComment(ModifyCommentRequest request);
+        Task<Comment> ModifyComment(ModifyCommentRequest request);
     }
 }

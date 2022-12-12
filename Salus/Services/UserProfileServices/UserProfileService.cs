@@ -34,7 +34,7 @@
             userProfile.birthDate = request.birthDate.ToString("yyyy.MM.dd.");
             userProfile.gender = request.gender;
             userProfile.goalWeight = request.goalWeight == 0 ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
-
+            _dataContext.userProfiles.Add(userProfile);
             await _dataContext.SaveChangesAsync();
             return $"{auth.username}'s data saved. Gender: {userProfile.gender}. Goal Weight: {userProfile.goalWeight}.";
         }
