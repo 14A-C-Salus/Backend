@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
@@ -17,71 +18,52 @@ namespace Salus.Controllers
             _socialMediaService = socialMediaService;
         }
 
-        [HttpPost("un-follow/follow"), Authorize]
+        [HttpPatch("unfollow-follow"), Authorize]
         public IActionResult UnFollowFollow(UnFollowFollowRequest request)
         {
-            try
+            return this.Run(() =>
             {
-                return Ok(_socialMediaService.StartOrStopFollow(request).Result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                _socialMediaService.StartOrStopFollow(request);
+                return Ok();
+            });
         }
 
 
-        [HttpPost("write-a-comment"), Authorize]
+        [HttpPut("write-comment"), Authorize]
         public IActionResult WriteComment(WriteCommentRequest request)
         {
-            try
+            return this.Run(() =>
             {
                 return Ok(_socialMediaService.SendComment(request).Result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            });
         }
 
-        [HttpPost("delete-comment"), Authorize]
+        [HttpDelete("delete-comment"), Authorize]
         public IActionResult DeleteComment(int commentId)
         {
-            try
+            return this.Run(() =>
             {
-                return Ok(_socialMediaService.DeleteCommentById(commentId).Result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                _socialMediaService.DeleteCommentById(commentId);
+                return Ok();
+            });
         }
 
-        [HttpPost("modify-comment"), Authorize]
+        [HttpPatch("modify-comment"), Authorize]
         public IActionResult ModifyComment(ModifyCommentRequest request)
         {
-            try
+            return this.Run(() =>
             {
                 return Ok(_socialMediaService.ModifyComment(request).Result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            });
         }
 
         [HttpGet("get-all-comment-by-authenticated-email"), Authorize]
         public IActionResult GetAllComment()
         {
-            try
+            return this.Run(() =>
             {
                 return Ok(_socialMediaService.CreateCommentListByAuthenticatedEmail());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            });
         }
     }
 }

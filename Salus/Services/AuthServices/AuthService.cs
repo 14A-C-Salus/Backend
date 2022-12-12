@@ -20,7 +20,140 @@ namespace Salus.Services.AuthServices
         }
 
         //public methods
-        public void SendToken(Auth auth)
+        public string GetEmail()
+        {
+            var result = string.Empty;
+
+            if (_httpContextAccessor.HttpContext != null)
+                result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
+
+            return result;
+        }
+        public async Task<Auth> Register(AuthRegisterRequest request)
+        {
+            if (_dataContext.auths.Any(a => a.email == request.email))
+                throw new Exception("Email already exists.");
+
+            var auth = NewAuth(request);
+            if (_configuration.GetSection("Host:Use").Value != "LocalDB")
+                SendToken(auth);
+            _dataContext.auths.Add(auth);
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+        public async Task<string> Login(AuthLoginRequest request)
+        {
+            var auth = await _dataContext.auths.FirstAsync(a => a.email == request.email);
+
+            if (auth == null || !VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt))
+                throw new Exception("Username or password is not correct!");
+
+            if (auth.date == null)
+                throw new Exception($"Not verified! Check your emails and verify your account!");
+
+            string jwt = CreateToken(auth);
+            return jwt;
+        }
+
+        public async Task<Auth> Verify(string token)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.verificationToken == token);
+            if (auth == null)
+                throw new Exception("Invalid token!");
+
+            auth.date = DateTime.Now;
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+
+        public async Task<Auth> ForgotPassword(string email)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
+            if (auth == null)
+                throw new Exception("User not found!");
+
+            SetTokenAndExpires(auth);
+
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+
+        public async Task<Auth> ResetPassword(AuthResetPasswordRequest request)
+        {
+            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
+            if (auth == null || auth.resetTokenExpires < DateTime.Now)
+                throw new Exception("Invalid Token!");
+
+            UpdateAuthResetPasswordData(request.password, auth);
+
+            await _dataContext.SaveChangesAsync();
+            return auth;
+        }
+
+        //private methods
+        private string CreateRandomToken()
+        {
+            var randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
+            while (_dataContext.auths.Any(a => a.verificationToken == randomToken) && _dataContext.auths.Any(a => a.passwordResetToken == randomToken))
+            {
+                randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
+            }
+            return randomToken;
+        }
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            CheckPassword(password);
+
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            }
+        }
+        private void CheckPassword(string password)
+        {
+            if (password.Length > 20 || password.Length < 8)
+                throw new Exception("Invalid password!");
+        }
+        private void CheckAuthData(Auth auth)
+        {
+            if (auth == null)
+                throw new Exception("Empty auth.");
+            if (auth.username.Length < 8 || auth.username.Length > 20)
+                throw new Exception("Invalid username.");
+            if (auth.email.Length < 8 || auth.email.Length > 200)
+                throw new Exception("Invalid email.");
+        }
+        private void CheckRegisterRequest(AuthRegisterRequest request)
+        {
+            if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
+                throw new Exception("Invalid email!");
+            if (request.username.Length < 8 || request.username.Length > 20)
+                throw new Exception("Invalid username!");
+            if (request.password.Length < 8 || request.password.Length > 20)
+                throw new Exception("Invalid password!");
+            if (request.confirmPassword != request.password)
+                throw new Exception("Invalid confirm password!");
+        }
+        private Auth NewAuth(AuthRegisterRequest request)
+        {
+            CheckRegisterRequest(request);
+            CreatePasswordHash(request.password,
+            out byte[] passwordHash,
+            out byte[] passwordSalt);
+
+            var auth = new Auth
+            {
+                username = request.username,
+                email = request.email,
+                passwordHash = passwordHash,
+                passwordSalt = passwordSalt,
+                verificationToken = CreateRandomToken()
+            };
+
+            return auth;
+        }
+        private void SendToken(Auth auth)
         {
             var template = new EmailBodyTemplate();
 
@@ -69,36 +202,7 @@ namespace Salus.Services.AuthServices
                 throw new Exception("Email address doesn't exist.");
             }
         }
-        public string GetEmail()
-        {
-            var result = string.Empty;
-
-            if (_httpContextAccessor.HttpContext != null)
-                result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
-
-            return result;
-        }
-
-        public Auth NewAuth(AuthRegisterRequest request)
-        {
-            CheckRegisterRequest(request);
-            CreatePasswordHash(request.password,
-            out byte[] passwordHash,
-            out byte[] passwordSalt);
-
-            var auth = new Auth
-            {
-                username = request.username,
-                email = request.email,
-                passwordHash = passwordHash,
-                passwordSalt = passwordSalt,
-                verificationToken = CreateRandomToken()
-            };
-
-            return auth;
-        }
-
-        public string CreateToken(Auth auth)
+        private string CreateToken(Auth auth)
         {
             CheckAuthData(auth);
             List<Claim> claims = new List<Claim>
@@ -119,8 +223,7 @@ namespace Salus.Services.AuthServices
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
@@ -128,16 +231,14 @@ namespace Salus.Services.AuthServices
                 return computedPasswordHash.SequenceEqual(passwordHash);
             }
         }
-
-        public void SetTokenAndExpires(Auth auth)
+        private void SetTokenAndExpires(Auth auth)
         {
             CheckAuthData(auth);
 
             auth.passwordResetToken = CreateRandomToken();
             auth.resetTokenExpires = DateTime.Now.AddDays(1);
         }
-
-        public void UpdateAuthResetPasswordData(string password, Auth auth)
+        private void UpdateAuthResetPasswordData(string password, Auth auth)
         {
             if (auth.resetTokenExpires == null || auth.passwordResetToken == null)
                 throw new Exception("You need first use the 'forgoted-password' service!");
@@ -148,55 +249,6 @@ namespace Salus.Services.AuthServices
             auth.passwordSalt = passwordSalt;
             auth.passwordResetToken = null;
             auth.resetTokenExpires = null;
-        }
-
-        //private methods
-        private string CreateRandomToken()
-        {
-            var randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
-            while (_dataContext.auths.Any(a => a.verificationToken == randomToken) && _dataContext.auths.Any(a => a.passwordResetToken == randomToken))
-            {
-                randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
-            }
-            return randomToken;
-        }
-
-        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            CheckPassword(password);
-
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-        private void CheckPassword(string password)
-        {
-            if (password.Length > 20 || password.Length < 8)
-                throw new Exception("Invalid password!");
-        }
-
-        private void CheckAuthData(Auth auth)
-        {
-            if (auth == null)
-                throw new Exception("Empty auth.");
-            if (auth.username.Length < 8 || auth.username.Length > 20)
-                throw new Exception("Invalid username.");
-            if (auth.email.Length < 8 || auth.email.Length > 200)
-                throw new Exception("Invalid email.");
-        }
-        private void CheckRegisterRequest(AuthRegisterRequest request)
-        {
-            if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
-                throw new Exception("Invalid email!");
-            if (request.username.Length < 8 || request.username.Length > 20)
-                throw new Exception("Invalid username!");
-            if (request.password.Length < 8 || request.password.Length > 20)
-                throw new Exception("Invalid password!");
-            if (request.confirmPassword != request.password)
-                throw new Exception("Invalid confirm password!");
         }
     }
 }
