@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ReceptionHour.WebAPI;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
@@ -24,6 +24,15 @@ namespace Salus.Controllers
             return this.Run(() =>
             {
                 return Ok(_userProfileService.CreateProfile(request).Result);
+            });
+        }
+
+        [HttpPost("modify-profile"), Authorize]
+        public IActionResult ModifyProfile(UserSetDatasRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.ModifyProfile(request).Result);
             });
         }
 

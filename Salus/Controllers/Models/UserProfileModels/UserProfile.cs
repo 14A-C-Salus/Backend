@@ -1,4 +1,6 @@
-﻿namespace Salus.Controllers.Models.UserProfileModels
+﻿using Newtonsoft.Json;
+
+namespace Salus.Controllers.Models.UserProfileModels
 {
     public class UserProfile
     {
@@ -17,12 +19,17 @@
         public mouthEnum mouthIndex { get; set; }
 
         //Connections
-        [Required]
+        [Required, JsonIgnore]
         public Auth? auth { get; set; }
+        [JsonIgnore]
         public int authOfProfileId { get; set; }
+        [JsonIgnore]
         public IList<Following>? followerUserProfileToUserProfiles { get; set; }
+        [JsonIgnore]
         public IList<Following>? followedUserProfileToUserProfiles { get; set; }
+        [JsonIgnore]
         public IList<Comment>? commenterUserProfileToUserProfiles { get; set; }
+        [JsonIgnore]
         public IList<Comment>? commentedUserProfileToUserProfiles { get; set; }
 
     }

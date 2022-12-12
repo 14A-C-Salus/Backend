@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Salus;
 
-namespace ReceptionHour.WebAPI
+namespace Salus.WebAPI
 {
     public static class ControllerBaseExtension
     {

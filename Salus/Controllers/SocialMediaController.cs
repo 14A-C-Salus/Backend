@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ReceptionHour.WebAPI;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
