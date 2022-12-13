@@ -7,7 +7,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         public int id { get; set; }
         public double weight { get; set; }
         public double height { get; set; }
-        public string birthDate { get; set; } = default(DateTime).ToString("yyyy.MM.dd");
+        public string birthDate { get; set; } = default(DateTime).ToString("yyyy.MM.dd.");
         public genderEnum gender { get; set; }
         public bool isAdmin { get; set; } = false;
         public double goalWeight { get; set; }
