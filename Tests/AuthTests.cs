@@ -23,12 +23,13 @@ namespace Tests
             _configuration = InitConfiguration();
             _dataContext = new DataContext(_configuration);
             _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
+            var password = RandomString(12);
             _request = new AuthRegisterRequest()
             {
-                username = "Test Username",
-                email = "validemail@format.com",
-                password = "validpassword",
-                confirmPassword = "validpassword"
+                username = $"{RandomString(12)}",
+                email = $"{RandomString(12)}@address.com",
+                password = password,
+                confirmPassword = password
             };
             _auth = _authService.Register(_request).Result;
         }
@@ -77,7 +78,6 @@ namespace Tests
         private async void ForgotPassword()
         {
             _ = await _authService.ForgotPassword(_auth.email);
-
             Assert.NotNull(_auth.passwordResetToken);
             Assert.NotNull(_auth.resetTokenExpires);
         }
@@ -119,7 +119,15 @@ namespace Tests
 
             return config;
         }
+        private static string RandomString(int length)
+        {
+            var chars = Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8);
 
+            var randomStr = new string(chars.SelectMany(str => str)
+                                            .OrderBy(c => Guid.NewGuid())
+                                            .Take(length).ToArray());
+            return randomStr;
+        }
         private static string GetEmailfromJwt(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

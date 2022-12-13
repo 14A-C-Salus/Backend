@@ -1,4 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Salus.Controllers.Models.AuthModels;
 using Salus.Controllers.Models.UserProfileModels;
@@ -16,9 +23,10 @@ namespace Tests
 
         private readonly AuthService _authService;
 
+
+
         private readonly DataContext _dataContext;
         private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
-        private readonly HttpClient _httpClient;
 
         private readonly Auth _auth;
         private readonly AuthRegisterRequest _registerRequest;
@@ -38,20 +46,24 @@ namespace Tests
 
             //register and login
             _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
+
+            var password = RandomString(12);
             _registerRequest = new AuthRegisterRequest()
             {
-                username = "Test Username",
-                email = "validemail@format.com",
-                password = "validpassword",
-                confirmPassword = "validpassword"
+                username = $"{RandomString(12)}",
+                email = $"{RandomString(12)}@address.com",
+                password = password,
+                confirmPassword = password
             };
-            _auth = _authService.Register(_registerRequest).Result;
-            _ = _authService.Verify(_auth.verificationToken);
+
+            _auth = RegisterAndVerify().Result;
+
             var jwt = _authService.Login(new AuthLoginRequest()
             {
                 email = _registerRequest.email,
                 password = _registerRequest.password,
             }).Result;
+            Login();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
             //Create valid User Profile
@@ -66,7 +78,19 @@ namespace Tests
             _userProfile = _userProfileService.CreateProfile(_userSetDatasRequest).Result;
         }
 
-        public async void Dispose()
+        private void Login()
+        {
+            
+        }
+
+        private async Task<Auth> RegisterAndVerify()
+        {
+            var auth = _authService.Register(_registerRequest).Result;
+            _ = await _authService.Verify(auth.verificationToken);
+            return auth;
+        }
+
+        public void Dispose()
         {
             _httpClient.Dispose();
             _dataContext.auths.Remove(_auth);
@@ -124,6 +148,19 @@ namespace Tests
         //                hairIndex = hairEnum.ginger
         //            };
         //        }
+        
+        
+        
+        private static string RandomString(int length)
+        {
+            var chars = Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8);
+
+            var randomStr = new string(chars.SelectMany(str => str)
+                                            .OrderBy(c => Guid.NewGuid())
+                                            .Take(length).ToArray());
+            return randomStr;
+        }
+
         private static IConfiguration InitConfiguration()
         {
             var config = new ConfigurationBuilder()
