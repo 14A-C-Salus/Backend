@@ -3,13 +3,20 @@ global using Salus.Controllers.Models.AuthModels;
 global using Salus.Controllers.Models.UserProfileModels;
 global using Salus.Controllers.Models.SocialMediaModels;
 global using Salus.Controllers.Models.JoiningEntity;
+global using Salus.Controllers.Models.TagModels;
+global using Salus.Controllers.Models.RecipeModels;
+global using Salus.Controllers.Models.FoodModels;
+
 //services
 global using Salus.Services.UserProfileServices;
 global using Salus.Services.AuthServices;
 global using Salus.Services.SocialMediaServices;
+global using Salus.Services.RecipeServices;
+
 //templates
 global using Salus.Templates;
 
+global using Microsoft.AspNetCore.Mvc;
 global using System.ComponentModel.DataAnnotations;
 global using Salus.Data;
 global using Microsoft.EntityFrameworkCore;
@@ -32,6 +39,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<ISocialMediaService, SocialMediaService>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {
