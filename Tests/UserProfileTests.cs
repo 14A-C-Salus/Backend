@@ -64,7 +64,6 @@ namespace Tests
                 password = _registerRequest.password,
             }).Result;
             Login();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwt);
 
             //Create valid User Profile
             _userProfileService = new UserProfileService(_dataContext, _authService);
@@ -92,7 +91,6 @@ namespace Tests
 
         public void Dispose()
         {
-            _httpClient.Dispose();
             _dataContext.auths.Remove(_auth);
             _dataContext.SaveChanges();
         }
