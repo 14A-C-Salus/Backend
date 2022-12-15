@@ -2,5 +2,6 @@
 {
     public interface IRecipeService
     {
+        Task<Recipe> WriteRecipe(WriteRecipeRequest request);
     }
 }

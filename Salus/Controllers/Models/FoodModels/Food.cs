@@ -8,6 +8,6 @@
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
-        public List<Tag>? Tags { get; set; }
+        public List<Tag> tags { get; set; } = new ();
     }
 }

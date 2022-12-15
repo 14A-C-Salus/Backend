@@ -10,11 +10,11 @@
         public string name { get; set; } = string.Empty;
         public bool verifeid { get; set; } = false;
         [Required]
-        public UserProfile? Author { get; set; }
-        public List<Tag>? Tags { get; set; }
+        public UserProfile Author { get; set; } = new ();
+        public List<Tag> tags { get; set; } = new ();
 
         //Connections
         [Required]
-        public List<Food>? ingredients { get; set; }
+        public List<Food> ingredients { get; set; } = new ();
     }
 }
