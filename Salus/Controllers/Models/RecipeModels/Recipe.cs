@@ -13,13 +13,11 @@ namespace Salus.Controllers.Models.RecipeModels
         public bool verifeid { get; set; } = false;
         [Required]
         public UserProfile Author { get; set; } = new ();
-        public List<int> tagIds { get; set; } = new ();
+        public List<Tag> tags { get; set; } = new ();
 
         //Connections
-        [Required]
-        public List<int> foodIds { get; set; } = new ();
-        public List<RecipesIncludeIngredients> ingredients { get; set; }
-        public List<UsersLikeRecipes> usersWhoLiked { get; set; }
+        public IList<RecipesIncludeIngredients> ingredients { get; set; }
+        public IList<UsersLikeRecipes> usersWhoLiked { get; set; }
 
         public int? oilId { get; set; }
         [ForeignKey("oilId")]

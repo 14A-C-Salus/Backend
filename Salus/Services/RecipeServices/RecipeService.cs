@@ -33,11 +33,11 @@
                 recipe.carbohydrate += ingredient.carbohydrate;
                 recipe.kcal += ingredient.kcal;
 
-                if (ingredient.tagIds.Count() != 0)
+                if (ingredient.tags.Count() != 0)
                 {
-                    foreach (var tag in ingredient.tagIds)
+                    foreach (var tag in ingredient.tags)
                     {
-                        recipe.tagIds.Add(tag);
+                        recipe.tags.Add(tag.tag);
                     }
                 }
             }

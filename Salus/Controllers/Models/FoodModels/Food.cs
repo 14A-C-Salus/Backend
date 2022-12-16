@@ -8,7 +8,6 @@
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
-        public List<int> tagIds { get; set; } = new ();
 
         //Connections
         public List<RecipesIncludeIngredients> recipes { get; set; }
