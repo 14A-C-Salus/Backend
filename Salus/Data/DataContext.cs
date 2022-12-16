@@ -60,13 +60,13 @@
                 .HasKey(fu => new { fu.followedId, fu.followerId });
             
             modelBuilder.Entity<Following>()
-                .HasOne(fu => fu.follower)
-                .WithMany(f => f.followers)
+                .HasOne(f => f.followed)
+                .WithMany(u => u.followers)
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Following>()
-                .HasOne(fu => fu.followed)
-                .WithMany(f => f.followeds)
+                .HasOne(f => f.follower)
+                .WithMany(u => u.followeds)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //many-to-many relationships
@@ -77,13 +77,13 @@
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.commentFrom)
-                .WithMany(c => c.commenters)
+                .WithMany(u => u.commenteds)
                 .HasForeignKey(c => c.fromId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.commentTo)
-                .WithMany(c => c.commenteds)
+                .WithMany(u => u.commenters)
                 .HasForeignKey(c => c.toId)
                 .OnDelete(DeleteBehavior.Restrict);
 
