@@ -6,6 +6,7 @@ global using Salus.Controllers.Models.JoiningEntity;
 global using Salus.Controllers.Models.TagModels;
 global using Salus.Controllers.Models.RecipeModels;
 global using Salus.Controllers.Models.FoodModels;
+global using Salus.Controllers.Models.Last24hModels;
 
 //services
 global using Salus.Services.UserProfileServices;

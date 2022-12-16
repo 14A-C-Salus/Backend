@@ -13,5 +13,6 @@
         //Connections
         public List<RecipesIncludeIngredients> recipes { get; set; }
         public List<FoodsHaveTags> tags { get; set; }
+        public Last24h last24h { get; set; }
     }
 }

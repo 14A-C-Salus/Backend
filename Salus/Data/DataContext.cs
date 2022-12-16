@@ -3,13 +3,14 @@
     public class DataContext : DbContext
     {
         public DbSet<Auth> auths => Set<Auth>();
-        public DbSet<UserProfile> userProfiles => Set<UserProfile>();
-        public DbSet<Following> followings => Set<Following>();
         public DbSet<Comment> comments => Set<Comment>();
-        public DbSet<Recipe> recipes => Set<Recipe>();
+        public DbSet<Following> followings => Set<Following>();
         public DbSet<Food> foods => Set<Food>();
+        public DbSet<Last24h> last24Hs => Set<Last24h>();
         public DbSet<Oil> oils => Set<Oil>();
+        public DbSet<Recipe> recipes => Set<Recipe>();
         public DbSet<Tag> tags => Set<Tag>();
+        public DbSet<UserProfile> userProfiles => Set<UserProfile>();
 
 
         private readonly IConfiguration _configuration;
@@ -50,23 +51,33 @@
                 .WithOne(ad => ad.auth)
                 .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
 
+            modelBuilder.Entity<UserProfile>()
+                .HasOne<Last24h>(u => u.last24h)
+                .WithOne(l24h => l24h.userProfile)
+                .HasForeignKey<Last24h>(l24h => l24h.userProfileId);
+
             //zero-or-one-to-many relationships
             modelBuilder
                 .Entity<Recipe>()
-                .HasOne<Oil>(o => o.oil)
+                .HasOne<Oil>(r => r.oil)
                 .WithMany(o => o.recipes);
+
+            modelBuilder
+                .Entity<Food>()
+                .HasOne<Last24h>(f => f.last24h)
+                .WithMany(l24h => l24h.foods);
 
             //many-to-many unable duplicate relationships
             //self join
             modelBuilder
                 .Entity<Following>()
                 .HasKey(fu => new { fu.followedId, fu.followerId });
-            
+
             modelBuilder.Entity<Following>()
                 .HasOne(f => f.followed)
                 .WithMany(u => u.followers)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             modelBuilder.Entity<Following>()
                 .HasOne(f => f.follower)
                 .WithMany(u => u.followeds)
@@ -76,7 +87,7 @@
             //normal many-to-many
             modelBuilder
                 .Entity<UsersLikeRecipes>()
-                .HasKey(ur => new {ur.userId, ur.recipeId});
+                .HasKey(ur => new { ur.userId, ur.recipeId });
 
             modelBuilder.Entity<UsersLikeRecipes>()
                 .HasOne(ur => ur.user)

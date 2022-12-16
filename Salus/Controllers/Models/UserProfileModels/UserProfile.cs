@@ -21,6 +21,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         //Connections
         [Required, JsonIgnore]
         public Auth? auth { get; set; }
+        public Last24h? last24h { get; set; }
         [JsonIgnore]
         public int authOfProfileId { get; set; }
         [JsonIgnore]
