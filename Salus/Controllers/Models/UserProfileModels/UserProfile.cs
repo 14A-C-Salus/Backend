@@ -24,13 +24,13 @@ namespace Salus.Controllers.Models.UserProfileModels
         [JsonIgnore]
         public int authOfProfileId { get; set; }
         [JsonIgnore]
-        public IList<Following>? followerUserProfileToUserProfiles { get; set; }
+        public IList<Following>? followers { get; set; }
         [JsonIgnore]
-        public IList<Following>? followedUserProfileToUserProfiles { get; set; }
+        public IList<Following>? followeds { get; set; }
         [JsonIgnore]
-        public IList<Comment>? commenterUserProfileToUserProfiles { get; set; }
+        public IList<Comment>? commenters { get; set; }
         [JsonIgnore]
-        public IList<Comment>? commentedUserProfileToUserProfiles { get; set; }
+        public IList<Comment>? commenteds { get; set; }
 
     }
 }

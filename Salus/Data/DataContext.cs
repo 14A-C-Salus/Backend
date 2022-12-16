@@ -61,12 +61,12 @@
             
             modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.follower)
-                .WithMany(f => f.followerUserProfileToUserProfiles)
+                .WithMany(f => f.followers)
                 .OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.followed)
-                .WithMany(f => f.followedUserProfileToUserProfiles)
+                .WithMany(f => f.followeds)
                 .OnDelete(DeleteBehavior.Restrict);
 
             //many-to-many relationships
@@ -77,13 +77,13 @@
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.commentFrom)
-                .WithMany(c => c.commenterUserProfileToUserProfiles)
+                .WithMany(c => c.commenters)
                 .HasForeignKey(c => c.fromId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.commentTo)
-                .WithMany(c => c.commentedUserProfileToUserProfiles)
+                .WithMany(c => c.commenteds)
                 .HasForeignKey(c => c.toId)
                 .OnDelete(DeleteBehavior.Restrict);
 
