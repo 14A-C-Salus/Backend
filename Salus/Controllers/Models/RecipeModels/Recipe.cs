@@ -1,4 +1,6 @@
-﻿namespace Salus.Controllers.Models.RecipeModels
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Salus.Controllers.Models.RecipeModels
 {
     public class Recipe
     {
@@ -11,10 +13,15 @@
         public bool verifeid { get; set; } = false;
         [Required]
         public UserProfile Author { get; set; } = new ();
-        public List<Tag> tags { get; set; } = new ();
+        public List<int> tagIds { get; set; } = new ();
 
         //Connections
         [Required]
-        public List<Food> ingredients { get; set; } = new ();
+        public List<int> foodIds { get; set; } = new ();
+        public List<RecipesIncludeIngredients> ingredients { get; set; };
+
+        public int? oilId { get; set; }
+        [ForeignKey("oilId")]
+        public virtual Oil? oil { get; set; }
     }
 }

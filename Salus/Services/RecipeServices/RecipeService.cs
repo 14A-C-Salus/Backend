@@ -24,28 +24,44 @@
                 name = request.name,
             };
 
-            if (request.ingredients == null)
-                throw new Exception("There are no ingredients!");
+            var ingredients = GetAllIngredients(request).Result;
 
-            foreach (var ingredient in request.ingredients)
+            foreach (var ingredient in ingredients)
             {
                 recipe.fat += ingredient.fat;
                 recipe.protein += ingredient.protein;
                 recipe.carbohydrate += ingredient.carbohydrate;
                 recipe.kcal += ingredient.kcal;
 
-                if (ingredient.tags.Count() != 0)
+                if (ingredient.tagIds.Count() != 0)
                 {
-                    foreach (var tag in ingredient.tags)
+                    foreach (var tag in ingredient.tagIds)
                     {
-                        recipe.tags.Add(tag);
+                        recipe.tagIds.Add(tag);
                     }
                 }
             }
 
+            _dataContext.recipes.Add(recipe);
+            await _dataContext.SaveChangesAsync();
             //TODO: sütési metódussal számolni
 
             return recipe;
+        }
+
+        public async Task<List<Food>> GetAllIngredients(WriteRecipeRequest request)
+        {
+            if (request.ingredientIds == null || request.ingredientIds.Count() == 0)
+                throw new Exception("There are no ingredients!");
+
+            List<Food> ingredients = new();
+
+            foreach (var ingredientId in request.ingredientIds)
+            {
+                ingredients.Add(await _dataContext.foods.SingleAsync(i => i.id == ingredientId));
+            }
+
+            return ingredients;
         }
     }
 }

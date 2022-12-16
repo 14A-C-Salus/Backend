@@ -6,6 +6,9 @@
         public DbSet<UserProfile> userProfiles => Set<UserProfile>();
         public DbSet<Following> followings => Set<Following>();
         public DbSet<Comment> comments => Set<Comment>();
+        public DbSet<Recipe> recipes => Set<Recipe>();
+        public DbSet<Food> foods => Set<Food>();
+        public DbSet<Oil> oils => Set<Oil>();
 
         private readonly IConfiguration _configuration;
 
@@ -39,25 +42,35 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //one-to-one
+            //zero-or-one-to-one relationships
             modelBuilder.Entity<Auth>()
                 .HasOne<UserProfile>(a => a.userProfile)
                 .WithOne(ad => ad.auth)
                 .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
 
-            //many-to-many unable duplicate
+            //zero-or-one-to-many relationships
+            modelBuilder
+                .Entity<Recipe>()
+                .HasOne<Oil>(o => o.oil)
+                .WithMany(o => o.recipes);
+
+            //many-to-many unable duplicate relationships
             modelBuilder
                 .Entity<Following>()
                 .HasKey(fu => new { fu.followedId, fu.followerId });
+            
             modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.follower)
                 .WithMany(f => f.followerUserProfileToUserProfiles)
                 .OnDelete(DeleteBehavior.Restrict);
+            
             modelBuilder.Entity<Following>()
                 .HasOne(fu => fu.followed)
                 .WithMany(f => f.followedUserProfileToUserProfiles)
                 .OnDelete(DeleteBehavior.Restrict);
-            //many-to-many
+
+            //many-to-many relationships
+            //self join
             modelBuilder
                 .Entity<Comment>()
                 .HasKey(c => c.id);
@@ -72,6 +85,24 @@
                 .HasOne(c => c.commentTo)
                 .WithMany(c => c.commentedUserProfileToUserProfiles)
                 .HasForeignKey(c => c.toId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            //normal many-to-many
+            modelBuilder
+                .Entity<RecipesIncludeIngredients>()
+                .HasKey(r => r.id);
+
+            modelBuilder.Entity<RecipesIncludeIngredients>()
+                .HasOne(ri => ri.food)
+                .WithMany(f => f.recipes)
+                .HasForeignKey(ri => ri.foodId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RecipesIncludeIngredients>()
+                .HasOne(ri => ri.recipe)
+                .WithMany(r => r.ingredients)
+                .HasForeignKey(ri => ri.recipeId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
