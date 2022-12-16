@@ -12,5 +12,6 @@
 
         //Connections
         public List<RecipesIncludeIngredients> recipes { get; set; }
+        public List<FoodsHaveTags> tags { get; set; }
     }
 }

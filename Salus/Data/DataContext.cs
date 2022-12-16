@@ -9,6 +9,8 @@
         public DbSet<Recipe> recipes => Set<Recipe>();
         public DbSet<Food> foods => Set<Food>();
         public DbSet<Oil> oils => Set<Oil>();
+        public DbSet<Tag> tags => Set<Tag>();
+
 
         private readonly IConfiguration _configuration;
 
@@ -55,6 +57,7 @@
                 .WithMany(o => o.recipes);
 
             //many-to-many unable duplicate relationships
+            //self join
             modelBuilder
                 .Entity<Following>()
                 .HasKey(fu => new { fu.followedId, fu.followerId });
@@ -68,6 +71,61 @@
                 .HasOne(f => f.follower)
                 .WithMany(u => u.followeds)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            //normal many-to-many
+            modelBuilder
+                .Entity<UsersLikeRecipes>()
+                .HasKey(ur => new {ur.userId, ur.recipeId});
+
+            modelBuilder.Entity<UsersLikeRecipes>()
+                .HasOne(ur => ur.user)
+                .WithMany(u => u.likedRecipes)
+                .HasForeignKey(ur => ur.recipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UsersLikeRecipes>()
+                .HasOne(ur => ur.recipe)
+                .WithMany(r => r.usersWhoLiked)
+                .HasForeignKey(ur => ur.userId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder
+                .Entity<UsersPreferTags>()
+                .HasKey(ut => new { ut.userId, ut.tagId });
+
+            modelBuilder.Entity<UsersPreferTags>()
+                .HasOne(ut => ut.user)
+                .WithMany(u => u.preferredTags)
+                .HasForeignKey(ut => ut.tagId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UsersPreferTags>()
+                .HasOne(ut => ut.tag)
+                .WithMany(t => t.usersWhoPrefer)
+                .HasForeignKey(ut => ut.userId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+
+            modelBuilder
+                .Entity<FoodsHaveTags>()
+                .HasKey(ft => new { ft.foodId, ft.tagId });
+
+            modelBuilder.Entity<FoodsHaveTags>()
+                .HasOne(ft => ft.food)
+                .WithMany(f => f.tags)
+                .HasForeignKey(ut => ut.tagId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FoodsHaveTags>()
+                .HasOne(ut => ut.tag)
+                .WithMany(t => t.foodsThatHave)
+                .HasForeignKey(ut => ut.foodId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
 
             //many-to-many relationships
             //self join
@@ -91,7 +149,7 @@
             //normal many-to-many
             modelBuilder
                 .Entity<RecipesIncludeIngredients>()
-                .HasKey(r => r.id);
+                .HasKey(ri => ri.id);
 
             modelBuilder.Entity<RecipesIncludeIngredients>()
                 .HasOne(ri => ri.food)

@@ -18,7 +18,8 @@ namespace Salus.Controllers.Models.RecipeModels
         //Connections
         [Required]
         public List<int> foodIds { get; set; } = new ();
-        public List<RecipesIncludeIngredients> ingredients { get; set; };
+        public List<RecipesIncludeIngredients> ingredients { get; set; }
+        public List<UsersLikeRecipes> usersWhoLiked { get; set; }
 
         public int? oilId { get; set; }
         [ForeignKey("oilId")]

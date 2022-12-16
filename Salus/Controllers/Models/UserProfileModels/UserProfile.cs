@@ -31,6 +31,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         public IList<Comment>? commenters { get; set; }
         [JsonIgnore]
         public IList<Comment>? commenteds { get; set; }
-
+        public List<UsersLikeRecipes>? likedRecipes { get; set; }
+        public List<UsersPreferTags>? preferredTags { get; set; }
     }
 }
