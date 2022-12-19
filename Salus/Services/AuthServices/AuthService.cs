@@ -35,8 +35,9 @@ namespace Salus.Services.AuthServices
                 throw new Exception("Email already exists.");
 
             var auth = NewAuth(request);
-            if (_configuration.GetSection("Host:Use").Value != "LocalDB")
-                SendToken(auth);
+#if !DEBUG
+            SendToken(auth);
+#endif
             _dataContext.auths.Add(auth);
             await _dataContext.SaveChangesAsync();
             return auth;

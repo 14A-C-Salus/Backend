@@ -1,4 +1,6 @@
-﻿namespace Salus.Data
+﻿using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+
+namespace Salus.Data
 {
     public class DataContext : DbContext
     {
@@ -29,10 +31,16 @@
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+#if DEBUG
+            optionsBuilder.UseMySql(
+                connectionString,
+                ServerVersion.AutoDetect(connectionString)
+);
+#else
             base.OnConfiguring(optionsBuilder);
-
             optionsBuilder
                 .UseSqlServer(connectionString);
+#endif
         }
 
 

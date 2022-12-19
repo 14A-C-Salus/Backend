@@ -2,13 +2,12 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Salus.Data;
 
 #nullable disable
 
-namespace Salus_temp.Migrations
+namespace Salus.Migrations
 {
     [DbContext(typeof(DataContext))]
     partial class DataContextModelSnapshot : ModelSnapshot
@@ -18,9 +17,7 @@ namespace Salus_temp.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Salus.Controllers.Models.AuthModels.Auth", b =>
                 {
@@ -28,35 +25,33 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<DateTime?>("date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<byte[]>("passwordHash")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("longblob");
 
                     b.Property<string>("passwordResetToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<byte[]>("passwordSalt")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("longblob");
 
                     b.Property<DateTime?>("resetTokenExpires")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("verificationToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("id");
 
@@ -68,8 +63,6 @@ namespace Salus_temp.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
                     b.Property<int>("carbohydrate")
                         .HasColumnType("int");
@@ -85,7 +78,7 @@ namespace Salus_temp.Migrations
 
                     b.Property<string>("name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("protein")
                         .HasColumnType("int");
@@ -103,8 +96,6 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<int>("kcalIn14Ml")
                         .HasColumnType("int");
 
@@ -119,19 +110,17 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<string>("body")
                         .IsRequired()
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("varchar(1000)");
 
                     b.Property<int>("fromId")
                         .HasColumnType("int");
 
                     b.Property<string>("sendDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("toId")
                         .HasColumnType("int");
@@ -155,7 +144,7 @@ namespace Salus_temp.Migrations
 
                     b.Property<string>("followDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("followedId", "followerId");
 
@@ -185,8 +174,6 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<int>("foodId")
                         .HasColumnType("int");
 
@@ -214,7 +201,7 @@ namespace Salus_temp.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("date")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("userId", "recipeId");
 
@@ -243,8 +230,6 @@ namespace Salus_temp.Migrations
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
 
                     b.Property<int>("carbohydrate")
                         .HasColumnType("int");
@@ -284,8 +269,6 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<int>("Authorid")
                         .HasColumnType("int");
 
@@ -300,7 +283,7 @@ namespace Salus_temp.Migrations
 
                     b.Property<string>("name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("oilId")
                         .HasColumnType("int");
@@ -309,7 +292,7 @@ namespace Salus_temp.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("verifeid")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("id");
 
@@ -326,14 +309,12 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<int?>("Recipeid")
                         .HasColumnType("int");
 
                     b.Property<string>("name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("id");
 
@@ -348,14 +329,12 @@ namespace Salus_temp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"), 1L, 1);
-
                     b.Property<int>("authOfProfileId")
                         .HasColumnType("int");
 
                     b.Property<string>("birthDate")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("eyesIndex")
                         .HasColumnType("int");
@@ -364,16 +343,16 @@ namespace Salus_temp.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("goalWeight")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<int>("hairIndex")
                         .HasColumnType("int");
 
                     b.Property<double>("height")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.Property<bool>("isAdmin")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("mouthIndex")
                         .HasColumnType("int");
@@ -382,7 +361,7 @@ namespace Salus_temp.Migrations
                         .HasColumnType("int");
 
                     b.Property<double>("weight")
-                        .HasColumnType("float");
+                        .HasColumnType("double");
 
                     b.HasKey("id");
 
