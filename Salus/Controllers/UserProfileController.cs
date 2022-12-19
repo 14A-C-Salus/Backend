@@ -5,6 +5,9 @@ namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+#if !DEBUG
+    [Authorize]
+#endif
     public class UserProfileController : Controller
     {
 
@@ -15,7 +18,7 @@ namespace Salus.Controllers
             _userProfileService = userProfileService;
         }
 
-        [HttpPut("create-profile"), Authorize]
+        [HttpPut("create-profile")]
         public IActionResult CreateProfile(UserSetDatasRequest request)
         {
             return this.Run(() =>
@@ -24,7 +27,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPatch("modify-profile"), Authorize]
+        [HttpPatch("modify-profile")]
         public IActionResult ModifyProfile(UserSetDatasRequest request)
         {
             return this.Run(() =>
@@ -33,7 +36,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPatch("set-profile-picture"), Authorize]
+        [HttpPatch("set-profile-picture")]
         public IActionResult SetProfilePicture(UserSetProfilePictureRequset request)
         {
             return this.Run(() =>

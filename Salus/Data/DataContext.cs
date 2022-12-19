@@ -20,26 +20,19 @@
         public DataContext(IConfiguration configuration)
         {
             _configuration = configuration;
-            connectionString = GetConnectionString(_configuration);
+#if DEBUG
+            connectionString = _configuration.GetConnectionString("LocalDB");
+#else
+            connectionString = _configuration.GetConnectionString("MyAspDB");
+#endif
         }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
 
             optionsBuilder
                 .UseSqlServer(connectionString);
-        }
-
-        public static string GetConnectionString(IConfiguration config)
-        {
-            if (config.GetSection("Host:Use").Value == "BsiteDB")
-                return config.GetConnectionString("BsiteDB");
-            if (config.GetSection("Host:Use").Value == "LocalDB")
-                return config.GetConnectionString("LocalDB");
-            else if (config.GetSection("Host:Use").Value == "MyAspDB")
-                return config.GetConnectionString("MyAspDB");
-            else
-                throw new Exception("Invalid option in appsettings in 'Host:Use' value.");
         }
 
 
