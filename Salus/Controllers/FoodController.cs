@@ -7,13 +7,9 @@
 #endif
     public class FoodController:Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IConfiguration _configuration;
         private readonly IFoodService _foodService;
-        public FoodController(DataContext dataContext, IConfiguration configuration, IFoodService foodService)
+        public FoodController(IFoodService foodService)
         {
-            _dataContext = dataContext;
-            _configuration = configuration;
             _foodService = foodService;
         }
     }

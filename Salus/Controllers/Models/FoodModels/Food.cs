@@ -8,6 +8,8 @@
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
+        public bool verifeid { get; set; } = false;
+
 
         //Connections
         public List<RecipesIncludeIngredients> recipes { get; set; }
