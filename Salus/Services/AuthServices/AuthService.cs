@@ -209,7 +209,7 @@ namespace Salus.Services.AuthServices
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, auth.username),
-                new Claim(ClaimTypes.Email, auth.email),
+                new Claim(ClaimTypes.Role, auth.isAdmin ? "Admin" : "User"),
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

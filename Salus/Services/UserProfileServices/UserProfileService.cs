@@ -46,7 +46,6 @@
 
 
             var userProfile = new UserProfile();
-            userProfile.isAdmin = false;
             userProfile.auth = auth;
 
 
