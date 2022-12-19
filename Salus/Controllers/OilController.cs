@@ -1,20 +1,44 @@
-﻿namespace Salus.Controllers
+﻿using Salus.WebAPI;
+
+namespace Salus.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
 #if !DEBUG
-    [Authorize]
+    [Authorize(Roles = "Admin")]
 #endif
     public class OilController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IConfiguration _configuration;
         private readonly IOilService _oilService;
-        public OilController(DataContext dataContext, IConfiguration configuration, IOilService oilService)
+        public OilController(IOilService oilService)
         {
-            _dataContext = dataContext;
-            _configuration = configuration;
             _oilService = oilService;
+        }
+        [HttpPut("create")]
+        public IActionResult Create(OilCreateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_oilService.Create(request));
+            });
+        }
+        [HttpPatch("update")]
+        public IActionResult Update(OilUpdateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_oilService.Update(request));
+            });
+        }
+        [HttpDelete("delete")]
+        public IActionResult Delete(int id)
+        {
+            return this.Run(() =>
+            {
+                _oilService.Delete(id);
+                return Ok();
+            });
         }
     }
 }

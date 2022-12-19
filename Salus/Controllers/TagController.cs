@@ -9,21 +9,17 @@ namespace Salus.Controllers
 #endif
     public class TagController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IConfiguration _configuration;
         private readonly ITagService _tagService;
-        public TagController(DataContext dataContext, IConfiguration configuration, ITagService tagService)
+        public TagController(ITagService tagService)
         {
-            _dataContext = dataContext;
-            _configuration = configuration;
             _tagService = tagService;
         }
         [HttpPut("create")]
-        public IActionResult Create(TagCreateRequest tag)
+        public IActionResult Create(TagCreateRequest request)
         {
             return this.Run(() =>
             {
-                return Ok(_tagService.Create(tag));
+                return Ok(_tagService.Create(request));
             });
         }
         [HttpPatch("update")]
