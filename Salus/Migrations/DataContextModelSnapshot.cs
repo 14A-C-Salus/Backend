@@ -32,6 +32,9 @@ namespace Salus.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("isAdmin")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<byte[]>("passwordHash")
                         .IsRequired()
                         .HasColumnType("longblob");
@@ -350,9 +353,6 @@ namespace Salus.Migrations
 
                     b.Property<double>("height")
                         .HasColumnType("double");
-
-                    b.Property<bool>("isAdmin")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("mouthIndex")
                         .HasColumnType("int");

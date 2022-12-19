@@ -11,8 +11,8 @@ using Salus.Data;
 namespace Salus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221219074755_LocalHost")]
-    partial class LocalHost
+    [Migration("20221219101629_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,6 +33,9 @@ namespace Salus.Migrations
                     b.Property<string>("email")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("isAdmin")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<byte[]>("passwordHash")
                         .IsRequired()
@@ -352,9 +355,6 @@ namespace Salus.Migrations
 
                     b.Property<double>("height")
                         .HasColumnType("double");
-
-                    b.Property<bool>("isAdmin")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<int>("mouthIndex")
                         .HasColumnType("int");

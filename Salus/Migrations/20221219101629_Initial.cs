@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Salus.Migrations
 {
-    public partial class LocalHost : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,6 +25,7 @@ namespace Salus.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     passwordHash = table.Column<byte[]>(type: "longblob", nullable: false),
                     passwordSalt = table.Column<byte[]>(type: "longblob", nullable: false),
+                    isAdmin = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     verificationToken = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     date = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -63,7 +64,6 @@ namespace Salus.Migrations
                     birthDate = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     gender = table.Column<int>(type: "int", nullable: false),
-                    isAdmin = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     goalWeight = table.Column<double>(type: "double", nullable: false),
                     hairIndex = table.Column<int>(type: "int", nullable: false),
                     skinIndex = table.Column<int>(type: "int", nullable: false),

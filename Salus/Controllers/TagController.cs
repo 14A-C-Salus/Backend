@@ -1,9 +1,11 @@
-﻿namespace Salus.Controllers
+﻿using Salus.WebAPI;
+
+namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
 #if !DEBUG
-    [Authorize]
+    [Authorize(Roles = "Admin")]
 #endif
     public class TagController : Controller
     {
@@ -15,6 +17,31 @@
             _dataContext = dataContext;
             _configuration = configuration;
             _tagService = tagService;
+        }
+        [HttpPut("create")]
+        public IActionResult Create(TagCreateRequest tag)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_tagService.Create(tag));
+            });
+        }
+        [HttpPatch("update")]
+        public IActionResult Update(TagUpdateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_tagService.Update(request));
+            });
+        }
+        [HttpDelete("delete")]
+        public IActionResult Delete(int id)
+        {
+            return this.Run(() =>
+            {
+                _tagService.Delete(id);
+                return Ok();
+            });
         }
     }
 }
