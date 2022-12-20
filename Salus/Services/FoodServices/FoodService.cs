@@ -32,6 +32,7 @@ namespace Salus.Services.FoodServices
                 };
                 foodHasTags.Add(foodHasTag);
                 _dataContext.Set<FoodsHaveTags>().Add(foodHasTag);
+                //todo
                 tag.foodsThatHave = foodHasTags;
             }
             food.tags = foodHasTags;
