@@ -46,7 +46,7 @@ namespace Salus.Services.FoodServices
             _crud.Delete(oil);
         }
 
-        protected void CheckData(Oil oil)
+        private void CheckData(Oil oil)
         {
             if (oil.name.Length > 50)
                 throw new Exception("Name can't be longer then 50 character!");

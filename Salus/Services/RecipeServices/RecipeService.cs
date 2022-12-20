@@ -22,6 +22,10 @@
             {
                 Author = userProfile,
                 name = request.name,
+                fat = 0,
+                protein = 0,
+                carbohydrate = 0,
+                kcal = 0
             };
 
             var ingredients = GetAllIngredients(request).Result;

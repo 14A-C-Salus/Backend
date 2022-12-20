@@ -212,7 +212,7 @@ namespace Salus.Services.AuthServices
                 new Claim(ClaimTypes.Role, auth.isAdmin ? "Admin" : "User"),
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration.GetSection("Keys:JwtKey").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
