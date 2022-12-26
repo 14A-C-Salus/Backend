@@ -18,14 +18,5 @@ namespace Salus.Controllers
             _configuration = configuration;
             _recipeService = recipeService;
         }
-
-        [HttpPut("write-recipe")]
-        public IActionResult WriteRecipe(WriteRecipeRequest request)
-        {
-            return this.Run(() =>
-            {
-                return Ok(_recipeService.WriteRecipe(request).Result);
-            });
-        }
     }
 }
