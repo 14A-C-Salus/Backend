@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Salus.Data;
 
@@ -10,9 +11,10 @@ using Salus.Data;
 namespace Salus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221220100956_Nullable24H")]
+    partial class Nullable24H
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,15 +324,6 @@ namespace Salus.Migrations
                     b.Property<string>("description")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<int>("foodProperty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("max")
-                        .HasColumnType("int");
-
-                    b.Property<int>("min")
-                        .HasColumnType("int");
 
                     b.Property<string>("name")
                         .IsRequired()

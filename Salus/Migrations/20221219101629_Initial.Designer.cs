@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Salus.Data;
 
@@ -10,9 +11,10 @@ using Salus.Data;
 namespace Salus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221219101629_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +78,7 @@ namespace Salus.Migrations
                     b.Property<int>("kcal")
                         .HasColumnType("int");
 
-                    b.Property<int?>("last24hid")
+                    b.Property<int>("last24hid")
                         .HasColumnType("int");
 
                     b.Property<string>("name")
@@ -85,9 +87,6 @@ namespace Salus.Migrations
 
                     b.Property<int>("protein")
                         .HasColumnType("int");
-
-                    b.Property<bool>("verifeid")
-                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("id");
 
@@ -102,12 +101,8 @@ namespace Salus.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("calIn14Ml")
+                    b.Property<int>("kcalIn14Ml")
                         .HasColumnType("int");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.HasKey("id");
 
@@ -301,6 +296,9 @@ namespace Salus.Migrations
                     b.Property<int>("protein")
                         .HasColumnType("int");
 
+                    b.Property<bool>("verifeid")
+                        .HasColumnType("tinyint(1)");
+
                     b.HasKey("id");
 
                     b.HasIndex("Authorid");
@@ -317,19 +315,6 @@ namespace Salus.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("Recipeid")
-                        .HasColumnType("int");
-
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("foodProperty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("max")
-                        .HasColumnType("int");
-
-                    b.Property<int>("min")
                         .HasColumnType("int");
 
                     b.Property<string>("name")
@@ -392,7 +377,9 @@ namespace Salus.Migrations
                 {
                     b.HasOne("Salus.Controllers.Models.Last24hModels.Last24h", "last24h")
                         .WithMany("foods")
-                        .HasForeignKey("last24hid");
+                        .HasForeignKey("last24hid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("last24h");
                 });

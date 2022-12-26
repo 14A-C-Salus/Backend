@@ -1,15 +1,26 @@
 //models
 global using Salus.Controllers.Models.AuthModels;
-global using Salus.Controllers.Models.UserProfileModels;
-global using Salus.Controllers.Models.SocialMediaModels;
+global using Salus.Controllers.Models.FoodModels;
 global using Salus.Controllers.Models.JoiningEntity;
+global using Salus.Controllers.Models.Last24hModels;
+global using Salus.Controllers.Models.RecipeModels;
+global using Salus.Controllers.Models.SocialMediaModels;
+global using Salus.Controllers.Models.TagModels;
+global using Salus.Controllers.Models.UserProfileModels;
+
 //services
-global using Salus.Services.UserProfileServices;
 global using Salus.Services.AuthServices;
+global using Salus.Services.FoodServices;
+global using Salus.Services.Last24hServices;
+global using Salus.Services.RecipeServices;
 global using Salus.Services.SocialMediaServices;
+global using Salus.Services.TagServices;
+global using Salus.Services.UserProfileServices;
+
 //templates
 global using Salus.Templates;
 
+global using Microsoft.AspNetCore.Mvc;
 global using System.ComponentModel.DataAnnotations;
 global using Salus.Data;
 global using Microsoft.EntityFrameworkCore;
@@ -22,6 +33,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Newtonsoft.Json;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -29,9 +41,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IFoodService, FoodService>();
+builder.Services.AddScoped<ILast24hService, Last24hService>();
+builder.Services.AddScoped<IOilService, OilService>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<ISocialMediaService, SocialMediaService>();
+builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {

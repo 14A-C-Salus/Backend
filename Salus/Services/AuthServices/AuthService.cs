@@ -35,8 +35,9 @@ namespace Salus.Services.AuthServices
                 throw new Exception("Email already exists.");
 
             var auth = NewAuth(request);
-            if (_configuration.GetSection("Host:Use").Value != "LocalDB")
-                SendToken(auth);
+#if !DEBUG
+            SendToken(auth);
+#endif
             _dataContext.auths.Add(auth);
             await _dataContext.SaveChangesAsync();
             return auth;
@@ -208,10 +209,10 @@ namespace Salus.Services.AuthServices
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, auth.username),
-                new Claim(ClaimTypes.Email, auth.email),
+                new Claim(ClaimTypes.Role, auth.isAdmin ? "Admin" : "User"),
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 _configuration.GetSection("Keys:JwtKey").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

@@ -5,6 +5,9 @@ namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+#if !DEBUG
+    [Authorize]
+#endif
     public class SocialMediaController : Controller
     {
         private readonly DataContext _dataContext;
@@ -18,7 +21,7 @@ namespace Salus.Controllers
             _socialMediaService = socialMediaService;
         }
 
-        [HttpPatch("unfollow-follow"), Authorize]
+        [HttpPatch("unfollow-follow")]
         public IActionResult UnFollowFollow(UnFollowFollowRequest request)
         {
             return this.Run(() =>
@@ -29,7 +32,7 @@ namespace Salus.Controllers
         }
 
 
-        [HttpPut("write-comment"), Authorize]
+        [HttpPut("write-comment")]
         public IActionResult WriteComment(WriteCommentRequest request)
         {
             return this.Run(() =>
@@ -38,7 +41,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpDelete("delete-comment"), Authorize]
+        [HttpDelete("delete-comment")]
         public IActionResult DeleteComment(int commentId)
         {
             return this.Run(() =>
@@ -48,7 +51,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPatch("modify-comment"), Authorize]
+        [HttpPatch("modify-comment")]
         public IActionResult ModifyComment(ModifyCommentRequest request)
         {
             return this.Run(() =>
@@ -57,7 +60,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpGet("get-all-comment-by-authenticated-email"), Authorize]
+        [HttpGet("get-all-comment-by-authenticated-email")]
         public IActionResult GetAllComment()
         {
             return this.Run(() =>

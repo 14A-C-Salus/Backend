@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Salus.Data;
 
@@ -10,9 +11,10 @@ using Salus.Data;
 namespace Salus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221220095147_OrganisationAndRename")]
+    partial class OrganisationAndRename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +78,7 @@ namespace Salus.Migrations
                     b.Property<int>("kcal")
                         .HasColumnType("int");
 
-                    b.Property<int?>("last24hid")
+                    b.Property<int>("last24hid")
                         .HasColumnType("int");
 
                     b.Property<string>("name")
@@ -323,15 +325,6 @@ namespace Salus.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("foodProperty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("max")
-                        .HasColumnType("int");
-
-                    b.Property<int>("min")
-                        .HasColumnType("int");
-
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -392,7 +385,9 @@ namespace Salus.Migrations
                 {
                     b.HasOne("Salus.Controllers.Models.Last24hModels.Last24h", "last24h")
                         .WithMany("foods")
-                        .HasForeignKey("last24hid");
+                        .HasForeignKey("last24hid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("last24h");
                 });

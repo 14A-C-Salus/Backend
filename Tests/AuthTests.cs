@@ -6,7 +6,7 @@ using System.Security.Claims;
 
 namespace Tests
 {
-    public class AuthTests
+    public class AuthTests : IDisposable
     {
         protected readonly IConfiguration _configuration;
 
@@ -14,7 +14,8 @@ namespace Tests
 
         private readonly DataContext _dataContext;
         private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
-
+        private readonly Auth _auth;
+        private readonly AuthRegisterRequest _request;
         public AuthTests()
         {
             var context = new DefaultHttpContext();
@@ -22,135 +23,92 @@ namespace Tests
             _configuration = InitConfiguration();
             _dataContext = new DataContext(_configuration);
             _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
-        }
-
-        [Fact]
-        private void NewAuthWithRequest()
-        {
-            var request = CreateValidAuthRegisterRequest();
-
-            var auth = _authService.NewAuth(request);
-
-            Assert.Equal(request.username, auth.username);
-            Assert.Equal(request.email, auth.email);
-            Assert.Null(auth.date);
-            Assert.Null(auth.passwordResetToken);
-            Assert.Null(auth.resetTokenExpires);
-        }
-
-        [Fact]
-        private void NewAuthWithEmptyRequest()
-        {
-            var request = new AuthRegisterRequest();
-            Assert.ThrowsAny<Exception>(() => _authService.NewAuth(request));
-        }
-
-        [Fact]
-        private void SendEmailToInvalidAddress()
-        {
-            var auth = new Auth()
+            var password = RandomString(12);
+            _request = new AuthRegisterRequest()
             {
-                email = "notvadfgdfgdfglidemail@exist.not",
-                username = "Just need to test",
-                verificationToken = "Also need to test"
+                username = $"{RandomString(12)}",
+                email = $"{RandomString(12)}@address.com",
+                password = password,
+                confirmPassword = password
             };
+            _auth = _authService.Register(_request).Result;
+        }
 
-            Exception ex = Assert.Throws<Exception>(() => _authService.SendToken(auth));
-
-            Assert.Equal("Email address doesn't exist.", ex.Message);
+        public void Dispose()
+        {
+            _dataContext.auths.Remove(_auth);
+            _dataContext.SaveChanges();
         }
 
         [Fact]
-        private void CreateTokenWithValidData()
+        private void Register()
         {
-            var request = CreateValidAuthRegisterRequest();
-            var auth = _authService.NewAuth(request);
-
-            var jwt = _authService.CreateToken(auth);
-
-            Assert.Equal(request.email, GetEmailfromJwt(jwt));
+            //before each
+            Assert.Equal(_request.username, _auth.username);
+            Assert.Equal(_request.email, _auth.email);
+            Assert.NotNull(_auth.passwordHash);
+            Assert.NotNull(_auth.passwordSalt);
+            Assert.Null(_auth.date);
+            Assert.Null(_auth.passwordResetToken);
+            Assert.Null(_auth.resetTokenExpires);
         }
 
         [Fact]
-        private void CreateTokenWithEmptyAuth()
+        private async void Verify()
         {
-            var auth = new Auth();
-            Assert.Throws<Exception>(() => _authService.CreateToken(auth));
+            _ = await _authService.Verify(_auth.verificationToken);
+            Assert.NotNull(_auth.date);
         }
 
         [Fact]
-        private void VerifyPasswordHashWithValidData()
+        private async void Login()
         {
-            var request = CreateValidAuthRegisterRequest();
-            var auth = _authService.NewAuth(request);
-
-            Assert.True(_authService.VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt));
+            _ = await _authService.Verify(_auth.verificationToken);
+            var loginRequest = new AuthLoginRequest()
+            {
+                email = _request.email,
+                password = _request.password
+            };
+            var jwt = _authService.Login(loginRequest).Result;
+            Assert.NotNull(jwt);
+            Assert.Equal(loginRequest.email, GetEmailfromJwt(jwt));
         }
 
         [Fact]
-        private void VerifyPasswordHashWithWrongPassword()
+        private async void ForgotPassword()
         {
-            var request = CreateValidAuthRegisterRequest();
-            var auth = _authService.NewAuth(request);
-            var wrongPassword = "wrongpassword";
-
-            Assert.False(_authService.VerifyPasswordHash(wrongPassword, auth.passwordHash, auth.passwordSalt));
+            _ = await _authService.ForgotPassword(_auth.email);
+            Assert.NotNull(_auth.passwordResetToken);
+            Assert.NotNull(_auth.resetTokenExpires);
         }
 
         [Fact]
-        private void SetTokenAndExpires()
+        private async void ResetPassword()
         {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-
-            _authService.SetTokenAndExpires(auth);
-
-            Assert.NotNull(auth.resetTokenExpires);
-            Assert.NotNull(auth.passwordResetToken);
+            _ = await _authService.ForgotPassword(_auth.email);
+            byte[][] oldPasswordHashAndSalt = {_auth.passwordHash, _auth.passwordSalt};
+            
+            var resetPasswordRequest = new AuthResetPasswordRequest()
+            {
+                token = _auth.passwordResetToken,
+                password = "newpassword",
+                confirmPassword = "newpassword"
+            };
+            _ = _authService.ResetPassword(resetPasswordRequest).Result;
+            Assert.Null(_auth.passwordResetToken);
+            Assert.Null(_auth.resetTokenExpires);
+            Assert.NotEqual(_auth.passwordHash, oldPasswordHashAndSalt[0]);
+            Assert.NotEqual(_auth.passwordSalt, oldPasswordHashAndSalt[1]);
         }
 
+        //[Fact]
+        //private void InvalidDataTestExample()
+        //{
+        //    Exception ex = Assert.Throws<Exception>(() => _authService.Method());
+        //    Assert.Equal("Email address doesn't exist.", ex.Message);
 
-        [Fact]
-        private void SetTokenAndExpiresnWithEmptyAuth()
-        {
-            var auth = new Auth();
-
-            Assert.Throws<Exception>(() => _authService.SetTokenAndExpires(auth));
-
-            Assert.Null(auth.resetTokenExpires);
-            Assert.Null(auth.passwordResetToken);
-        }
-
-        [Fact]
-        private void UpdateAuthResetPasswordData()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var oldPasswordHash = auth.passwordHash;
-            var oldPasswordSalt = auth.passwordSalt;
-
-            _authService.SetTokenAndExpires(auth);
-            _authService.UpdateAuthResetPasswordData("newpassword", auth);
-
-            Assert.Null(auth.resetTokenExpires);
-            Assert.Null(auth.passwordResetToken);
-            Assert.NotEqual(oldPasswordHash, auth.passwordHash);
-            Assert.NotEqual(oldPasswordSalt, auth.passwordSalt);
-        }
-
-        [Fact]
-        private void UpdateAuthResetPasswordDataWithoutSetTokenAndExpires()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var oldPasswordHash = auth.passwordHash;
-            var oldPasswordSalt = auth.passwordSalt;
-
-            Exception ex = Assert.Throws<Exception>(() => _authService.UpdateAuthResetPasswordData("newpassword", auth));
-
-            Assert.Equal("You need first use the 'forgoted-password' service!", ex.Message);
-            Assert.Null(auth.resetTokenExpires);
-            Assert.Null(auth.passwordResetToken);
-            Assert.Equal(oldPasswordHash, auth.passwordHash);
-            Assert.Equal(oldPasswordSalt, auth.passwordSalt);
-        }
+        //    Assert.ThrowsAny<Exception>(() => _authService.NewAuth(request));
+        //}
 
         //not Fact methods
         private static IConfiguration InitConfiguration()
@@ -161,7 +119,15 @@ namespace Tests
 
             return config;
         }
+        private static string RandomString(int length)
+        {
+            var chars = Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8);
 
+            var randomStr = new string(chars.SelectMany(str => str)
+                                            .OrderBy(c => Guid.NewGuid())
+                                            .Take(length).ToArray());
+            return randomStr;
+        }
         private static string GetEmailfromJwt(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -170,17 +136,6 @@ namespace Tests
             List<Claim> claims = securityToken.Claims.ToList();
 
             return claims[1].Value.ToString();
-        }
-
-        private static AuthRegisterRequest CreateValidAuthRegisterRequest()
-        {
-            return new AuthRegisterRequest()
-            {
-                email = "test@emailaddress.test",
-                username = "testtest",
-                password = "testtest",
-                confirmPassword = "testtest"
-            };
         }
     }
 }

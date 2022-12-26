@@ -1,170 +1,164 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Salus.Controllers.Models.AuthModels;
 using Salus.Controllers.Models.UserProfileModels;
 using Salus.Data;
 using Salus.Services.AuthServices;
 using Salus.Services.UserProfileServices;
+using System.Net.Http.Headers;
 
 namespace Tests
 {
-    public class UserProfileTests
+    public class UserProfileTests:IDisposable
     {
         private readonly UserProfileService _userProfileService;
         protected readonly IConfiguration _configuration;
 
         private readonly AuthService _authService;
 
+
+
         private readonly DataContext _dataContext;
         private readonly Mock<IHttpContextAccessor> _httpContextAccessorMock = new();
 
+        private readonly Auth _auth;
+        private readonly AuthRegisterRequest _registerRequest;
+
+        private readonly UserProfile _userProfile;
+        private readonly UserSetDatasRequest _userSetDatasRequest;
+
         public UserProfileTests()
         {
+            //try to make await
             var context = new DefaultHttpContext();
             _httpContextAccessorMock.Setup(_ => _.HttpContext).Returns(context);
+
             _configuration = InitConfiguration();
+
             _dataContext = new DataContext(_configuration);
+
+            //register and login
             _authService = new AuthService(_httpContextAccessorMock.Object, _dataContext, _configuration);
+
+            var password = RandomString(12);
+            _registerRequest = new AuthRegisterRequest()
+            {
+                username = $"{RandomString(12)}",
+                email = $"{RandomString(12)}@address.com",
+                password = password,
+                confirmPassword = password
+            };
+
+            _auth = RegisterAndVerify().Result;
+
+            var jwt = _authService.Login(new AuthLoginRequest()
+            {
+                email = _registerRequest.email,
+                password = _registerRequest.password,
+            }).Result;
+            Login();
+
+            //Create valid User Profile
             _userProfileService = new UserProfileService(_dataContext, _authService);
-        }
-
-        [Fact]
-        private async void CreateUserProfile()
-        {
-            var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-            var request = CreateValidUserProfileRequest();
-
-            await _userProfileService.CreateProfile(request);
-
-            var userProfile = (UserProfile) _dataContext.userProfiles.ToList().Where(u => u.authOfProfileId == auth.id);
-
-            Assert.False(userProfile.isAdmin);
-            Assert.Equal(auth.id, userProfile.authOfProfileId);
-            Assert.Equal(userProfile.height, request.height);
-            Assert.Equal(userProfile.weight, request.weight);
-            Assert.Equal(userProfile.goalWeight, request.goalWeight);
-            Assert.Equal(userProfile.gender, request.gender);
-            Assert.Equal(userProfile.birthDate, request.birthDate.ToString("yyyy.MM.dd."));
-        }
-
-        //[Fact]
-        //private void UpdateUserProfile()
-        //{
-        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-        //    var oldRequest = CreateValidUserProfileRequest();
-        //    var userProfile = _userProfileService.SetUserProfileData(oldRequest, null, auth);
-        //    var newRequest = CreateValidUserProfileRequestForUpdate();
-
-        //    //Update the birthDate, gender, height and auto generate the new goalWeight
-        //    userProfile = _userProfileService.SetUserProfileData(newRequest, userProfile, auth);
-
-        //    Assert.False(userProfile.isAdmin);
-        //    Assert.Equal(auth.id, userProfile.authOfProfileId);
-        //    Assert.Equal(userProfile.weight, oldRequest.weight);
-        //    Assert.NotEqual(userProfile.goalWeight, oldRequest.goalWeight);
-
-        //    Assert.Equal(userProfile.height, newRequest.height);
-        //    Assert.Equal(userProfile.birthDate, newRequest.birthDate.ToString("yyyy.MM.dd."));
-        //    Assert.Equal(userProfile.gender, newRequest.gender);
-        //}
-
-        //[Fact]
-        //private void CreateUserProfileWithEmptyRequest()
-        //{
-        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-        //    var request = new UserSetDatasRequest();
-        //    Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfileData(request, null, auth));
-        //    Assert.Equal("Invalid userProfile", ex.Message);
-        //}
-
-        //[Fact]
-        //private void CreateProfilePicture()
-        //{
-        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-        //    var userProfileRequest = CreateValidUserProfileRequest();
-        //    var profilePictureRequest = CreateValidProfilePictureRequest();
-        //    var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
-
-        //    userProfile = _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile);
-
-        //    Assert.Equal(userProfile.eyesIndex, profilePictureRequest.eyesIndex);
-        //    Assert.Equal(userProfile.hairIndex, profilePictureRequest.hairIndex);
-        //    Assert.Equal(userProfile.mouthIndex, profilePictureRequest.mouthIndex);
-        //    Assert.Equal(userProfile.skinIndex, profilePictureRequest.skinIndex);
-        //}
-
-        //[Fact]
-        //private void UpdateProfilePicture()
-        //{
-        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-        //    var userProfileRequest = CreateValidUserProfileRequest();
-        //    var oldProfilePictureRequest = CreateValidProfilePictureRequest();
-        //    var newProfilePictureRequest = CreateValidProfilePictureRequestForUpdate();
-        //    var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
-
-        //    userProfile = _userProfileService.SetUserProfilePicture(oldProfilePictureRequest, userProfile);
-        //    //Update the eyes and the hair
-        //    userProfile = _userProfileService.SetUserProfilePicture(newProfilePictureRequest, userProfile);
-
-        //    Assert.Equal(userProfile.eyesIndex, newProfilePictureRequest.eyesIndex);
-        //    Assert.Equal(userProfile.hairIndex, newProfilePictureRequest.hairIndex);
-        //    Assert.NotEqual(userProfile.eyesIndex, oldProfilePictureRequest.eyesIndex);
-        //    Assert.NotEqual(userProfile.hairIndex, oldProfilePictureRequest.hairIndex);
-        //    Assert.Equal(userProfile.mouthIndex, oldProfilePictureRequest.mouthIndex);
-        //    Assert.Equal(userProfile.skinIndex, oldProfilePictureRequest.skinIndex);
-        //}
-
-        //[Fact]
-        //private void CreateProfilePictureWithEmpty()
-        //{
-        //    var auth = _authService.NewAuth(CreateValidAuthRegisterRequest());
-        //    var userProfileRequest = CreateValidUserProfileRequest();
-        //    var profilePictureRequest = new UserSetProfilePictureRequset();
-        //    var userProfile = _userProfileService.SetUserProfileData(userProfileRequest, null, auth);
-
-        //    Exception ex = Assert.Throws<Exception>(() => _userProfileService.SetUserProfilePicture(profilePictureRequest, userProfile));
-        //    Assert.Equal("Invalid profile picture.", ex.Message);
-        //}
-        //not Fact methods
-        private static UserSetDatasRequest CreateValidUserProfileRequest()
-        {
-            return new UserSetDatasRequest()
+            _userSetDatasRequest = new UserSetDatasRequest()
             {
                 birthDate = DateTime.Now.AddYears(-20),
                 gender = genderEnum.male,
-                height = 175,
-                weight = 80,
-                goalWeight = 60
+                height = 180,
+                weight = 75
             };
+            _userProfile = _userProfileService.CreateProfile(_userSetDatasRequest).Result;
         }
 
-        private static UserSetDatasRequest CreateValidUserProfileRequestForUpdate()
+        private void Login()
         {
-            return new UserSetDatasRequest()
-            {
-                birthDate = DateTime.Now.AddYears(-25),
-                gender = genderEnum.female,
-                height = 170
-            };
+            
         }
 
-        private static UserSetProfilePictureRequset CreateValidProfilePictureRequest()
+        private async Task<Auth> RegisterAndVerify()
         {
-            return new UserSetProfilePictureRequset()
-            {
-                eyesIndex = eyesEnum.blue,
-                hairIndex = hairEnum.blond,
-                mouthIndex = mouthEnum.happy,
-                skinIndex = skinEnum.light
-            };
+            var auth = _authService.Register(_registerRequest).Result;
+            _ = await _authService.Verify(auth.verificationToken);
+            return auth;
         }
-        private static UserSetProfilePictureRequset CreateValidProfilePictureRequestForUpdate()
+
+        public void Dispose()
         {
-            return new UserSetProfilePictureRequset()
-            {
-                eyesIndex = eyesEnum.green,
-                hairIndex = hairEnum.ginger
-            };
+            _dataContext.auths.Remove(_auth);
+            _dataContext.SaveChanges();
         }
+
+        [Fact]
+        public void CreateProfile()
+        {
+            Assert.Equal(_userProfile.height, _userSetDatasRequest.height);
+            Assert.Equal(_userProfile.weight, _userSetDatasRequest.weight);
+            Assert.Equal(_userProfile.birthDate, _userSetDatasRequest.birthDate.ToString("yyyy.MM.dd."));
+            Assert.Equal(_userProfile.gender, _userSetDatasRequest.gender);
+            Assert.NotEqual(default, _userProfile.goalWeight);
+        }
+
+        //        //not Fact methods
+        //        private static UserSetDatasRequest CreateValidUserProfileRequest()
+        //        {
+        //            return new UserSetDatasRequest()
+        //            {
+        //                birthDate = DateTime.Now.AddYears(-20),
+        //                gender = genderEnum.male,
+        //                height = 175,
+        //                weight = 80,
+        //                goalWeight = 60
+        //            };
+        //        }
+
+        //        private static UserSetDatasRequest CreateValidUserProfileRequestForUpdate()
+        //        {
+        //            return new UserSetDatasRequest()
+        //            {
+        //                birthDate = DateTime.Now.AddYears(-25),
+        //                gender = genderEnum.female,
+        //                height = 170
+        //            };
+        //        }
+
+        //        private static UserSetProfilePictureRequset CreateValidProfilePictureRequest()
+        //        {
+        //            return new UserSetProfilePictureRequset()
+        //            {
+        //                eyesIndex = eyesEnum.blue,
+        //                hairIndex = hairEnum.blond,
+        //                mouthIndex = mouthEnum.happy,
+        //                skinIndex = skinEnum.light
+        //            };
+        //        }
+        //        private static UserSetProfilePictureRequset CreateValidProfilePictureRequestForUpdate()
+        //        {
+        //            return new UserSetProfilePictureRequset()
+        //            {
+        //                eyesIndex = eyesEnum.green,
+        //                hairIndex = hairEnum.ginger
+        //            };
+        //        }
+        
+        
+        
+        private static string RandomString(int length)
+        {
+            var chars = Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 8);
+
+            var randomStr = new string(chars.SelectMany(str => str)
+                                            .OrderBy(c => Guid.NewGuid())
+                                            .Take(length).ToArray());
+            return randomStr;
+        }
+
         private static IConfiguration InitConfiguration()
         {
             var config = new ConfigurationBuilder()
@@ -173,15 +167,15 @@ namespace Tests
 
             return config;
         }
-        private static AuthRegisterRequest CreateValidAuthRegisterRequest()
-        {
-            return new AuthRegisterRequest()
-            {
-                email = "test@emailaddress.test",
-                username = "testtest",
-                password = "testtest",
-                confirmPassword = "testtest"
-            };
-        }
+        //        private static AuthRegisterRequest CreateValidAuthRegisterRequest()
+        //        {
+        //            return new AuthRegisterRequest()
+        //            {
+        //                email = "test@emailaddress.test",
+        //                username = "testtest",
+        //                password = "testtest",
+        //                confirmPassword = "testtest"
+        //            };
+        //        }
     }
 }
