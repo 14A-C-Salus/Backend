@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Salus.Controllers.Models.FoodModels;
 using System.Xml.Linq;
 
 namespace Salus.Services.FoodServices
@@ -11,6 +12,21 @@ namespace Salus.Services.FoodServices
         {
             _dataContext = dataContext;
             _crud = new CRUD<Food>(_dataContext);
+        }
+
+        public List<Tag> GetRecommendedTags(int foodId)
+        {
+            var food = _dataContext.Set<Food>().Find(foodId);
+            if (food == null)
+                throw new Exception();
+            List<Tag> tags = new();
+            foreach (Tag tag in _dataContext.Set<Tag>().ToList())
+            {
+                tag.food = food;
+                if (tag.recommend)
+                    tags.Add(tag);
+            }
+            return tags;
         }
 
         public Food AddTags(AddTagsToFoodRequest request)
@@ -33,7 +49,7 @@ namespace Salus.Services.FoodServices
                 foodHasTags.Add(foodHasTag);
                 _dataContext.Set<FoodsHaveTags>().Add(foodHasTag);
                 //todo
-                tag.foodsThatHave = foodHasTags;
+                tag.foodsThatHave.Add(foodHasTag);
             }
             food.tags = foodHasTags;
             food = _crud.Update(food);

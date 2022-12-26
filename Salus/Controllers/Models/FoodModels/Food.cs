@@ -10,7 +10,6 @@
         public int carbohydrate { get; set; }
         public bool verifeid { get; set; } = false;
 
-
         //Connections
         public IList<RecipesIncludeIngredients> recipes { get; set; }
         public IList<FoodsHaveTags> tags { get; set; }

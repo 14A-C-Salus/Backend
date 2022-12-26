@@ -17,7 +17,10 @@ namespace Salus.Services.TagServices
             var tag = new Tag()
             {
                 name = request.name,
-                description = request.description
+                description = request.description,
+                foodProperty = request.property,
+                max = request.maxValue,
+                min = request.minValue
             };
             CheckData(tag);
             tag = _crud.Create(tag);
@@ -55,6 +58,12 @@ namespace Salus.Services.TagServices
                 throw new Exception("Please enter at least 5 character to the name field.");
             if (tag.description.Length < 20)
                 throw new Exception("Please enter at least 20 character to the description field.");
+            if (tag.foodProperty == null && (tag.min != null || tag.max != null))
+                throw new Exception("You can't give value to min or max, if you dont choose a property.");
+            if (tag.max > 100 || tag.max < 0)
+                throw new Exception("Please enter a number between 0 and 100 to do max field!");
+            if (tag.min < 0 || tag.min > 100)
+                throw new Exception("Please enter a number between 0 and 100 to do min field!");
         }
     }
 }

@@ -7,5 +7,6 @@
         public Food VerifyUnVerify(int id);
         public void Delete(int id);
         public Food AddTags(AddTagsToFoodRequest request);
+        public List<Tag> GetRecommendedTags(int foodId);
     }
 }

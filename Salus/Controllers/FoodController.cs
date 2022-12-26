@@ -14,6 +14,14 @@ namespace Salus.Controllers
         {
             _foodService = foodService;
         }
+        [HttpGet("get-recommended-tags")]
+        public IActionResult GetRecommendedTags(int foodId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_foodService.GetRecommendedTags(foodId));
+            });
+        }
         [HttpPut("create")]
         public IActionResult Create(FoodCreateRequest request)
         {
