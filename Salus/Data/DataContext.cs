@@ -4,15 +4,15 @@ namespace Salus.Data
 {
     public class DataContext : DbContext
     {
-        public DbSet<Auth> auths => Set<Auth>();
-        public DbSet<Comment> comments => Set<Comment>();
-        public DbSet<Following> followings => Set<Following>();
-        public DbSet<Food> foods => Set<Food>();
-        public DbSet<Last24h> last24Hs => Set<Last24h>();
-        public DbSet<Oil> oils => Set<Oil>();
-        public DbSet<Recipe> recipes => Set<Recipe>();
-        public DbSet<Tag> tags => Set<Tag>();
-        public DbSet<UserProfile> userProfiles => Set<UserProfile>();
+        public DbSet<Auth> auths { get; set; }
+        public DbSet<Comment> comments { get; set; }
+        public DbSet<Following> followings { get; set; }
+        public DbSet<Food> foods { get; set; }
+        public DbSet<Last24h> last24Hs { get; set; }
+        public DbSet<Oil> oils { get; set; }
+        public DbSet<Recipe> recipes { get; set; }
+        public DbSet<Tag> tags { get; set; }
+        public DbSet<UserProfile> userProfiles { get; set; }
 
 
         private readonly IConfiguration _configuration;
