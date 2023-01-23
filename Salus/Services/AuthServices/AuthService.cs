@@ -10,14 +10,15 @@ namespace Salus.Services.AuthServices
     {
         private readonly DataContext _dataContext;
         private readonly IConfiguration _configuration;
-        private readonly IGenericServices<Auth> _crud;
+        private readonly GenericService<Auth> _genericServices;
+        public IHttpContextAccessor _httpContextAccessor;
 
-
-        public AuthService(DataContext dataContext, IConfiguration configuration, IGenericServices<Auth> genericServices)
+        public AuthService(DataContext dataContext, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
             _configuration = configuration;
-            _crud = genericServices;
+            _genericServices = new(dataContext, httpContextAccessor);
+            _httpContextAccessor = httpContextAccessor;
         }
 
         //public methods
@@ -31,7 +32,7 @@ namespace Salus.Services.AuthServices
 #if !DEBUG
             SendToken(auth);
 #endif
-            _crud.Create(auth);
+            _genericServices.Create(auth);
             return auth;
         }
         public async Task<string> Login(AuthLoginRequest request)

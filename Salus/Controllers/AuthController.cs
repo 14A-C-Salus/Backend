@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Salus.Services;
 using Salus.WebAPI;
 using System.ComponentModel.DataAnnotations;
 namespace Salus.Controllers
@@ -8,13 +9,10 @@ namespace Salus.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IConfiguration _configuration;
         private readonly IAuthService _authService;
-        public AuthController(DataContext dataContext, IConfiguration configuration, IAuthService authService)
+
+        public AuthController(IAuthService authService)
         {
-            _dataContext = dataContext;
-            _configuration = configuration;
             _authService = authService;
         }
         [HttpPut("register")]

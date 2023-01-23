@@ -1,4 +1,5 @@
-﻿using Salus.WebAPI;
+﻿using Salus.Services;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
@@ -8,6 +9,7 @@ namespace Salus.Controllers
     public class FoodController:Controller
     {
         private readonly IFoodService _foodService;
+
         public FoodController(IFoodService foodService)
         {
             _foodService = foodService;

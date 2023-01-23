@@ -3,17 +3,17 @@
     public class RecipeService : IRecipeService
     {
         private readonly DataContext _dataContext;
-        private readonly IGenericServices<Recipe> _crud;
+        private readonly GenericService<Recipe> _genericServices;
 
-        public RecipeService(DataContext dataContext, IGenericServices<Recipe> crud)
+        public RecipeService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
-            _crud = crud;
+            _genericServices = new(dataContext, httpContextAccessor);
         }
 
         public Recipe WriteRecipe(WriteRecipeRequest request)
         {
-            var userProfile = _crud.GetAuthenticatedUserProfile(_dataContext).Result;
+            var userProfile = _genericServices.GetAuthenticatedUserProfile();
 
             var recipe = new Recipe()
             {
@@ -43,7 +43,7 @@
                 }
             }
 
-            _crud.Create(recipe);
+            _genericServices.Create(recipe);
             //TODO: sütési metódussal számolni
 
             return recipe;
@@ -58,7 +58,7 @@
 
             foreach (var ingredientId in request.ingredientIds)
             {
-                ingredients.Add(await _dataContext.foods.SingleAsync(i => i.id == ingredientId));
+                ingredients.Add(await _dataContext.Set<Food>().SingleAsync(i => i.id == ingredientId));
             }
 
             return ingredients;

@@ -33,6 +33,8 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Newtonsoft.Json;
 using Salus.Services;
+using System.Reflection;
+using System.Reflection.Emit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,17 +44,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ILast24hService, Last24hService>();
-builder.Services.AddScoped<IGenericServices, GenericServices>();
 builder.Services.AddScoped<IOilService, OilService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<ISocialMediaService, SocialMediaService>();
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme

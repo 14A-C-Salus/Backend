@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Salus.Services;
 using Salus.WebAPI;
 
 namespace Salus.Controllers
@@ -8,14 +9,10 @@ namespace Salus.Controllers
     [Authorize]
     public class SocialMediaController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
         private readonly ISocialMediaService _socialMediaService;
 
-        public SocialMediaController(DataContext dataContext, IAuthService authService, ISocialMediaService socialMediaService)
+        public SocialMediaController(ISocialMediaService socialMediaService)
         {
-            _dataContext = dataContext;
-            _authService = authService;
             _socialMediaService = socialMediaService;
         }
 

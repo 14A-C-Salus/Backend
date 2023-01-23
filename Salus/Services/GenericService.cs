@@ -1,21 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
 using Salus.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Salus.Services
 {
-    public class GenericServices<T> where T : class,  IGenericServices<T>
+    public class GenericService<T> where T : class
     {
         private readonly DataContext _dataContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        public readonly IHttpContextAccessor _httpContextAccessor;
 
-
-        public GenericServices(DataContext dataContext, HttpContextAccessor httpContextAccessor)
+        public GenericService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
             _httpContextAccessor = httpContextAccessor;
@@ -49,12 +50,11 @@ namespace Salus.Services
             _dataContext.Set<T>().Remove(entity);
             _dataContext.SaveChanges();
         }
-        public async Task<UserProfile> GetAuthenticatedUserProfile(DataContext dataContext)
+        public UserProfile GetAuthenticatedUserProfile()
         {
-            var userProfile = await dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId());
+            var userProfile = _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId()).Result;
             if (userProfile == null)
                 throw new Exception("You need to create a user profile first!");
-
             return userProfile;
         }
         public int GetAuthId()

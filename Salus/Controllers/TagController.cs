@@ -1,4 +1,5 @@
-﻿using Salus.WebAPI;
+﻿using Salus.Services;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
@@ -8,6 +9,7 @@ namespace Salus.Controllers
     public class TagController : Controller
     {
         private readonly ITagService _tagService;
+
         public TagController(ITagService tagService)
         {
             _tagService = tagService;

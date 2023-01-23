@@ -1,4 +1,5 @@
-﻿using Salus.WebAPI;
+﻿using Salus.Services;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
