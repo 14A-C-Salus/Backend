@@ -14,9 +14,7 @@
         //public methods
         public async Task<Comment> ModifyComment(ModifyCommentRequest request)
         {
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == _crudComment.GetAuthId());
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
+            var userProfile = _crudComment.GetAuthenticatedUserProfile(_dataContext).Result;
 
             var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == request.commentId);
 
@@ -42,9 +40,8 @@
 
         public async void DeleteCommentById(int commentId)
         {
-            var userProfile = GetAuthenticatedAuthUserProfile().Result;
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
+            var userProfile = _crudComment.GetAuthenticatedUserProfile(_dataContext).Result;
+
 
             var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == commentId);
             if (comment == null)
