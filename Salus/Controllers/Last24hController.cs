@@ -2,9 +2,7 @@
 {
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize]
-#endif
     public class Last24hController : Controller
     {
         private readonly ILast24hService _last24HService;

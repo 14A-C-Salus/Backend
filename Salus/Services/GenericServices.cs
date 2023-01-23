@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Salus.Data;
 using System;
 using System.Collections.Generic;
@@ -8,13 +9,16 @@ using System.Threading.Tasks;
 
 namespace Salus.Services
 {
-    public class CRUD<T> where T : class
+    public class GenericServices<T> where T : class,  IGenericServices<T>
     {
         private readonly DataContext _dataContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CRUD(DataContext dataContext)
+
+        public GenericServices(DataContext dataContext, HttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public virtual T Create(T entity)
@@ -44,6 +48,23 @@ namespace Salus.Services
         {
             _dataContext.Set<T>().Remove(entity);
             _dataContext.SaveChanges();
+        }
+        public async Task<UserProfile> GetAuthenticatedUserProfile(DataContext dataContext)
+        {
+            var userProfile = await dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId());
+            if (userProfile == null)
+                throw new Exception("You need to create a user profile first!");
+
+            return userProfile;
+        }
+        public int GetAuthId()
+        {
+            var result = -1;
+
+            if (_httpContextAccessor.HttpContext != null)
+                result = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("id"));
+
+            return result;
         }
     }
 }

@@ -4,16 +4,18 @@
     {
         private readonly DataContext _dataContext;
         private readonly IAuthService _authService;
+        public IGenericServices<Auth> crud;
 
-        public UserProfileService(DataContext dataContext, IAuthService authService)
+        public UserProfileService(DataContext dataContext, IAuthService authService, IGenericServices<Auth> crud)
         {
             _dataContext = dataContext;
             _authService = authService;
+            this.crud = crud;
         }
         //public methods
         public async Task<UserProfile> SetProfilePicture(UserSetProfilePictureRequset request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            var auth = crud.Read(_authService.GetAuthId());
             if (auth == null)
                 throw new Exception("You must log in first.");
 
@@ -36,7 +38,7 @@
 
         public async Task<UserProfile> CreateProfile(UserSetDatasRequest request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == _authService.GetEmail());
+            var auth = crud.Read(_authService.GetAuthId());
             if (auth == null)
                 throw new Exception("You must log in first.");
 
@@ -61,7 +63,7 @@
 
         public async Task<UserProfile> ModifyProfile(UserSetDatasRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            var auth = crud.Read(_authService.GetAuthId());
             if (auth == null)
                 throw new Exception("You must log in first.");
 

@@ -6,11 +6,11 @@ namespace Salus.Services.FoodServices
     public class OilService:IOilService
     {
         private readonly DataContext _dataContext;
-        private readonly CRUD<Oil> _crud;
-        public OilService(DataContext dataContext)
+        private readonly IGenericServices<Oil> _crud;
+        public OilService(DataContext dataContext, IGenericServices<Oil> crud)
         {
             _dataContext = dataContext;
-            _crud = new CRUD<Oil>(_dataContext);
+            _crud = crud;
         }
 
         public Oil Create(OilCreateRequest request)

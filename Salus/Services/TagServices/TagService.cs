@@ -5,7 +5,7 @@ namespace Salus.Services.TagServices
     public class TagService:ITagService
     {
         private readonly DataContext _dataContext;
-        private readonly CRUD<Tag> _crud;
+        private readonly GenericServices<Tag> _crud;
         public TagService(DataContext dataContext)
         {
             _dataContext = dataContext;

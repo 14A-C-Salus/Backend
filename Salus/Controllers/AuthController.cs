@@ -22,7 +22,7 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_authService.Register(request).Result);
+                return Ok(_authService.Register(request));
             });
         }
         [HttpPost("login")]

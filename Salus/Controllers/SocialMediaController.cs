@@ -5,9 +5,7 @@ namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize]
-#endif
     public class SocialMediaController : Controller
     {
         private readonly DataContext _dataContext;

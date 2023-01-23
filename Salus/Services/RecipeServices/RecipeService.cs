@@ -3,20 +3,17 @@
     public class RecipeService : IRecipeService
     {
         private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
-        public RecipeService(DataContext dataContext, IAuthService authService)
+        private readonly IGenericServices<Recipe> _crud;
+
+        public RecipeService(DataContext dataContext, IGenericServices<Recipe> crud)
         {
             _dataContext = dataContext;
-            _authService = authService;
+            _crud = crud;
         }
 
-        public async Task<Recipe> WriteRecipe(WriteRecipeRequest request)
+        public Recipe WriteRecipe(WriteRecipeRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
+            var userProfile = _crud.GetAuthenticatedUserProfile(_dataContext).Result;
 
             var recipe = new Recipe()
             {
@@ -46,8 +43,7 @@
                 }
             }
 
-            _dataContext.recipes.Add(recipe);
-            await _dataContext.SaveChangesAsync();
+            _crud.Create(recipe);
             //TODO: sütési metódussal számolni
 
             return recipe;

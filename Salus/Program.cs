@@ -32,7 +32,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Newtonsoft.Json;
-
+using Salus.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +45,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ILast24hService, Last24hService>();
+builder.Services.AddScoped<IGenericServices, GenericServices>();
 builder.Services.AddScoped<IOilService, OilService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<ISocialMediaService, SocialMediaService>();

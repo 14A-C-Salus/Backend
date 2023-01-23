@@ -5,9 +5,7 @@ namespace Salus.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize(Roles = "Admin")]
-#endif
     public class OilController : Controller
     {
         private readonly IOilService _oilService;

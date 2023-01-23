@@ -3,20 +3,18 @@
     public class SocialMediaService : ISocialMediaService
     {
         private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
-        public SocialMediaService(DataContext dataContext, IAuthService authService)
+        private readonly IGenericServices<Comment> _crudComment;
+        public SocialMediaService(DataContext dataContext, IGenericServices<Comment> crudComment)
         {
             _dataContext = dataContext;
-            _authService = authService;
+            _crudComment = crudComment;
         }
 
 
         //public methods
         public async Task<Comment> ModifyComment(ModifyCommentRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == _crudComment.GetAuthId());
             if (userProfile == null)
                 throw new Exception("You need to create a user profile first!");
 
@@ -128,9 +126,7 @@
         //private methods
         private async Task<UserProfile> GetAuthenticatedAuthUserProfile()
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
+            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == _authService.GetAuthId());
             if (userProfile == null)
                 throw new Exception("You need to create a user profile first!");
 
