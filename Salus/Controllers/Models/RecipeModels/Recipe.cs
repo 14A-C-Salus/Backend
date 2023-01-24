@@ -5,15 +5,19 @@ namespace Salus.Controllers.Models.RecipeModels
     public class Recipe
     {
         public int id { get; set; }
+        public int gramm { get; set; }
         public int kcal { get; set; }
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
+        public int timeInMinute { get; set; }
         public int? oilPortionMl { get; set; }
-        public List<int>? ingredientPortionGramm { get; set; }
+        public string description { get; set; } = string.Empty;
         public string name { get; set; } = string.Empty;
-        [Required]
+        [Required, NotMapped]
         public UserProfile Author { get; set; } = new ();
+        [Required, NotMapped] //todo
+
         public List<Tag> tags { get; set; } = new ();
 
         //Connections

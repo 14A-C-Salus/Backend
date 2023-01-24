@@ -29,7 +29,9 @@ namespace Salus.Services.RecipeServices
                 fat = 0,
                 protein = 0,
                 carbohydrate = 0,
-                kcal = 0
+                kcal = 0,
+                gramm = 0,
+                description = !request.generateDescription ? request.description : string.Empty
             };
             //TODO: Use generic sevice
             
@@ -37,20 +39,26 @@ namespace Salus.Services.RecipeServices
             {
                 var ingredient = ingredients[i];
                 var portion = request.ingredientPortionGramm[i];
-                recipe.fat += ingredient.fat * portion;
-                recipe.protein += ingredient.protein * portion;
-                recipe.carbohydrate += ingredient.carbohydrate * portion;
-                recipe.kcal += ingredient.kcal * portion;
+                recipe.gramm += portion;
+                recipe.fat += ingredient.fat * portion / 100;
+                recipe.protein += ingredient.protein * portion / 100;
+                recipe.carbohydrate += ingredient.carbohydrate * portion / 100;
+                recipe.kcal += ingredient.kcal * portion / 100;
 
-                if (ingredient.tags.Count() != 0)
-                    foreach (var tag in ingredient.tags)
-                    {
-                        if (tag.tag == null)
-                            throw new Exception(); //TODO Idk mi ez
-                        recipe.tags.Add(tag.tag);
-                    }
+                if (ingredient.tags != null && ingredient.tags.Count() != 0)
+                    foreach (var foodsHasTag in ingredient.tags)
+                        if (foodsHasTag.tag != null)
+                            recipe.tags.Add(foodsHasTag.tag);
+
+                var recipeIncludeIngredients = new RecipesIncludeIngredients()
+                {
+                    food = ingredient,
+                    recipe = recipe,
+                    portionInGramm = portion
+                };
+                _dataContext.Set<RecipesIncludeIngredients>().Add(recipeIncludeIngredients);
             }
-            //TODO: sütési metódussal számolni
+
             if (request.method == makeingMethodEnum.frying)
             {
                 var oil = _dataContext.Set<Oil>().Find(request.oilId);
@@ -59,13 +67,34 @@ namespace Salus.Services.RecipeServices
                 if (request.oilPortionMl <= 0 || request.oilPortionMl == null)
                     throw new Exception("Oil has no portion!");
 
-                recipe.fat += (int) Math.Round((decimal)(oil.calIn14Ml/1000 * request.oilPortionMl / 4.5));
+                recipe.fat += (int) Math.Round((decimal)(
+                    ((oil.calIn14Ml/1000) //cal to kcal
+                    / 14) //14Ml to 1Ml
+                    * request.oilPortionMl //1Ml to request Ml
+                    / 9 //kcal to fat
+                    / 10)); //10% of the oil is in the food
+
+                recipe.kcal += (int)Math.Round((decimal)(
+                    ((oil.calIn14Ml / 1000) //cal to kcal
+                    / 14) //14Ml to 1Ml
+                    * request.oilPortionMl //1Ml to request Ml
+                    / 10)); //10% of the oil is in the food
+
+                recipe.oilPortionMl = request.oilPortionMl;
             }
-            //TODO: Check
+
+            if (request.generateDescription)
+                recipe.description = GenerateDescription(recipe);
 
             _genericServices.Create(recipe);
 
             return recipe;
+        }
+
+        private string GenerateDescription(Recipe recipe)
+        {
+            return $"Name: {recipe.name} \n," +
+                $"";
         }
 
         public async Task<List<Food>> GetAllIngredients(WriteRecipeRequest request)
