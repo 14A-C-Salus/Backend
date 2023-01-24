@@ -2,8 +2,8 @@
 {
     public interface IUserProfileService
     {
-        Task<UserProfile> CreateProfile(UserSetDatasRequest request);
-        Task<UserProfile> ModifyProfile(UserSetDatasRequest request);
-        Task<UserProfile> SetProfilePicture(UserSetProfilePictureRequset request);
+        UserProfile CreateProfile(UserSetDatasRequest request);
+        UserProfile ModifyProfile(UserSetDatasRequest request);
+        UserProfile SetProfilePicture(UserSetProfilePictureRequset request);
     }
 }

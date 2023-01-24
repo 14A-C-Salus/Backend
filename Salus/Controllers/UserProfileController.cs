@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Salus.Services;
 using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize]
-#endif
     public class UserProfileController : Controller
     {
 
         private readonly IUserProfileService _userProfileService;
-
+ 
         public UserProfileController(IUserProfileService userProfileService)
         {
             _userProfileService = userProfileService;
@@ -23,7 +22,7 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_userProfileService.CreateProfile(request).Result);
+                return Ok(_userProfileService.CreateProfile(request));
             });
         }
 
@@ -32,7 +31,7 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_userProfileService.ModifyProfile(request).Result);
+                return Ok(_userProfileService.ModifyProfile(request));
             });
         }
 
@@ -41,7 +40,7 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_userProfileService.SetProfilePicture(request).Result);
+                return Ok(_userProfileService.SetProfilePicture(request));
             });
          }
     }

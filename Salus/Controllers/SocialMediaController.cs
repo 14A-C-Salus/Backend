@@ -1,23 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Salus.Services;
 using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize]
-#endif
     public class SocialMediaController : Controller
     {
-        private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
         private readonly ISocialMediaService _socialMediaService;
 
-        public SocialMediaController(DataContext dataContext, IAuthService authService, ISocialMediaService socialMediaService)
+        public SocialMediaController(ISocialMediaService socialMediaService)
         {
-            _dataContext = dataContext;
-            _authService = authService;
             _socialMediaService = socialMediaService;
         }
 

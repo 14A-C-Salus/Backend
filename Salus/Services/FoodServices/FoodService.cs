@@ -7,20 +7,22 @@ namespace Salus.Services.FoodServices
     public class FoodService : IFoodService
     {
         private readonly DataContext _dataContext;
-        private readonly CRUD<Food> _crud;
-        public FoodService(DataContext dataContext)
+        private readonly GenericService<Food> _genericServicesFood;
+        private readonly GenericService<Tag> _genericServicesTag;
+        public FoodService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
-            _crud = new CRUD<Food>(_dataContext);
+            _genericServicesFood = new(dataContext, httpContextAccessor);
+            _genericServicesTag = new(dataContext, httpContextAccessor);
         }
 
         public List<Tag> GetRecommendedTags(int foodId)
         {
-            var food = _dataContext.Set<Food>().Find(foodId);
+            var food = _genericServicesFood.Read(foodId);
             if (food == null)
-                throw new Exception();
+                throw new Exception($"Food (id:{foodId}) does not exist.");
             List<Tag> tags = new();
-            foreach (Tag tag in _dataContext.Set<Tag>().ToList())
+            foreach (Tag tag in _genericServicesTag.ReadAll())
             {
                 tag.food = food;
                 if (tag.recommend)
@@ -31,28 +33,34 @@ namespace Salus.Services.FoodServices
 
         public Food AddTags(AddTagsToFoodRequest request)
         {
-            var food = _crud.Read(request.foodId);
+            var food = _genericServicesFood.Read(request.foodId);
             if (food == null)
                 throw new Exception("This food doesn't exist.");
 
             List<FoodsHaveTags> foodHasTags = new();
             foreach (var tagId in request.tagIds)
             {
-                var tag = _dataContext.Set<Tag>().Find(tagId);
+                var tag = _genericServicesTag.Read(tagId);
                 if (tag == null)
                     throw new Exception($"This tag ($id={tagId}) doesn't exist.");
+
                 var foodHasTag = new FoodsHaveTags
                 {
                     food = food,
                     tag = tag
                 };
                 foodHasTags.Add(foodHasTag);
+
+                if (_dataContext.Set<FoodsHaveTags>().Any(fHT => fHT.foodId == foodHasTag.foodId && fHT.tagId == foodHasTag.tagId))
+                    throw new Exception("This food already have this tag.");
+
                 _dataContext.Set<FoodsHaveTags>().Add(foodHasTag);
-                //todo
                 tag.foodsThatHave.Add(foodHasTag);
             }
+
             food.tags = foodHasTags;
-            food = _crud.Update(food);
+            food = _genericServicesFood.Update(food);
+
             return food;
         }
 
@@ -69,21 +77,21 @@ namespace Salus.Services.FoodServices
             };
             food.kcal = (int)(request.kcal == null ? CalculateKcal(food):request.kcal);
             CheckData(food);
-            food = _crud.Create(food);
+            food = _genericServicesFood.Create(food);
             return food;
         }
 
         public void Delete(int id)
         {
-            var food = _crud.Read(id);
+            var food = _genericServicesFood.Read(id);
             if (food == null)
-                throw new Exception("This food doesn't exist.");
-            _crud.Delete(food);
+                throw new Exception("This food does not exist.");
+            _genericServicesFood.Delete(food);
         }
 
         public Food Update(FoodUpdateRequest request)
         {
-            var food = _crud.Read(request.id);
+            var food = _genericServicesFood.Read(request.id);
             if (food == null)
                 throw new Exception("This food doesn't exist.");
 
@@ -94,17 +102,17 @@ namespace Salus.Services.FoodServices
             food.kcal = (int)(request.kcal == null ? CalculateKcal(food) : request.kcal);
 
             CheckData(food);
-            food = _crud.Update(food);
+            food = _genericServicesFood.Update(food);
             return food;
         }
 
         public Food VerifyUnVerify(int id)
         {
-            var food = _crud.Read(id);
+            var food = _genericServicesFood.Read(id);
             if (food == null)
                 throw new Exception("This food doesn't exist.");
             food.verifeid = !food.verifeid;
-            food = _crud.Update(food);
+            food = _genericServicesFood.Update(food);
             return food;
         }
         private int CalculateKcal(Food food)

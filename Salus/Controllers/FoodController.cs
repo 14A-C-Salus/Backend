@@ -1,15 +1,15 @@
-﻿using Salus.WebAPI;
+﻿using Salus.Services;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize]
-#endif
     public class FoodController:Controller
     {
         private readonly IFoodService _foodService;
+
         public FoodController(IFoodService foodService)
         {
             _foodService = foodService;

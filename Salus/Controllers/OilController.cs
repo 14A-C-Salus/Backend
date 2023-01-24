@@ -1,13 +1,12 @@
-﻿using Salus.WebAPI;
+﻿using Salus.Services;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
 
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize(Roles = "Admin")]
-#endif
     public class OilController : Controller
     {
         private readonly IOilService _oilService;

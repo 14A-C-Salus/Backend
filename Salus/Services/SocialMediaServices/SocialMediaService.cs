@@ -3,24 +3,20 @@
     public class SocialMediaService : ISocialMediaService
     {
         private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
-        public SocialMediaService(DataContext dataContext, IAuthService authService)
+        private readonly GenericService<Comment> _genericServicesComment;
+        public SocialMediaService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
-            _authService = authService;
+            _genericServicesComment = new(dataContext, httpContextAccessor);
         }
 
 
         //public methods
         public async Task<Comment> ModifyComment(ModifyCommentRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();
 
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
-
-            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == request.commentId);
+            var comment = _genericServicesComment.Read(request.commentId);
 
             if (comment == null)
                 throw new Exception("Comment doesn't exist.");
@@ -35,57 +31,55 @@
 
         public List<Comment> CreateCommentListByAuthenticatedEmail()
         {
-            var userProfile = GetAuthenticatedAuthUserProfile().Result;
+            var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();
 
-            List<Comment> comments = _dataContext.comments.Where(c => c.toId == userProfile.id).ToList();
+            List<Comment> comments = _dataContext.Set<Comment>().Where(c => c.toId == userProfile.id).ToList();
             return comments;
         }
 
 
-        public async void DeleteCommentById(int commentId)
+        public void DeleteCommentById(int commentId)
         {
-            var userProfile = GetAuthenticatedAuthUserProfile().Result;
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
+            var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();
 
-            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == commentId);
+
+            var comment = _genericServicesComment.Read(commentId);
             if (comment == null)
                 throw new Exception ("Comment doesn't exist.");
 
             if (userProfile.id != comment.toId && userProfile.id != comment.fromId)
                 throw new Exception("You do not have permission to delete the comment.");
 
-            _dataContext.comments.Remove(comment);
-            await _dataContext.SaveChangesAsync();
+            _genericServicesComment.Delete(comment);
        }
 
         public async void StartOrStopFollow(UnFollowFollowRequest request)
         {
-            var followedAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+            var followedAuth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == request.email);
             if (followedAuth == null)
                 throw new Exception("Auth to follow doesn't exist.");
 
-            var followerUserProfile = GetAuthenticatedAuthUserProfile().Result;
+            var followerUserProfile = _genericServicesComment.GetAuthenticatedUserProfile();
             if (followerUserProfile == null)
                 throw new Exception("You need to create a user profile first!");
 
-            var followedUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
+            var followedUserProfile = await _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
             if (followedUserProfile == null)
                 throw new Exception($"{followedAuth.username} has no user profile!");
 
             if (followedUserProfile.id == followerUserProfile.id)
                 throw new Exception($"You can't follow yourself.");
 
-            var follow = await _dataContext.followings
+            var follow = await _dataContext.Set<Following>()
                 .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id);
 
             if (follow != null)
             {
-                _dataContext.followings.Remove(follow);
+                _dataContext.Set<Following>().Remove(follow);
             }
             else
             {
-                _dataContext.followings.Add(new Following
+                _dataContext.Set<Following>().Add(new Following
                 {
                     followed = followedUserProfile,
                     follower = followerUserProfile,
@@ -93,19 +87,18 @@
                 });
             }
 
-
             await _dataContext.SaveChangesAsync();
        }
 
         public async Task<Comment> SendComment(WriteCommentRequest request)
         {
-            var toAuth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == request.email);
+            var toAuth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == request.email);
             if (toAuth == null)
                 throw new Exception("'toAuth' doesn't exist.");
 
-            var toUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
+            var toUserProfile = await _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
             
-            var writerUserProfile = GetAuthenticatedAuthUserProfile().Result;
+            var writerUserProfile = _genericServicesComment.GetAuthenticatedUserProfile();
             if (writerUserProfile == null)
                 throw new Exception("You need to create a user profile first!");
 
@@ -120,21 +113,8 @@
                 sendDate = DateTime.Now.ToString("yyyy.MM.dd")
             };
 
-            _dataContext.comments.Add(comment);
-            await _dataContext.SaveChangesAsync();
+            _genericServicesComment.Create(comment);
             return comment;
       }
-
-        //private methods
-        private async Task<UserProfile> GetAuthenticatedAuthUserProfile()
-        {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
-
-            return userProfile;
-        }
     }
 }

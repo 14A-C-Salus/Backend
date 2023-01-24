@@ -2,8 +2,7 @@
 {
     public interface IAuthService
     {
-        public string GetEmail();
-        Task<Auth> Register(AuthRegisterRequest request);
+        Auth Register(AuthRegisterRequest request);
         Task<string> Login(AuthLoginRequest request);
         Task<Auth> Verify(string token);
         Task<Auth> ForgotPassword(string email);

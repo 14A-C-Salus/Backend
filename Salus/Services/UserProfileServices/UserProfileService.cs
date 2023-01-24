@@ -2,24 +2,22 @@
 {
     public class UserProfileService : IUserProfileService
     {
-        private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
+        public GenericService<Auth> _genericServicesAuth;
+        public GenericService<UserProfile> _genericServicesUserProfile;
+        Auth? auth;
 
-        public UserProfileService(DataContext dataContext, IAuthService authService)
+        public UserProfileService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
-            _dataContext = dataContext;
-            _authService = authService;
-        }
-        //public methods
-        public async Task<UserProfile> SetProfilePicture(UserSetProfilePictureRequset request)
-        {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
+            _genericServicesAuth = new(dataContext, httpContextAccessor);
+            _genericServicesUserProfile = new(dataContext, httpContextAccessor);
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
             if (auth == null)
                 throw new Exception("You must log in first.");
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                throw new Exception("You need to create a profile first!");
+        }
+        //public methods
+        public UserProfile SetProfilePicture(UserSetProfilePictureRequset request)
+        {
+            var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
 
             userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
             userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
@@ -29,17 +27,12 @@
             var checkResult = CheckProfilePicture(userProfile);
             if (checkResult != "Everything's okay.")
                 throw new Exception(checkResult);
-
-            await _dataContext.SaveChangesAsync();
+            userProfile = _genericServicesUserProfile.Update(userProfile);
             return userProfile;
         }
 
-        public async Task<UserProfile> CreateProfile(UserSetDatasRequest request)
+        public UserProfile CreateProfile(UserSetDatasRequest request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == _authService.GetEmail());
-            if (auth == null)
-                throw new Exception("You must log in first.");
-
             var checkResult = CheckCreateRequest(request);
             if (checkResult != "Everything's okay.")
                 throw new Exception(checkResult);
@@ -54,32 +47,24 @@
             userProfile.birthDate = request.birthDate.ToString("yyyy.MM.dd.");
             userProfile.gender = request.gender;
             userProfile.goalWeight = request.goalWeight == 0 ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
-            _dataContext.userProfiles.Add(userProfile);
-            await _dataContext.SaveChangesAsync();
+            userProfile = _genericServicesUserProfile.Create(userProfile);
             return userProfile;
         }
 
-        public async Task<UserProfile> ModifyProfile(UserSetDatasRequest request)
+        public UserProfile ModifyProfile(UserSetDatasRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-            if (auth == null)
-                throw new Exception("You must log in first.");
-
             var checkResult = CheckUpdateRequest(request);
             if (checkResult != "Everything's okay.")
                 throw new Exception(checkResult);
 
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                throw new Exception("You need to create a profile first!");
+            var userProfile = _genericServicesUserProfile.GetAuthenticatedUserProfile();
 
             userProfile.weight = request.weight == default(double) ? userProfile.weight : request.weight;
             userProfile.height = request.height == default(double) ? userProfile.weight : request.weight;
             userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate.ToString("yyyy.MM.dd");
             userProfile.gender = request.gender == default(genderEnum) ? userProfile.gender : request.gender;
             userProfile.goalWeight = request.goalWeight == default(double) ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
-            _dataContext.userProfiles.Update(userProfile);
-            await _dataContext.SaveChangesAsync();
+            userProfile = _genericServicesUserProfile.Update(userProfile);
             return userProfile;
         }
 

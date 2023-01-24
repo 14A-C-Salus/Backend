@@ -1,20 +1,25 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
 using Salus.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Salus.Services
 {
-    public class CRUD<T> where T : class
+    public class GenericService<T> where T : class
     {
         private readonly DataContext _dataContext;
+        public readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CRUD(DataContext dataContext)
+        public GenericService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public virtual T Create(T entity)
@@ -44,6 +49,22 @@ namespace Salus.Services
         {
             _dataContext.Set<T>().Remove(entity);
             _dataContext.SaveChanges();
+        }
+        public UserProfile GetAuthenticatedUserProfile()
+        {
+            var userProfile = _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId()).Result;
+            if (userProfile == null)
+                throw new Exception("You need to create a user profile first!");
+            return userProfile;
+        }
+        public int GetAuthId()
+        {
+            var result = -1;
+
+            if (_httpContextAccessor.HttpContext != null)
+                result = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue("id"));
+
+            return result;
         }
     }
 }

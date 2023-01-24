@@ -5,12 +5,10 @@ namespace Salus.Services.FoodServices
 {
     public class OilService:IOilService
     {
-        private readonly DataContext _dataContext;
-        private readonly CRUD<Oil> _crud;
-        public OilService(DataContext dataContext)
+        private readonly GenericService<Oil> _genericServices;
+        public OilService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
-            _dataContext = dataContext;
-            _crud = new CRUD<Oil>(_dataContext);
+            _genericServices = new(dataContext, httpContextAccessor);
         }
 
         public Oil Create(OilCreateRequest request)
@@ -21,29 +19,29 @@ namespace Salus.Services.FoodServices
                 calIn14Ml = request.calIn14Ml,
             };
             CheckData(oil);
-            oil = _crud.Create(oil);
+            oil = _genericServices.Create(oil);
             return oil;
         }
 
         public Oil Update(OilUpdateRequest request)
         {
-            var oil = _crud.Read(request.id);
+            var oil = _genericServices.Read(request.id);
             if (oil == null)
                 throw new Exception("This oil doesn't exist.");
 
             oil.name = request.name.Length == 0 ? oil.name : request.name;
             oil.calIn14Ml = request.calIn14Ml == 0 ? oil.calIn14Ml : request.calIn14Ml;
             CheckData(oil);
-            oil = _crud.Update(oil);
+            oil = _genericServices.Update(oil);
             return oil;
         }
 
         public void Delete(int id)
         {
-            var oil = _crud.Read(id);
+            var oil = _genericServices.Read(id);
             if (oil == null)
                 throw new Exception("This oil doesn't exist.");
-            _crud.Delete(oil);
+            _genericServices.Delete(oil);
         }
 
         private void CheckData(Oil oil)

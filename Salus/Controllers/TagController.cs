@@ -1,15 +1,15 @@
-﻿using Salus.WebAPI;
+﻿using Salus.Services;
+using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-#if !DEBUG
     [Authorize(Roles = "Admin")]
-#endif
     public class TagController : Controller
     {
         private readonly ITagService _tagService;
+
         public TagController(ITagService tagService)
         {
             _tagService = tagService;

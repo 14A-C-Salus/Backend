@@ -9,42 +9,35 @@ namespace Salus.Services.AuthServices
     public class AuthService : IAuthService
     {
         private readonly DataContext _dataContext;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _configuration;
+        private readonly GenericService<Auth> _genericServices;
+        public IHttpContextAccessor _httpContextAccessor;
 
-        public AuthService(IHttpContextAccessor httpContextAccessor, DataContext dataContext, IConfiguration configuration)
+        public AuthService(DataContext dataContext, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
             _dataContext = dataContext;
             _configuration = configuration;
+            _genericServices = new(dataContext, httpContextAccessor);
+            _httpContextAccessor = httpContextAccessor;
         }
 
         //public methods
-        public string GetEmail()
-        {
-            var result = string.Empty;
 
-            if (_httpContextAccessor.HttpContext != null)
-                result = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Email);
-
-            return result;
-        }
-        public async Task<Auth> Register(AuthRegisterRequest request)
+        public Auth Register(AuthRegisterRequest request)
         {
-            if (_dataContext.auths.Any(a => a.email == request.email))
+            if (_dataContext.Set<Auth>().Any(a => a.email == request.email))
                 throw new Exception("Email already exists.");
 
             var auth = NewAuth(request);
 #if !DEBUG
             SendToken(auth);
 #endif
-            _dataContext.auths.Add(auth);
-            await _dataContext.SaveChangesAsync();
+            _genericServices.Create(auth);
             return auth;
         }
         public async Task<string> Login(AuthLoginRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == request.email);
+            var auth = await _dataContext.Set<Auth>().FirstAsync(a => a.email == request.email);
 
             if (auth == null || !VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt))
                 throw new Exception("Username or password is not correct!");
@@ -58,7 +51,7 @@ namespace Salus.Services.AuthServices
 
         public async Task<Auth> Verify(string token)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.verificationToken == token);
+            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.verificationToken == token);
             if (auth == null)
                 throw new Exception("Invalid token!");
 
@@ -69,7 +62,7 @@ namespace Salus.Services.AuthServices
 
         public async Task<Auth> ForgotPassword(string email)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.email == email);
+            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
                 throw new Exception("User not found!");
 
@@ -81,7 +74,7 @@ namespace Salus.Services.AuthServices
 
         public async Task<Auth> ResetPassword(AuthResetPasswordRequest request)
         {
-            var auth = await _dataContext.auths.FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
+            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
             if (auth == null || auth.resetTokenExpires < DateTime.Now)
                 throw new Exception("Invalid Token!");
 
@@ -95,7 +88,7 @@ namespace Salus.Services.AuthServices
         private string CreateRandomToken()
         {
             var randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
-            while (_dataContext.auths.Any(a => a.verificationToken == randomToken) && _dataContext.auths.Any(a => a.passwordResetToken == randomToken))
+            while (_dataContext.Set<Auth>().Any(a => a.verificationToken == randomToken) && _dataContext.Set<Auth>().Any(a => a.passwordResetToken == randomToken))
             {
                 randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
             }
@@ -208,7 +201,7 @@ namespace Salus.Services.AuthServices
             CheckAuthData(auth);
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, auth.username),
+                new Claim("id", auth.id.ToString()),
                 new Claim(ClaimTypes.Role, auth.isAdmin ? "Admin" : "User"),
             };
 

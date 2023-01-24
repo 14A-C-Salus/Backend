@@ -4,22 +4,24 @@ namespace Salus.Data
 {
     public class DataContext : DbContext
     {
-        public DbSet<Auth> auths => Set<Auth>();
-        public DbSet<Comment> comments => Set<Comment>();
-        public DbSet<Following> followings => Set<Following>();
-        public DbSet<Food> foods => Set<Food>();
-        public DbSet<Last24h> last24Hs => Set<Last24h>();
-        public DbSet<Oil> oils => Set<Oil>();
-        public DbSet<Recipe> recipes => Set<Recipe>();
-        public DbSet<Tag> tags => Set<Tag>();
-        public DbSet<UserProfile> userProfiles => Set<UserProfile>();
+        public DbSet<Auth> auths { get; set; }
+        public DbSet<Comment> comments { get; set; }
+        public DbSet<Following> followings { get; set; }
+        public DbSet<Food> foods { get; set; }
+        public DbSet<Last24h> last24Hs { get; set; }
+        public DbSet<Oil> oils { get; set; }
+        public DbSet<Recipe> recipes { get; set; }
+        public DbSet<Tag> tags { get; set; }
+        public DbSet<UserProfile> userProfiles { get; set; }
 
 
         private readonly IConfiguration _configuration;
 
         readonly string connectionString;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public DataContext(IConfiguration configuration)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             _configuration = configuration;
 #if DEBUG
@@ -93,13 +95,13 @@ namespace Salus.Data
             modelBuilder.Entity<UsersLikeRecipes>()
                 .HasOne(ur => ur.user)
                 .WithMany(u => u.likedRecipes)
-                .HasForeignKey(ur => ur.recipeId)
+                .HasForeignKey(ur => ur.userId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UsersLikeRecipes>()
                 .HasOne(ur => ur.recipe)
                 .WithMany(r => r.usersWhoLiked)
-                .HasForeignKey(ur => ur.userId)
+                .HasForeignKey(ur => ur.recipeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -110,13 +112,13 @@ namespace Salus.Data
             modelBuilder.Entity<UsersPreferTags>()
                 .HasOne(ut => ut.user)
                 .WithMany(u => u.preferredTags)
-                .HasForeignKey(ut => ut.tagId)
+                .HasForeignKey(ut => ut.userId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UsersPreferTags>()
                 .HasOne(ut => ut.tag)
                 .WithMany(t => t.usersWhoPrefer)
-                .HasForeignKey(ut => ut.userId)
+                .HasForeignKey(ut => ut.tagId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -126,15 +128,15 @@ namespace Salus.Data
                 .HasKey(ft => new { ft.foodId, ft.tagId });
 
             modelBuilder.Entity<FoodsHaveTags>()
-                .HasOne(ft => ft.food)
-                .WithMany(f => f.tags)
-                .HasForeignKey(ut => ut.tagId)
+                .HasOne(ft => ft.tag)
+                .WithMany(t => t.foodsThatHave)
+                .HasForeignKey(ft => ft.tagId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<FoodsHaveTags>()
-                .HasOne(ut => ut.tag)
-                .WithMany(t => t.foodsThatHave)
-                .HasForeignKey(ut => ut.foodId)
+                .HasOne(ft => ft.food)
+                .WithMany(f => f.tags)
+                .HasForeignKey(ft => ft.foodId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

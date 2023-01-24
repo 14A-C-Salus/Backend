@@ -4,12 +4,10 @@ namespace Salus.Services.TagServices
 {
     public class TagService:ITagService
     {
-        private readonly DataContext _dataContext;
-        private readonly CRUD<Tag> _crud;
-        public TagService(DataContext dataContext)
+        private readonly GenericService<Tag> _genericServices;
+        public TagService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
-            _dataContext = dataContext;
-            _crud = new CRUD<Tag>(_dataContext);
+            _genericServices = new(dataContext, httpContextAccessor);
         }
 
         public Tag Create(TagCreateRequest request)
@@ -23,29 +21,29 @@ namespace Salus.Services.TagServices
                 min = request.minValue
             };
             CheckData(tag);
-            tag = _crud.Create(tag);
+            tag = _genericServices.Create(tag);
             return tag;
         }
 
         public Tag Update(TagUpdateRequest request)
         {
-            var tag = _crud.Read(request.id);
+            var tag = _genericServices.Read(request.id);
             if (tag == null)
                 throw new Exception("This tag doesn't exist.");
 
             tag.description = request.description.Length == 0 ? tag.description : request.description;
             tag.name = request.name.Length == 0 ? tag.name : request.name;
             CheckData(tag);
-            tag = _crud.Update(tag);
+            tag = _genericServices.Update(tag);
             return tag;
         }
 
         public void Delete(int id)
         {
-            var tag = _crud.Read(id);
+            var tag = _genericServices.Read(id);
             if (tag == null)
                 throw new Exception("This tag doesn't exist.");
-            _crud.Delete(tag);
+            _genericServices.Delete(tag);
         }
 
         protected void CheckData(Tag tag)

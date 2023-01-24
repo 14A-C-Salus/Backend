@@ -3,20 +3,17 @@
     public class RecipeService : IRecipeService
     {
         private readonly DataContext _dataContext;
-        private readonly IAuthService _authService;
-        public RecipeService(DataContext dataContext, IAuthService authService)
+        private readonly GenericService<Recipe> _genericServices;
+
+        public RecipeService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
-            _authService = authService;
+            _genericServices = new(dataContext, httpContextAccessor);
         }
 
-        public async Task<Recipe> WriteRecipe(WriteRecipeRequest request)
+        public Recipe WriteRecipe(WriteRecipeRequest request)
         {
-            var auth = await _dataContext.auths.FirstAsync(a => a.email == _authService.GetEmail());
-
-            var userProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == auth.id);
-            if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
+            var userProfile = _genericServices.GetAuthenticatedUserProfile();
 
             var recipe = new Recipe()
             {
@@ -46,8 +43,7 @@
                 }
             }
 
-            _dataContext.recipes.Add(recipe);
-            await _dataContext.SaveChangesAsync();
+            _genericServices.Create(recipe);
             //TODO: sütési metódussal számolni
 
             return recipe;
@@ -62,7 +58,7 @@
 
             foreach (var ingredientId in request.ingredientIds)
             {
-                ingredients.Add(await _dataContext.foods.SingleAsync(i => i.id == ingredientId));
+                ingredients.Add(await _dataContext.Set<Food>().SingleAsync(i => i.id == ingredientId));
             }
 
             return ingredients;
