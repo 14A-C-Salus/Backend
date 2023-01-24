@@ -37,8 +37,9 @@ namespace Salus.Controllers.Models.TagModels
         }
 
         //Connection
-        [JsonIgnore]
-        public List<UsersPreferTags> usersWhoPrefer { get; set; }
-        public List<FoodsHaveTags> foodsThatHave { get; set; }
+        [JsonIgnore, Required]
+        public List<UsersPreferTags>? usersWhoPrefer { get; set; }
+        [Required]
+        public List<FoodsHaveTags>? foodsThatHave { get; set; }
     }
 }
