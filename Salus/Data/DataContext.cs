@@ -19,7 +19,9 @@ namespace Salus.Data
 
         readonly string connectionString;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public DataContext(IConfiguration configuration)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             _configuration = configuration;
 #if DEBUG
@@ -93,13 +95,13 @@ namespace Salus.Data
             modelBuilder.Entity<UsersLikeRecipes>()
                 .HasOne(ur => ur.user)
                 .WithMany(u => u.likedRecipes)
-                .HasForeignKey(ur => ur.recipeId)
+                .HasForeignKey(ur => ur.userId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UsersLikeRecipes>()
                 .HasOne(ur => ur.recipe)
                 .WithMany(r => r.usersWhoLiked)
-                .HasForeignKey(ur => ur.userId)
+                .HasForeignKey(ur => ur.recipeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -110,13 +112,13 @@ namespace Salus.Data
             modelBuilder.Entity<UsersPreferTags>()
                 .HasOne(ut => ut.user)
                 .WithMany(u => u.preferredTags)
-                .HasForeignKey(ut => ut.tagId)
+                .HasForeignKey(ut => ut.userId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UsersPreferTags>()
                 .HasOne(ut => ut.tag)
                 .WithMany(t => t.usersWhoPrefer)
-                .HasForeignKey(ut => ut.userId)
+                .HasForeignKey(ut => ut.tagId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -126,15 +128,15 @@ namespace Salus.Data
                 .HasKey(ft => new { ft.foodId, ft.tagId });
 
             modelBuilder.Entity<FoodsHaveTags>()
-                .HasOne(ft => ft.food)
-                .WithMany(f => f.tags)
-                .HasForeignKey(ut => ut.tagId)
+                .HasOne(ft => ft.tag)
+                .WithMany(t => t.foodsThatHave)
+                .HasForeignKey(ft => ft.tagId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<FoodsHaveTags>()
-                .HasOne(ut => ut.tag)
-                .WithMany(t => t.foodsThatHave)
-                .HasForeignKey(ut => ut.foodId)
+                .HasOne(ft => ft.food)
+                .WithMany(f => f.tags)
+                .HasForeignKey(ft => ft.foodId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

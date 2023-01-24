@@ -43,18 +43,24 @@ namespace Salus.Services.FoodServices
                 var tag = _genericServicesTag.Read(tagId);
                 if (tag == null)
                     throw new Exception($"This tag ($id={tagId}) doesn't exist.");
+
                 var foodHasTag = new FoodsHaveTags
                 {
                     food = food,
                     tag = tag
                 };
                 foodHasTags.Add(foodHasTag);
+
+                if (_dataContext.Set<FoodsHaveTags>().Any(fHT => fHT.foodId == foodHasTag.foodId && fHT.tagId == foodHasTag.tagId))
+                    throw new Exception("This food already have this tag.");
+
                 _dataContext.Set<FoodsHaveTags>().Add(foodHasTag);
-                //todo
                 tag.foodsThatHave.Add(foodHasTag);
             }
+
             food.tags = foodHasTags;
             food = _genericServicesFood.Update(food);
+
             return food;
         }
 

@@ -88,7 +88,7 @@ namespace Salus.Services.AuthServices
         private string CreateRandomToken()
         {
             var randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
-            while (_dataContext.Set<Auth>().Any(a => a.verificationToken == randomToken) && _dataContext.auths.Any(a => a.passwordResetToken == randomToken))
+            while (_dataContext.Set<Auth>().Any(a => a.verificationToken == randomToken) && _dataContext.Set<Auth>().Any(a => a.passwordResetToken == randomToken))
             {
                 randomToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(128));
             }

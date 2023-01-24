@@ -16,7 +16,7 @@
         {
             var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();
 
-            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == request.commentId);
+            var comment = _genericServicesComment.Read(request.commentId);
 
             if (comment == null)
                 throw new Exception("Comment doesn't exist.");
@@ -33,25 +33,24 @@
         {
             var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();
 
-            List<Comment> comments = _dataContext.comments.Where(c => c.toId == userProfile.id).ToList();
+            List<Comment> comments = _dataContext.Set<Comment>().Where(c => c.toId == userProfile.id).ToList();
             return comments;
         }
 
 
-        public async void DeleteCommentById(int commentId)
+        public void DeleteCommentById(int commentId)
         {
             var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();
 
 
-            var comment = await _dataContext.comments.FirstOrDefaultAsync(c => c.id == commentId);
+            var comment = _genericServicesComment.Read(commentId);
             if (comment == null)
                 throw new Exception ("Comment doesn't exist.");
 
             if (userProfile.id != comment.toId && userProfile.id != comment.fromId)
                 throw new Exception("You do not have permission to delete the comment.");
 
-            _dataContext.comments.Remove(comment);
-            await _dataContext.SaveChangesAsync();
+            _genericServicesComment.Delete(comment);
        }
 
         public async void StartOrStopFollow(UnFollowFollowRequest request)
@@ -97,7 +96,7 @@
             if (toAuth == null)
                 throw new Exception("'toAuth' doesn't exist.");
 
-            var toUserProfile = await _dataContext.userProfiles.FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
+            var toUserProfile = await _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
             
             var writerUserProfile = _genericServicesComment.GetAuthenticatedUserProfile();
             if (writerUserProfile == null)
