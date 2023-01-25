@@ -38,9 +38,7 @@ namespace Salus.Controllers
                 return Ok(_foodService.Update(request));
             });
         }
-#if !DEBUG
-    [Authorize(Roles = "Admin")]
-#endif
+        [Authorize(Roles = "Admin")]
         [HttpPatch("verify")]
         public IActionResult Verify(int id)
         {
@@ -49,6 +47,7 @@ namespace Salus.Controllers
                 return Ok(_foodService.VerifyUnVerify(id));
             });
         }
+        [Authorize(Roles = "Admin")] //todo: author törölheti
         [HttpDelete("delete")]
         public IActionResult Delete(int id)
         {

@@ -10,7 +10,7 @@ namespace Salus.Controllers.Models.FoodModels
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
-
+        //Todo: Author (törléshez kell)
         public string name { get; set; } = string.Empty;
         public bool verifeid { get; set; } = false;
 

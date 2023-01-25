@@ -11,15 +11,14 @@ namespace Salus.Controllers.Models.RecipeModels
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
-        public int timeInMinute { get; set; }
-        public int? oilPortionMl { get; set; }
-        public string description { get; set; } = string.Empty;
-        public string name { get; set; } = string.Empty;
+        public int timeInMinute { get; set; } //todo Korlátozni
+        public int? oilPortionMl { get; set; } //todo Korlátozni
+        public string description { get; set; } = string.Empty; //todo Korlátozni
+        public string name { get; set; } = string.Empty; //todo Korlátozni
         public makeingMethodEnum method { get; set; }
         [Required, NotMapped]
         public UserProfile Author { get; set; } = new ();
-        [Required, NotMapped] //todo
-
+        [Required, NotMapped]
         public List<Tag> tags { get; set; } = new ();
 
         //Connections
