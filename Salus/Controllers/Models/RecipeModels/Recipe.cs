@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
 
 namespace Salus.Controllers.Models.RecipeModels
 {
@@ -14,6 +15,7 @@ namespace Salus.Controllers.Models.RecipeModels
         public int? oilPortionMl { get; set; }
         public string description { get; set; } = string.Empty;
         public string name { get; set; } = string.Empty;
+        public makeingMethodEnum method { get; set; }
         [Required, NotMapped]
         public UserProfile Author { get; set; } = new ();
         [Required, NotMapped] //todo

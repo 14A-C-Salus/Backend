@@ -22,6 +22,9 @@ namespace Salus.Services.RecipeServices
             if (ingredients.Count() != request.ingredientPortionGramm.Count())
                 throw new Exception("Some ingredient has no portion.");
 
+            if (request.method == makeingMethodEnum.nondefined)
+                throw new Exception("Makeing method is required.");
+
             var recipe = new Recipe()
             {
                 Author = userProfile,
@@ -33,7 +36,6 @@ namespace Salus.Services.RecipeServices
                 gramm = 0,
                 description = !request.generateDescription ? request.description : string.Empty
             };
-            //TODO: Use generic sevice
             
             for (int i = 0; i < ingredients.Count; i++)
             {
@@ -91,10 +93,48 @@ namespace Salus.Services.RecipeServices
             return recipe;
         }
 
+        public void Delete(int recipeId)
+        {
+
+        }
+
         private string GenerateDescription(Recipe recipe)
         {
-            return $"Name: {recipe.name} \n," +
-                $"";
+            string desc = string.Empty;
+            desc += $"Name: {recipe.name} \n," +
+                    $"Ingredients:\n";
+#pragma warning disable CS8604 // Possible null reference argument.
+            for (int i = 0; i < recipe.ingredients.Count(); i++)
+            {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                var ingredient = recipe.ingredients[i].food.name;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+                var portion = recipe.ingredients[i].portionInGramm.ToString();
+                desc += $"\t {ingredient} - {portion} g \n";
+            }
+#pragma warning restore CS8604 // Possible null reference argument.
+            var methodVerb = string.Empty;
+            switch (recipe.method)
+            {
+                case makeingMethodEnum.nondefined:
+                    break;
+                case makeingMethodEnum.baking:
+                    methodVerb = "Bake";
+                    break;
+                case makeingMethodEnum.frying:
+                    methodVerb = "Fry";
+                    break;
+                case makeingMethodEnum.roasting:
+                    methodVerb = "Roast";
+                    break;
+                case makeingMethodEnum.cooking:
+                    methodVerb = "Cook";
+                    break;
+                default:
+                    break;
+            }
+            desc += $"{methodVerb} for {recipe.timeInMinute} minute.";
+            return desc;
         }
 
         public async Task<List<Food>> GetAllIngredients(WriteRecipeRequest request)

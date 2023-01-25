@@ -13,6 +13,6 @@ namespace Salus.Controllers.Models.RecipeModels
         public int timeInMinutes { get; set; }
         public string name { get; set; } = string.Empty;
         public string description { get; set; } = string.Empty;
-        public bool generateDescription { get; set; } = string.Empty;
+        public bool generateDescription { get; set; } = false;
     }
 }
