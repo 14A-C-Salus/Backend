@@ -29,6 +29,8 @@ namespace Salus.Services.RecipeServices
             {
                 Author = userProfile,
                 name = request.name,
+                method = request.method,
+                timeInMinute = request.timeInMinutes,
                 fat = 0,
                 protein = 0,
                 carbohydrate = 0,
