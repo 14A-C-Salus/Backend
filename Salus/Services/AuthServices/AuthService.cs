@@ -29,7 +29,7 @@ namespace Salus.Services.AuthServices
                 throw new Exception("Email already exists.");
 
             var auth = NewAuth(request);
-#if !DEBUG
+#if RELEASE
             SendToken(auth);
 #endif
             _genericServices.Create(auth);
