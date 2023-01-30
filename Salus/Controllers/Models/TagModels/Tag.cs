@@ -7,8 +7,8 @@ namespace Salus.Controllers.Models.TagModels
     public class Tag
     {
         public int id { get; set; }
-        public string name { get; set; } = string.Empty; //todo min to 3
-        public string description { get; set; } = string.Empty; //todo min to 10
+        public string name { get; set; } = string.Empty;
+        public string description { get; set; } = string.Empty;
         [NotMapped, JsonIgnore]
         public Food? food { get; set; }
         public foodPropertiesEnum? foodProperty { get; set; }

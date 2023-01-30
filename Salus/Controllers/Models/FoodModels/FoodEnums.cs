@@ -2,8 +2,9 @@
 {
     public class FoodEnums
     {
-        public enum foodPropertiesEnum //todo: nondefined
+        public enum foodPropertiesEnum
         {
+            nondefined,
             kcal,
             protein,
             fat,

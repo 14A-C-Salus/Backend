@@ -22,8 +22,7 @@ namespace Salus.Services.RecipeServices
             if (ingredients.Count() != request.ingredientPortionGramm.Count())
                 throw new Exception("Some ingredient has no portion.");
 
-            if (request.method == makeingMethodEnum.nondefined)
-                throw new Exception("Makeing method is required.");
+            Check(request);
 
             var recipe = new Recipe()
             {
@@ -93,6 +92,15 @@ namespace Salus.Services.RecipeServices
             _genericServices.Create(recipe);
 
             return recipe;
+        }
+
+        private void Check(WriteRecipeRequest request)
+        {
+            if (request.method == makeingMethodEnum.nondefined) throw new Exception("Makeing method is required.");
+            if (request.name.Length < 2 || request.name.Length > 200) throw new Exception("Invalid name.");
+            if (request.timeInMinutes < 0 || request.timeInMinutes > 2000) throw new Exception("Invalid time.");
+            if (request.oilPortionMl < 0 || request.oilPortionMl > 2000) throw new Exception("Invalid oil portion.");
+            if (!request.generateDescription && (request.description.Length < 10 || request.description.Length > 2000)) throw new Exception("Invalid description.");
         }
 
         public void Delete(int recipeId)

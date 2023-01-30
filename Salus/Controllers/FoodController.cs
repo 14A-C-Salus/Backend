@@ -47,7 +47,7 @@ namespace Salus.Controllers
                 return Ok(_foodService.VerifyUnVerify(id));
             });
         }
-        [Authorize(Roles = "Admin")] //todo: author törölheti
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete")]
         public IActionResult Delete(int id)
         {
