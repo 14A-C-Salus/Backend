@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using ProfanityFilter;
 
 namespace Salus.Services.AuthServices
 {
@@ -27,7 +28,9 @@ namespace Salus.Services.AuthServices
         {
             if (_dataContext.Set<Auth>().Any(a => a.email == request.email))
                 throw new Exception("Email already exists.");
-
+            var filter = new ProfanityFilter.ProfanityFilter();
+            if (filter.IsProfanity(request.username) || filter.IsProfanity(request.password))
+                throw new Exception("Username or password contains bad words.");
             var auth = NewAuth(request);
 #if RELEASE
             SendToken(auth);
