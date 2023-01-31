@@ -23,6 +23,14 @@ namespace Salus.Controllers
                 return Ok(_authService.Register(request));
             });
         }
+        [HttpPost("asdasd")]
+        public List<string> asdasd(AuthLoginRequest request)
+        {
+            List<string> asd = new();
+            new StreamReader("./Templates/badwords.txt").ReadToEnd().Split("\n").ToList().ForEach(x => asd.Add(x.Trim()));
+            return asd;
+        }
+
         [HttpPost("login")]
         public IActionResult Login(AuthLoginRequest request)
         {
