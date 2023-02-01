@@ -10,7 +10,7 @@ namespace Salus.Controllers.Models.TagModels
         public string name { get; set; } = string.Empty;
         public string description { get; set; } = string.Empty;
         [NotMapped, JsonIgnore]
-        public Food food { get; set; }
+        public Food? food { get; set; }
         public foodPropertiesEnum? foodProperty { get; set; }
         public int? min { get; set; }
         public int? max { get; set; }
@@ -37,8 +37,9 @@ namespace Salus.Controllers.Models.TagModels
         }
 
         //Connection
-        [JsonIgnore]
-        public List<UsersPreferTags> usersWhoPrefer { get; set; }
-        public List<FoodsHaveTags> foodsThatHave { get; set; }
+        [JsonIgnore, Required]
+        public List<UsersPreferTags> usersWhoPrefer { get; set; } = new();
+        [Required]
+        public List<FoodsHaveTags> foodsThatHave { get; set; } = new();
     }
 }

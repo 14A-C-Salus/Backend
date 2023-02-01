@@ -23,6 +23,7 @@ namespace Salus.Controllers
                 return Ok(_authService.Register(request));
             });
         }
+
         [HttpPost("login")]
         public IActionResult Login(AuthLoginRequest request)
         {

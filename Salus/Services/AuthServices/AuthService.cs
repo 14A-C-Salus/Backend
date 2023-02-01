@@ -27,9 +27,8 @@ namespace Salus.Services.AuthServices
         {
             if (_dataContext.Set<Auth>().Any(a => a.email == request.email))
                 throw new Exception("Email already exists.");
-
             var auth = NewAuth(request);
-#if !DEBUG
+#if RELEASE
             SendToken(auth);
 #endif
             _genericServices.Create(auth);
@@ -149,8 +148,6 @@ namespace Salus.Services.AuthServices
         }
         private void SendToken(Auth auth)
         {
-            var template = new EmailBodyTemplate();
-
             string to = auth.email;
             string from = _configuration.GetSection("MailSettings:From").Value;
             string password = _configuration.GetSection("MailSettings:Password").Value;
@@ -164,7 +161,7 @@ namespace Salus.Services.AuthServices
             else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
                 url = $"http://anoblade-001-site1.atempurl.com/api/Auth/verify?token={auth.verificationToken}";
 
-            string body = template.EmailBody(imgUrl, auth.username, url);
+            string body = File.ReadAllText("./Templates/EmailBody.html").Replace("IMAGEURL", imgUrl).Replace("USERNAME", auth.username).Replace("URL", url);
 
             SmtpClient client = new SmtpClient
             {

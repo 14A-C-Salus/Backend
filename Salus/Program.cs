@@ -17,9 +17,6 @@ global using Salus.Services.SocialMediaServices;
 global using Salus.Services.TagServices;
 global using Salus.Services.UserProfileServices;
 
-//templates
-global using Salus.Templates;
-
 global using Microsoft.AspNetCore.Mvc;
 global using System.ComponentModel.DataAnnotations;
 global using Salus.Data;
@@ -30,11 +27,11 @@ global using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using Newtonsoft.Json;
 using Salus.Services;
 using System.Reflection;
 using System.Reflection.Emit;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 

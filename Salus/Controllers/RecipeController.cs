@@ -13,5 +13,13 @@ namespace Salus.Controllers
         {
             _recipeService = recipeService;
         }
+        [HttpPut("create")]
+        public IActionResult Create(WriteRecipeRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.WriteRecipe(request));
+            });
+        }
     }
 }

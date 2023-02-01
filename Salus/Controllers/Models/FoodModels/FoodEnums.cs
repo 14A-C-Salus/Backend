@@ -4,6 +4,7 @@
     {
         public enum foodPropertiesEnum
         {
+            nondefined,
             kcal,
             protein,
             fat,

@@ -5,10 +5,10 @@
         public enum makeingMethodEnum
         {
             nondefined,
-            baking,
-            frying,
-            roasting,
-            cooking
+            baking, //sütés, mint a kenyeret
+            frying, //sütés, mint a sült krumplit
+            roasting, //pirítás
+            cooking //főzés
         }
     }
 }

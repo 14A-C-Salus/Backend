@@ -52,10 +52,10 @@ namespace Salus.Services.TagServices
                 throw new Exception("Name can't be longer then 50 character!");
             if (tag.description.Length > 500)
                 throw new Exception("Description can't be longer then 500 character!");
-            if (tag.name.Length < 5)
-                throw new Exception("Please enter at least 5 character to the name field.");
-            if (tag.description.Length < 20)
-                throw new Exception("Please enter at least 20 character to the description field.");
+            if (tag.name.Length < 3)
+                throw new Exception("Please enter at least 3 character to the name field.");
+            if (tag.description.Length < 10)
+                throw new Exception("Please enter at least 10 character to the description field.");
             if (tag.foodProperty == null && (tag.min != null || tag.max != null))
                 throw new Exception("You can't give value to min or max, if you dont choose a property.");
             if (tag.max > 100 || tag.max < 0)
