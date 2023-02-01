@@ -17,9 +17,6 @@ global using Salus.Services.SocialMediaServices;
 global using Salus.Services.TagServices;
 global using Salus.Services.UserProfileServices;
 
-//templates
-global using Salus.Templates;
-
 global using Microsoft.AspNetCore.Mvc;
 global using System.ComponentModel.DataAnnotations;
 global using Salus.Data;
