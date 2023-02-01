@@ -23,12 +23,18 @@ namespace Salus.Controllers
                 return Ok(_authService.Register(request));
             });
         }
-        [HttpPost("asdasd")]
-        public List<string> asdasd(AuthLoginRequest request)
+        [HttpPost("badwordtest")]
+        public bool asdasd(string request)
         {
-            List<string> asd = new();
-            new StreamReader("./Templates/badwords.txt").ReadToEnd().Split("\n").ToList().ForEach(x => asd.Add(x.Trim()));
-            return asd;
+            var filter = new BadWordFilterExtension();
+            return filter.CheckStringContainsBadWords(request);
+        }
+
+        [HttpPost("asdasdasdasd")]
+        public List<string> asdasdasdasd()
+        {
+            var filter = new BadWordFilterExtension();
+            return filter.badWordList;
         }
 
         [HttpPost("login")]

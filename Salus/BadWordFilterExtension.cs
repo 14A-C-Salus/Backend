@@ -1,71 +1,100 @@
-﻿using System.Text.RegularExpressions;
+﻿using Newtonsoft.Json;
 
 namespace Salus
 {
+    class Word
+    {
+        public string word { get; set; } = string.Empty;
+    }
     public class BadWordFilterExtension
     {
-
-        List<string> badWordList = new();
+        public List<string> badWordList = new();
+        public string json = string.Empty;
         public BadWordFilterExtension()
         {
-            new StreamReader("./Templates/badwords.txt").ReadToEnd().Split("\n").ToList().ForEach(b => badWordList.Add(b.Trim()));
+            string json = File.ReadAllText("./Templates/badwords.json");
+            JsonConvert
+                .DeserializeObject<List<Word>>(json)?
+                .ForEach
+                (
+                    b => GetVariationsOfWord(b.word)
+                        .ForEach
+                        (
+                            w => badWordList.Add(w)
+                        )
+                );
         }
 
         public bool CheckStringContainsBadWords(string data)
         {
-            bool contains = false;
-            int count = 0;
-            Regex r;
-            foreach (var word in badWordList)
-            {
-                var expword = ExpandBadWordToIncludeIntentionalMisspellings(word);
-                r = new Regex(@"(?<Pre>\s+)(?<Word>" + expword + @")(?<Post>\s+|\!\?|\.)");
-                var matches = r.Matches(data);
-                foreach (Match match in matches)
-                {
-                    count++;
-                }
-            }
-            return contains;
+            var clearWord = string.Empty;
+            List<char> separators = new List<char>();
+            for (char i = ' '; i < '@'; i++)
+                separators.Add(i);
+
+            for (int j = 0; j < data.Length; j++)
+                if (!separators.Contains(data[j]))
+                    clearWord += data[j];
+
+            if (badWordList.Contains(clearWord.ToLower()))
+                return true;
+            foreach (var badWord in badWordList)
+                if (clearWord.ToLower().Contains(badWord))
+                    return true;
+
+            return false;
         }
 
-        //src: https://stackoverflow.com/questions/18324054/filtering-bad-words-and-all-permutations-of-intentionally-misspelled-words
-
-        public string ExpandBadWordToIncludeIntentionalMisspellings(string word)
+        public List<string> GetVariationsOfWord(string word)
         {
-            var chars = word
-                .ToCharArray();
+            var optionalWords = new List<string>() { word }; //phasz fa5z || pha5z
+            Dictionary<char, List<string>> charMisspelling = new()
+            {
+                { 'a', new() {"@", "á", "ä"} },
+                { 'b', new() { "B", "I3", "l3", "i3", "ß" } },
+                { 'c', new() {"("} },
+                { 'd', new() {"Đ", "đ"} },
+                { 'e', new() {"3", "é"} },
+                { 'f', new() {"ph", "|="} },
+                { 'g', new() {"6"} },
+                { 'h', new() {"|n"} },
+                { 'i', new() {"í", "l", "!", "1"} },
+                { 'j', new() {"ly"} },
+                { 'k', new() {"|<"} },
+                { 'l', new() {"ly", "1", "!"} },
+                { 'n', new() {"ny"} },
+                { 'o', new() {"0", "ó", "ö", "ő"} },
+                //{ 'p', new() {""} },
+                { 'q', new() {"9"} },
+                //{ 'r', new() {""} },
+                { 's', new() {"5", "$", "sz"} },
+                { 't', new() {"ty", "7"} },
+                { 'u', new() {"ú", "ü", "ű"} },
+                { 'v', new() {"\\/"} },
+                { 'x', new() {"×", "ksz", "gz"} },
+                //{ 'y', new() {""} },
+                { 'z', new() {"sz", "2"} },
+            };
 
-            var op = "[" + string.Join("][", chars) + "]";
+            List<List<string>> charOptions = new();
 
-            return op
-                .Replace("[a]", "[a A @ á Á ä]")
-                .Replace("[b]", "[b B I3 l3 i3 ß]")
-                .Replace("[c]", "(?:[c C \\(]|[k K])")
-                .Replace("[d]", "[d D]")
-                .Replace("[e]", "[e E 3 é É]")
-                .Replace("[f]", "(?:[f F]|[ph pH Ph PH])")
-                .Replace("[g]", "[g G 6]")
-                .Replace("[h]", "[h H]")
-                .Replace("[i]", "[i I l ! 1 Í í j J]")
-                .Replace("[j]", "[j J]")
-                .Replace("[k]", "(?:[c C \\(]|[k K])")
-                .Replace("[l]", "[l L 1 ! i I]")
-                .Replace("[m]", "[m M]")
-                .Replace("[n]", "[n N]")
-                .Replace("[o]", "[o O 0 ó Ó ö Ö ő Ő]")//todo: folytatni magyar betűkkel
-                .Replace("[p]", "[p P]")
-                .Replace("[q]", "[q Q 9]")
-                .Replace("[r]", "[r R]")
-                .Replace("[s]", "[s S $ 5]")
-                .Replace("[t]", "[t T 7]")
-                .Replace("[u]", "[u U v V ú Ú ü Ü ű Ű]")
-                .Replace("[v]", "[v V u U]")
-                .Replace("[w]", "[w W vv VV]")
-                .Replace("[x]", "[x X]")
-                .Replace("[y]", "[y Y]")
-                .Replace("[z]", "[z Z 2]")
-                ;
+            foreach (var _char in word)
+                foreach (var pair in charMisspelling)
+                    if (_char == pair.Key)
+                        charOptions.Add(pair.Value);
+
+            for (int i = 0; i < charOptions.Count(); i++)
+                foreach (var charOption in charOptions[i])
+                {
+                    var temp = string.Empty;
+                    for (int j = 0; j < word.Length; j++)
+                        if (j != i)
+                            temp += word[j];
+                        else
+                            temp += charOption;
+                    optionalWords.Add(temp);
+                }
+            return optionalWords;
         }
     }
 }
