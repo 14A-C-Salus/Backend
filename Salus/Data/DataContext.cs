@@ -18,8 +18,8 @@ namespace Salus.Data
         private readonly IConfiguration _configuration;
 
         readonly string connectionString;
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        // Reaseon: Properties need to make datebase, but we never use them in code.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable. 
         public DataContext(IConfiguration configuration)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {

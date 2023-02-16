@@ -110,22 +110,21 @@ namespace Salus.Services.RecipeServices
         {
 
             var userProfile = _genericServices.GetAuthenticatedUserProfile();
+            var recipe = _genericServices.Read(request.recipeId);
+
+            if (recipe == null)
+                throw new Exception("This recipe doesn't exist.");
+
             var ingredients = GetAllIngredients(request.ingredientIds).Result;
 
             if (ingredients.Count() != request.ingredientPortionGramm.Count())
                 throw new Exception("Some ingredient has no portion.");
 
             UpdateCheck(request);
-            var recipe = _genericServices.Read(request.recipeId);
 
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
             if (request.saveAs == false && recipe.Author != userProfile)
                 throw new Exception("Only the author can modify the recipe, please check in the \"save as\" option, if you want to create a new recipe base on this one!");
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
             recipe.Author = userProfile;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
             recipe.name = request.name == string.Empty ? recipe.name : request.name;
             recipe.method = request.method == RecipeEnums.makeingMethodEnum.nondefined ? recipe.method : request.method;
             recipe.fat = 0;
@@ -215,9 +214,11 @@ namespace Salus.Services.RecipeServices
             string desc = string.Empty;
             desc += $"Name: {recipe.name} \n," +
                     $"Ingredients:\n";
-#pragma warning disable CS8604 // Possible null reference argument.
+            //Reason: We checked before in "GetAllIngredients".
+#pragma warning disable CS8604 // Possible null reference argument. 
             for (int i = 0; i < recipe.ingredients.Count(); i++)
             {
+                //Reason: Nullable need to the optional relationship, but it can't be null here.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
                 var ingredient = recipe.ingredients[i].food.name;
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
