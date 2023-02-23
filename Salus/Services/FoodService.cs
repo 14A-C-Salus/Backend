@@ -122,23 +122,23 @@ namespace Salus.Services.FoodServices
         private void CheckData(Food food)
         {
             if (food.name.Length > 50)
-                throw new Exception("Name can't be longer then 50 character!");
+                throw new Exception("Name can't be longer than 50 character!");
             if (food.name.Length < 5)
                 throw new Exception("Please enter at least 5 character to the name field.");
             if (food.fat > 100)
-                throw new Exception("100g food can't contains more then 100g fat.");
+                throw new Exception("100g food can't contains more than 100g fat.");
             if (food.protein > 100)
-                throw new Exception("100g food can't contains more then 100g protein.");
+                throw new Exception("100g food can't contains more than 100g protein.");
             if (food.carbohydrate > 100)
-                throw new Exception("100g food can't contains more then 100g carbohydrate.");
+                throw new Exception("100g food can't contains more than 100g carbohydrate.");
             if (food.fat < 0)
-                throw new Exception("Food can't contains less then 0g fat.");
+                throw new Exception("Food can't contains less than 0g fat.");
             if (food.protein < 0)
-                throw new Exception("Food can't contains less then 0g protein.");
+                throw new Exception("Food can't contains less than 0g protein.");
             if (food.carbohydrate < 0)
-                throw new Exception("Food can't contains less then 0g carbohydrate.");
+                throw new Exception("Food can't contains less than 0g carbohydrate.");
             if (food.kcal < 0)
-                throw new Exception("Food can't contains less then 0kcal.");
+                throw new Exception("Food can't contains less than 0kcal.");
         }
     }
 }

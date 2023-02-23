@@ -47,13 +47,13 @@ namespace Salus.Services.FoodServices
         private void CheckData(Oil oil)
         {
             if (oil.name.Length > 50)
-                throw new Exception("Name can't be longer then 50 character!");
+                throw new Exception("Name can't be longer than 50 character!");
             if (oil.calIn14Ml > 300)
-                throw new Exception("Oils can't contains more then 300 cal/14ml!");
+                throw new Exception("Oils can't contains more than 300 cal/14ml!");
             if (oil.name.Length < 5)
                 throw new Exception("Please enter at least 5 character to the name field.");
             if (oil.calIn14Ml < 30)
-                throw new Exception("Oils can't contains less then 30 cal/14ml");
+                throw new Exception("Oils can't contains less than 30 cal/14ml");
         }
     }
 }

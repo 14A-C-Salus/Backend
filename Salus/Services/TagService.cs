@@ -49,9 +49,9 @@ namespace Salus.Services.TagServices
         protected void CheckData(Tag tag)
         {
             if (tag.name.Length > 50)
-                throw new Exception("Name can't be longer then 50 character!");
+                throw new Exception("Name can't be longer than 50 character!");
             if (tag.description.Length > 500)
-                throw new Exception("Description can't be longer then 500 character!");
+                throw new Exception("Description can't be longer than 500 character!");
             if (tag.name.Length < 3)
                 throw new Exception("Please enter at least 3 character to the name field.");
             if (tag.description.Length < 10)
