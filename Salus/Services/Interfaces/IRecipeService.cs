@@ -2,7 +2,7 @@
 {
     public interface IRecipeService
     {
-        Recipe WriteRecipe(WriteRecipeRequest request);
+        Recipe Create(WriteRecipeRequest request);
         Recipe Update(UpdateRecipeRequest request);
         public void Delete(int recipeId);
     }

@@ -19,7 +19,7 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_recipeService.WriteRecipe(request));
+                return Ok(_recipeService.Create(request));
             });
         }
 
@@ -41,5 +41,7 @@ namespace Salus.Controllers
                 return Ok();
             });
         }
+
+        //todo:like
     }
 }

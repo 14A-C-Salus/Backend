@@ -26,7 +26,7 @@ namespace Salus.Services.RecipeServices
             _genericServices.Delete(recipe);
         }
 
-        public Recipe WriteRecipe(WriteRecipeRequest request)
+        public Recipe Create(WriteRecipeRequest request)
         {
             var userProfile = _genericServices.GetAuthenticatedUserProfile();
             var ingredients = GetAllIngredients(request.ingredientIds).Result;
