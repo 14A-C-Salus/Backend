@@ -43,5 +43,6 @@ namespace Salus.Controllers
         }
 
         //todo:like
+        //todo:kicserélni az emaileket idra
     }
 }
