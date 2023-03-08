@@ -8,10 +8,6 @@
     {
     }
 
-    public class ETagNotFound : Exception
-    {
-    }
-
     public class EFoodNameLength : Exception
     {
     }

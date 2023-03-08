@@ -1,9 +1,5 @@
 ﻿namespace Salus.Exceptions
 {
-    public class EFoodNotFound : Exception
-    {
-    }
-
     public class ETagNotFound : Exception
     {
     }
