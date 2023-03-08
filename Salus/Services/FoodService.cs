@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Salus.Controllers.Models.FoodModels;
+using Salus.Exceptions;
 using System.Xml.Linq;
 
 namespace Salus.Services.FoodServices
@@ -20,7 +21,7 @@ namespace Salus.Services.FoodServices
         {
             var food = _genericServicesFood.Read(foodId);
             if (food == null)
-                throw new Exception($"Food (id:{foodId}) does not exist.");
+                throw new EFoodNotFound();
             List<Tag> tags = new();
             foreach (Tag tag in _genericServicesTag.ReadAll())
             {
@@ -35,14 +36,14 @@ namespace Salus.Services.FoodServices
         {
             var food = _genericServicesFood.Read(request.foodId);
             if (food == null)
-                throw new Exception("This food doesn't exist.");
+                throw new EFoodNotFound();
 
             List<FoodsHaveTags> foodHasTags = new();
             foreach (var tagId in request.tagIds)
             {
                 var tag = _genericServicesTag.Read(tagId);
                 if (tag == null)
-                    throw new Exception($"This tag ($id={tagId}) doesn't exist.");
+                    throw new ETagNotFound();
 
                 var foodHasTag = new FoodsHaveTags
                 {
@@ -52,7 +53,7 @@ namespace Salus.Services.FoodServices
                 foodHasTags.Add(foodHasTag);
 
                 if (_dataContext.Set<FoodsHaveTags>().Any(fHT => fHT.foodId == foodHasTag.foodId && fHT.tagId == foodHasTag.tagId))
-                    throw new Exception("This food already have this tag.");
+                    throw new EFoodAlreadyHasTag();
 
                 _dataContext.Set<FoodsHaveTags>().Add(foodHasTag);
                 tag.foodsThatHave.Add(foodHasTag);
@@ -85,7 +86,7 @@ namespace Salus.Services.FoodServices
         {
             var food = _genericServicesFood.Read(id);
             if (food == null)
-                throw new Exception("This food does not exist.");
+                throw new EFoodNotFound();
             _genericServicesFood.Delete(food);
         }
 
@@ -93,7 +94,7 @@ namespace Salus.Services.FoodServices
         {
             var food = _genericServicesFood.Read(request.id);
             if (food == null)
-                throw new Exception("This food doesn't exist.");
+                throw new EFoodNotFound();
 
             food.name = request.name.Length == 0 ? food.name : request.name;
             food.carbohydrate = request.carbohydrate == -1 ? food.carbohydrate : request.carbohydrate;
@@ -110,7 +111,7 @@ namespace Salus.Services.FoodServices
         {
             var food = _genericServicesFood.Read(id);
             if (food == null)
-                throw new Exception("This food doesn't exist.");
+                throw new EFoodNotFound();
             food.verifeid = !food.verifeid;
             food = _genericServicesFood.Update(food);
             return food;
@@ -122,23 +123,23 @@ namespace Salus.Services.FoodServices
         private void CheckData(Food food)
         {
             if (food.name.Length > 50)
-                throw new Exception("Name can't be longer than 50 character!");
+                throw new EFoodNameLength();
             if (food.name.Length < 5)
-                throw new Exception("Please enter at least 5 character to the name field.");
+                throw new EFoodNameNull();
             if (food.fat > 100)
-                throw new Exception("100g food can't contains more than 100g fat.");
+                throw new EFoodFatValue();
             if (food.protein > 100)
-                throw new Exception("100g food can't contains more than 100g protein.");
+                throw new EFoodProteinValue();
             if (food.carbohydrate > 100)
-                throw new Exception("100g food can't contains more than 100g carbohydrate.");
+                throw new EFoodCarbohydrateValue();
             if (food.fat < 0)
-                throw new Exception("Food can't contains less than 0g fat.");
+                throw new EFoodFatNegativeValue();
             if (food.protein < 0)
-                throw new Exception("Food can't contains less than 0g protein.");
+                throw new EFoodProteinNegativeValue();
             if (food.carbohydrate < 0)
-                throw new Exception("Food can't contains less than 0g carbohydrate.");
+                throw new EFoodCarbohydrateNegativeValue();
             if (food.kcal < 0)
-                throw new Exception("Food can't contains less than 0kcal.");
+                throw new EFoodCarbohydrateValue();
         }
     }
 }

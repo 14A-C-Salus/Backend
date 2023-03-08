@@ -1,4 +1,5 @@
 ﻿using Salus.Data;
+using Salus.Exceptions;
 
 namespace Salus.Services.TagServices
 {
@@ -29,7 +30,7 @@ namespace Salus.Services.TagServices
         {
             var tag = _genericServices.Read(request.id);
             if (tag == null)
-                throw new Exception("This tag doesn't exist.");
+                throw new ETagNotFound();
 
             tag.description = request.description.Length == 0 ? tag.description : request.description;
             tag.name = request.name.Length == 0 ? tag.name : request.name;
@@ -42,26 +43,26 @@ namespace Salus.Services.TagServices
         {
             var tag = _genericServices.Read(id);
             if (tag == null)
-                throw new Exception("This tag doesn't exist.");
+                throw new ETagNotFound();
             _genericServices.Delete(tag);
         }
 
         protected void CheckData(Tag tag)
         {
             if (tag.name.Length > 50)
-                throw new Exception("Name can't be longer than 50 character!");
+                throw new ENameTooLong();
             if (tag.description.Length > 500)
-                throw new Exception("Description can't be longer than 500 character!");
+                throw new EDescriptionTooLong();
             if (tag.name.Length < 3)
-                throw new Exception("Please enter at least 3 character to the name field.");
+                throw new ENameTooShort();
             if (tag.description.Length < 10)
-                throw new Exception("Please enter at least 10 character to the description field.");
+                throw new EDescriptionTooShort();
             if (tag.foodProperty == null && (tag.min != null || tag.max != null))
-                throw new Exception("You can't give value to min or max, if you dont choose a property.");
+                throw new EPropertyValue();
             if (tag.max > 100 || tag.max < 0)
-                throw new Exception("Please enter a number between 0 and 100 to do max field!");
+                throw new EMaxValueOutOfRange();
             if (tag.min < 0 || tag.min > 100)
-                throw new Exception("Please enter a number between 0 and 100 to do min field!");
+                throw new EMinValueOutOfRange();
         }
     }
 }

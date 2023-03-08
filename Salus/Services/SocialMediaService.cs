@@ -1,4 +1,6 @@
-﻿namespace Salus.Services.SocialMediaServices
+﻿using Salus.Exceptions;
+
+namespace Salus.Services.SocialMediaServices
 {
     public class SocialMediaService : ISocialMediaService
     {
@@ -19,10 +21,10 @@
             var comment = _genericServicesComment.Read(request.commentId);
 
             if (comment == null)
-                throw new Exception("Comment doesn't exist.");
+                throw new ECommentNotFound();
 
             if (userProfile.id != comment.fromId)
-                throw new Exception("You do not have permission to modify the comment.");
+                throw new EPermissionDenied();
             comment.body = request.body;
             await _dataContext.SaveChangesAsync();
             return comment;
@@ -45,10 +47,10 @@
 
             var comment = _genericServicesComment.Read(commentId);
             if (comment == null)
-                throw new Exception ("Comment doesn't exist.");
+                throw new ECommentNotFound();
 
             if (userProfile.id != comment.toId && userProfile.id != comment.fromId)
-                throw new Exception("You do not have permission to delete the comment.");
+                throw new EPermissionDenied();
 
             _genericServicesComment.Delete(comment);
        }
@@ -57,18 +59,18 @@
         {
             var followedAuth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == request.email);
             if (followedAuth == null)
-                throw new Exception("Auth to follow doesn't exist.");
+                throw new EAuthNotFound();
 
             var followerUserProfile = _genericServicesComment.GetAuthenticatedUserProfile();
             if (followerUserProfile == null)
-                throw new Exception("You need to create a user profile first!");
+                throw new EUserProfileNotFound();
 
             var followedUserProfile = await _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
             if (followedUserProfile == null)
-                throw new Exception($"{followedAuth.username} has no user profile!");
+                throw new EUserProfileNotFound();
 
             if (followedUserProfile.id == followerUserProfile.id)
-                throw new Exception($"You can't follow yourself.");
+                throw new ESelfFollow();
 
             var follow = await _dataContext.Set<Following>()
                 .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id);
@@ -94,16 +96,16 @@
         {
             var toAuth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == request.email);
             if (toAuth == null)
-                throw new Exception("'toAuth' doesn't exist.");
+                throw new EAuthNotFound();
 
             var toUserProfile = await _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == toAuth.id);
             
             var writerUserProfile = _genericServicesComment.GetAuthenticatedUserProfile();
             if (writerUserProfile == null)
-                throw new Exception("You need to create a user profile first!");
+                throw new EUserProfileNotFound();
 
             if (toUserProfile == null)
-                throw new Exception($"{toAuth.username} has no user profile!");
+                throw new EUserProfileNotFound();
 
             var comment = new Comment
             {

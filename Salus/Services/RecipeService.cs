@@ -1,4 +1,5 @@
 ﻿using Salus.Controllers.Models.AuthModels;
+using Salus.Exceptions;
 using System.Xml.Linq;
 using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
 
@@ -20,9 +21,9 @@ namespace Salus.Services.RecipeServices
         {
             var recipe = _genericServices.Read(recipeId);
             if (recipe == null)
-                throw new Exception("This recipe doesn't exist.");
+                throw new ERecipeNotFound();
             if (recipe.Author != _genericServices.GetAuthenticatedUserProfile())
-                throw new Exception("Only the author can delete the recipe.");
+                throw new EUnauthorized();
             _genericServices.Delete(recipe);
         }
 
@@ -32,7 +33,7 @@ namespace Salus.Services.RecipeServices
             var ingredients = GetAllIngredients(request.ingredientIds).Result;
 
             if (ingredients.Count() != request.ingredientPortionGramm.Count())
-                throw new Exception("Some ingredient has no portion.");
+                throw new EIngredientHasNoPortion();
 
             Check(request);
 
@@ -78,9 +79,9 @@ namespace Salus.Services.RecipeServices
             {
                 var oil = _dataContext.Set<Oil>().Find(request.oilId);
                 if (oil == null)
-                    throw new Exception("You need to choose an oil, if you fry something.");
+                    throw new EToFryNeedOil();
                 if (request.oilPortionMl <= 0 || request.oilPortionMl == null)
-                    throw new Exception("Oil has no portion!");
+                    throw new EInvalidOilPortion();
 
                 recipe.fat += (int)Math.Round((decimal)(
                     ((oil.calIn14Ml / 1000) //cal to kcal
@@ -113,17 +114,17 @@ namespace Salus.Services.RecipeServices
             var recipe = _genericServices.Read(request.recipeId);
 
             if (recipe == null)
-                throw new Exception("This recipe doesn't exist.");
+                throw new ERecipeNotFound();
 
             var ingredients = GetAllIngredients(request.ingredientIds).Result;
 
             if (ingredients.Count() != request.ingredientPortionGramm.Count())
-                throw new Exception("Some ingredient has no portion.");
+                throw new EIngredientHasNoPortion();
 
             UpdateCheck(request);
 
             if (request.saveAs == false && recipe.Author != userProfile)
-                throw new Exception("Only the author can modify the recipe, please check in the \"save as\" option, if you want to create a new recipe base on this one!");
+                throw new EOnlyAuthorCanModifyRecipe();
             recipe.Author = userProfile;
             recipe.name = request.name == string.Empty ? recipe.name : request.name;
             recipe.method = request.method == RecipeEnums.makeingMethodEnum.nondefined ? recipe.method : request.method;
@@ -163,9 +164,9 @@ namespace Salus.Services.RecipeServices
             {
                 var oil = _dataContext.Set<Oil>().Find(request.oilId);
                 if (oil == null)
-                    throw new Exception("You need to choose an oil, if you fry something.");
+                    throw new EToFryNeedOil();
                 if (request.oilPortionMl <= 0 || request.oilPortionMl == null)
-                    throw new Exception("Oil has no portion!");
+                    throw new EInvalidOilPortion();
 
                 recipe.fat += (int)Math.Round((decimal)(
                     ((oil.calIn14Ml / 1000) //cal to kcal
@@ -194,10 +195,10 @@ namespace Salus.Services.RecipeServices
         //private methods
         private void Check(WriteRecipeRequest request)
         {
-            if (request.method == makeingMethodEnum.nondefined) throw new Exception("Makeing method is required.");
-            if (request.name.Length < 2 || request.name.Length > 200) throw new Exception("Invalid name.");
-            if (request.timeInMinutes < 0 || request.timeInMinutes > 2000) throw new Exception("Invalid time.");
-            if (request.oilPortionMl < 0 || request.oilPortionMl > 2000) throw new Exception("Invalid oil portion.");
+            if (request.method == makeingMethodEnum.nondefined) throw new EMakingMethodMissing();
+            if (request.name.Length < 2 || request.name.Length > 200) throw new ERecipeName();
+            if (request.timeInMinutes < 0 || request.timeInMinutes > 2000) throw new EInvalidTime();
+            if (request.oilPortionMl < 0 || request.oilPortionMl > 2000) throw new EInvalidOilPortion();
             if (!request.generateDescription && (request.description.Length < 10 || request.description.Length > 2000)) throw new Exception("Invalid description.");
         }
 
@@ -253,7 +254,7 @@ namespace Salus.Services.RecipeServices
         private async Task<List<Food>> GetAllIngredients(List<int>? ids)
         {
             if (ids == null || ids.Count() == 0)
-                throw new Exception("There are no ingredients!");
+                throw new EIngredientsMissing();
 
             List<Food> ingredients = new();
 

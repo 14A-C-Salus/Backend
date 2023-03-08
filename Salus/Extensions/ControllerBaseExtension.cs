@@ -11,13 +11,6 @@ namespace Salus.WebAPI
             {
                 return action();
             }  
-            catch (ApiException ex)
-            {
-                return controller.StatusCode(501, new
-                {
-                    error = ex.Message,
-                });
-            }
             catch (Exception ex)
             {
                 try
@@ -28,7 +21,7 @@ namespace Salus.WebAPI
 #if DEBUG
                 return controller.StatusCode(500, new
                 {
-                    error = ex.Message,
+                    error = ex.InnerException.GetType().Name,
                     stackTrace = ex.StackTrace
                 });
 #else

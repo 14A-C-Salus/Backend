@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Any;
 using Salus.Data;
+using Salus.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +55,7 @@ namespace Salus.Services
         {
             var userProfile = _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId()).Result;
             if (userProfile == null)
-                throw new Exception("You need to create a user profile first!");
+                throw new EUserNotFound(); //u can find this in the AuthExcepptions.cs
             return userProfile;
         }
         public int GetAuthId()

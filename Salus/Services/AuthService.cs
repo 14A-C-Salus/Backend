@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Salus.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Mail;
@@ -26,7 +27,7 @@ namespace Salus.Services.AuthServices
         public Auth Register(AuthRegisterRequest request)
         {
             if (_dataContext.Set<Auth>().Any(a => a.email == request.email))
-                throw new Exception("Email already exists.");
+                throw new EEmailAlreadyExist();
             var auth = NewAuth(request);
 #if RELEASE
             SendToken(auth);
@@ -36,13 +37,13 @@ namespace Salus.Services.AuthServices
         }
         public async Task<string> Login(AuthLoginRequest request)
         {
-            var auth = await _dataContext.Set<Auth>().FirstAsync(a => a.email == request.email);
+            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == request.email);
 
             if (auth == null || !VerifyPasswordHash(request.password, auth.passwordHash, auth.passwordSalt))
-                throw new Exception("Username or password is not correct!");
+                throw new EUsernamePasswordIncorrect();
 
             if (auth.date == null)
-                throw new Exception($"Not verified! Check your emails and verify your account!");
+                throw new ENotVerified();
 
             string jwt = CreateToken(auth);
             return jwt;
@@ -52,7 +53,7 @@ namespace Salus.Services.AuthServices
         {
             var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.verificationToken == token);
             if (auth == null)
-                throw new Exception("Invalid token!");
+                throw new EInvalidToken();
 
             auth.date = DateTime.Now;
             await _dataContext.SaveChangesAsync();
@@ -63,7 +64,7 @@ namespace Salus.Services.AuthServices
         {
             var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == email);
             if (auth == null)
-                throw new Exception("User not found!");
+                throw new EUserNotFound();
 
             SetTokenAndExpires(auth);
 
@@ -75,7 +76,7 @@ namespace Salus.Services.AuthServices
         {
             var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
             if (auth == null || auth.resetTokenExpires < DateTime.Now)
-                throw new Exception("Invalid Token!");
+                throw new EInvalidToken();
 
             UpdateAuthResetPasswordData(request.password, auth);
 
@@ -106,27 +107,27 @@ namespace Salus.Services.AuthServices
         private void CheckPassword(string password)
         {
             if (password.Length > 20 || password.Length < 8)
-                throw new Exception("Invalid password!");
+                throw new EInvalidPassword();
         }
         private void CheckAuthData(Auth auth)
         {
             if (auth == null)
-                throw new Exception("Empty auth.");
+                throw new EEmptyToken();
             if (auth.username.Length < 8 || auth.username.Length > 20)
-                throw new Exception("Invalid username.");
+                throw new EInvalidUsername();
             if (auth.email.Length < 8 || auth.email.Length > 200)
-                throw new Exception("Invalid email.");
+                throw new EInvalidEmail();
         }
         private void CheckRegisterRequest(AuthRegisterRequest request)
         {
             if (request.email.Length < 8 || request.email.Length > 200 || !request.email.Contains("@") || !request.email.Contains("."))
-                throw new Exception("Invalid email!");
+                throw new EInvalidEmail();
             if (request.username.Length < 8 || request.username.Length > 20)
-                throw new Exception("Invalid username!");
+                throw new EInvalidUsername();
             if (request.password.Length < 8 || request.password.Length > 20)
-                throw new Exception("Invalid password!");
+                throw new EInvalidPassword();
             if (request.confirmPassword != request.password)
-                throw new Exception("Invalid confirm password!");
+                throw new EInvalidConfirmPassword();
         }
         private Auth NewAuth(AuthRegisterRequest request)
         {
@@ -190,7 +191,7 @@ namespace Salus.Services.AuthServices
             }
             catch
             {
-                throw new Exception("Email address doesn't exist.");
+                throw new EEmailNotFound();
             }
         }
         private string CreateToken(Auth auth)
@@ -232,7 +233,7 @@ namespace Salus.Services.AuthServices
         private void UpdateAuthResetPasswordData(string password, Auth auth)
         {
             if (auth.resetTokenExpires == null || auth.passwordResetToken == null)
-                throw new Exception("You need first use the 'forgoted-password' service!");
+                throw new EPasswordResetTokenExpired();
 
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
 

@@ -1,4 +1,6 @@
-﻿namespace Salus.Services.UserProfileServices
+﻿using Salus.Exceptions;
+
+namespace Salus.Services.UserProfileServices
 {
     public class UserProfileService : IUserProfileService
     {
@@ -12,7 +14,7 @@
             _genericServicesUserProfile = new(dataContext, httpContextAccessor);
             auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
             if (auth == null)
-                throw new Exception("You must log in first.");
+                throw new ELoginRequired();
         }
         //public methods
         public UserProfile SetProfilePicture(UserSetProfilePictureRequset request)
@@ -24,18 +26,16 @@
             userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
             userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
             
-            var checkResult = CheckProfilePicture(userProfile);
-            if (checkResult != "Everything's okay.")
-                throw new Exception(checkResult);
+            CheckProfilePicture(userProfile);
+
             userProfile = _genericServicesUserProfile.Update(userProfile);
             return userProfile;
         }
 
         public UserProfile CreateProfile(UserSetDatasRequest request)
         {
-            var checkResult = CheckCreateRequest(request);
-            if (checkResult != "Everything's okay.")
-                throw new Exception(checkResult);
+            CheckCreateRequest(request);
+
 
 
             var userProfile = new UserProfile();
@@ -53,9 +53,7 @@
 
         public UserProfile ModifyProfile(UserSetDatasRequest request)
         {
-            var checkResult = CheckUpdateRequest(request);
-            if (checkResult != "Everything's okay.")
-                throw new Exception(checkResult);
+            CheckUpdateRequest(request);
 
             var userProfile = _genericServicesUserProfile.GetAuthenticatedUserProfile();
 
@@ -70,79 +68,72 @@
 
 
         //private methods
-        private string CheckCreateRequest(UserSetDatasRequest request)
+        private void CheckCreateRequest(UserSetDatasRequest request)
         {
             if (request.birthDate < DateTime.Now.AddYears(-100) || request.birthDate > DateTime.Now.AddYears(-12))
-                return $"The user must be between 12 and 100 years old!";
+                throw new EInvalidBirthDate();
 
             if (request.weight < 20 || request.weight > 1000)
-                return "The user weight must be over 20 and 1000!";
+                throw new EInvalidWeight();
 
             if (request.height < 40 || request.height > 250)
-                return "The user height must be between 40 and 250 cm!";
+                throw new EInvalidHeight();
 
             if (request.gender == genderEnum.nondefined)
-                return "You must select your gender!";
+                throw new EGenderNotSelected();
 
             if (request.gender < genderEnum.nondefined || request.gender > genderEnum.other)
-                return "Invalid gender!";
+                throw new EInvalidGender();
 
             if (request.goalWeight != default(double) &&
                 (request.goalWeight < 20 || request.goalWeight > 1000))
-                return "The user goal weight must be over 20 and 1000!";
-
-            return "Everything's okay.";
+                throw new EInvalidGoalWeight();
         }
-        private string CheckUpdateRequest(UserSetDatasRequest request)
+        private void CheckUpdateRequest(UserSetDatasRequest request)
         {
             if (request.birthDate != default(DateTime) &&
                      (request.birthDate < DateTime.Now.AddYears(-100) || request.birthDate > DateTime.Now.AddYears(-12)))
-                return $"The user must be between 12 and 100 years old!";
+                throw new EInvalidBirthDate();
 
             if (request.weight != default(double) &&
                 (request.weight < 20 || request.weight > 1000))
-                return "The user weight must be over 20 and 1000!";
-
+                throw new EInvalidWeight();
             if (request.height != default(double) &&
                 (request.height < 40 || request.height > 250))
-                return "The user height must be between 40 and 250 cm!";
+                throw new EInvalidHeight();
 
             if (request.gender < genderEnum.nondefined || request.gender > genderEnum.other)
-                return "Invalid gender!";
+                throw new EInvalidGender();
 
             if (request.goalWeight != default(double) &&
                 (request.goalWeight < 20 || request.goalWeight > 1000))
-                return "The user goal weight must be over 20 and 1000!";
-
-            return "Everything's okay.";
+                throw new EInvalidGoalWeight();
         }
-        private string CheckProfilePicture(UserProfile userProfile)
+        private void CheckProfilePicture(UserProfile userProfile)
         {
             if (userProfile.hairIndex < hairEnum.nondefined || userProfile.hairIndex > hairEnum.white)
-                return "Invalid hair!";
+                throw new EInvalidHair();
 
             if (userProfile.skinIndex < skinEnum.nondefined || userProfile.skinIndex > skinEnum.lightest)
-                return "Invalid skin color!";
+                throw new EInvalidSkin();
 
             if (userProfile.eyesIndex < eyesEnum.nondefined || userProfile.eyesIndex > eyesEnum.brown)
-                return "Invalid eye color!";
+                throw new EInvalidEye();
 
             if (userProfile.mouthIndex < mouthEnum.nondefined || userProfile.mouthIndex > mouthEnum.sad)
-                return "Invalid mouth!";
+                throw new EInvalidMouth();
 
             if (userProfile.hairIndex == hairEnum.nondefined)
-                return "Select a hair!";
+                throw new EInvalidHair();
 
             if (userProfile.skinIndex == skinEnum.nondefined)
-                return "Select a skin color!";
+                throw new EInvalidSkin();
 
             if (userProfile.eyesIndex == eyesEnum.nondefined)
-                return "Select a eye!";
+                throw new EInvalidEye();
 
             if (userProfile.mouthIndex == mouthEnum.nondefined)
-                return "Select a mouth!";
-
-            return "Everything's okay.";
+                throw new EInvalidMouth();
         }
 
         private double SetGoalWeight(double height, double weight)
