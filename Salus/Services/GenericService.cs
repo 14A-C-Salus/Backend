@@ -55,7 +55,7 @@ namespace Salus.Services
         {
             var userProfile = _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId()).Result;
             if (userProfile == null)
-                throw new EUserNotFound(); //u can find this in the AuthExcepptions.cs
+                throw new EUserNotFound();
             return userProfile;
         }
         public int GetAuthId()

@@ -35,12 +35,21 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPut("")]
+        [HttpPatch("add-diet")]
         public IActionResult AddDiet(int dietId)
         {
             return this.Run(() =>
             {
                 return Ok(_userProfileService.AddDiet(dietId));
+            });
+        }
+
+        [HttpPatch("remove-diet")]
+        public IActionResult RemoveDiet()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.RemoveDiet());
             });
         }
 

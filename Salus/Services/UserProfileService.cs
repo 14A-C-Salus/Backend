@@ -24,25 +24,7 @@ namespace Salus.Services.UserProfileServices
                 throw new ELoginRequired();
             var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
 
-
-            int goalKcal;
-            //Mifflin-St Jeor method
-            if (userProfile.gender == genderEnum.male)
-                goalKcal = (int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) + 5);
-            else if (userProfile.gender == genderEnum.female)
-                goalKcal = (int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) - 161);
-            else
-                throw new EGenderNotSelected();
-
-            int goalDl;
-            if (userProfile.gender == genderEnum.male)
-                goalDl = 37;
-            else if (userProfile.gender == genderEnum.female)
-                goalDl = 27;
-            else
-                throw new EGenderNotSelected();
-
-            return _genericServicesDiet.ReadAll().Where(d => (d.maxKcal < goalKcal) && (d.minDl > goalDl)).ToList();
+            return _genericServicesDiet.ReadAll().Where(d => (d.maxKcal < userProfile.maxKcal) && (d.minDl > userProfile.minDl)).ToList();
         }
 
         public UserProfile AddDiet(int dietId)
@@ -57,6 +39,17 @@ namespace Salus.Services.UserProfileServices
                 throw new EInvalidDiet();
 
             userProfile.diet = diet;
+            return _genericServicesUserProfile.Update(userProfile);
+        }
+
+        public UserProfile RemoveDiet()
+        {
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
+            if (auth == null)
+                throw new ELoginRequired();
+            var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
+
+            userProfile.diet = null;
             return _genericServicesUserProfile.Update(userProfile);
         }
         //public methods
