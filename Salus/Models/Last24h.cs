@@ -9,13 +9,11 @@ namespace Salus.Controllers.Models.Last24hModels
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
-        public int liquidInDl { get; set; }
-        public int minLiquidInDl { get; set; }
-        public int maxKcal { get; set; }
+        public int? liquidInDl { get; set; }
         [Required, JsonIgnore]
         public UserProfile? userProfile { get; set; }
         public int userProfileId { get; set; }
-        [Required, JsonIgnore]
+        [JsonIgnore]
         public IList<Food>? foods { get; set; }
     }
 }

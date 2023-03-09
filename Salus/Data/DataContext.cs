@@ -1,4 +1,5 @@
 ﻿using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Salus.Models;
 
 namespace Salus.Data
 {
@@ -6,6 +7,7 @@ namespace Salus.Data
     {
         public DbSet<Auth> auths { get; set; }
         public DbSet<Comment> comments { get; set; }
+        public DbSet<Diet> diets { get; set; }
         public DbSet<Following> followings { get; set; }
         public DbSet<Food> foods { get; set; }
         public DbSet<Last24h> last24Hs { get; set; }
@@ -57,6 +59,11 @@ namespace Salus.Data
                 .Entity<Recipe>()
                 .HasOne<Oil>(r => r.oil)
                 .WithMany(o => o.recipes);
+
+            modelBuilder
+                .Entity<UserProfile>()
+                .HasOne<Diet>(u => u.diet)
+                .WithMany(d => d.userProfiles);
 
             modelBuilder
                 .Entity<Food>()

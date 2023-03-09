@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Salus.Models;
 
 namespace Salus.Controllers.Models.UserProfileModels
 {
@@ -7,7 +8,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         public int id { get; set; }
         public double weight { get; set; }
         public double height { get; set; }
-        public string birthDate { get; set; } = default(DateTime).ToString("yyyy.MM.dd.");
+        public DateTime birthDate { get; set; }
         public genderEnum gender { get; set; }
         public double goalWeight { get; set; }
 
@@ -22,6 +23,8 @@ namespace Salus.Controllers.Models.UserProfileModels
         public Auth? auth { get; set; }
         [JsonIgnore]
         public Last24h? last24h { get; set; }
+        [JsonIgnore]
+        public Diet? diet { get; set; }
         [JsonIgnore]
         public int authOfProfileId { get; set; }
         [JsonIgnore]

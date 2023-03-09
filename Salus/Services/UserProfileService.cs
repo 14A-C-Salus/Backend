@@ -1,4 +1,5 @@
 ﻿using Salus.Exceptions;
+using Salus.Models;
 
 namespace Salus.Services.UserProfileServices
 {
@@ -6,13 +7,42 @@ namespace Salus.Services.UserProfileServices
     {
         public GenericService<Auth> _genericServicesAuth;
         public GenericService<UserProfile> _genericServicesUserProfile;
+        public GenericService<Diet> _genericServicesDiet;
         Auth? auth;
 
         public UserProfileService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _genericServicesAuth = new(dataContext, httpContextAccessor);
             _genericServicesUserProfile = new(dataContext, httpContextAccessor);
+            _genericServicesDiet = new(dataContext, httpContextAccessor);
+        }
 
+        public List<Diet> GetRecommendedDiets()
+        {
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
+            if (auth == null)
+                throw new ELoginRequired();
+            var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
+
+
+            int goalKcal;
+            //Mifflin-St Jeor method
+            if (userProfile.gender == genderEnum.male)
+                goalKcal = (int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) + 5);
+            else if (userProfile.gender == genderEnum.female)
+                goalKcal = (int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) - 161);
+            else
+                throw new EGenderNotSelected();
+
+            int goalDl;
+            if (userProfile.gender == genderEnum.male)
+                goalDl = 37;
+            else if (userProfile.gender == genderEnum.female)
+                goalDl = 27;
+            else
+                throw new EGenderNotSelected();
+
+            return _genericServicesDiet.ReadAll().Where(d => (d.maxKcal < goalKcal) && (d.minDl > goalDl)).ToList();
         }
         //public methods
         public UserProfile SetProfilePicture(UserSetProfilePictureRequset request)
@@ -49,11 +79,9 @@ namespace Salus.Services.UserProfileServices
             CheckCreateRequest(request);
             var userProfile = new UserProfile();
             userProfile.auth = auth;
-
-
             userProfile.weight = request.weight;
             userProfile.height = request.height;
-            userProfile.birthDate = request.birthDate.ToString("yyyy.MM.dd.");
+            userProfile.birthDate = request.birthDate;
             userProfile.gender = request.gender;
             userProfile.goalWeight = request.goalWeight == 0 ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
             userProfile = _genericServicesUserProfile.Create(userProfile);
@@ -69,7 +97,7 @@ namespace Salus.Services.UserProfileServices
             var userProfile = _genericServicesUserProfile.GetAuthenticatedUserProfile();
             userProfile.weight = request.weight == default(double) ? userProfile.weight : request.weight;
             userProfile.height = request.height == default(double) ? userProfile.weight : request.weight;
-            userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate.ToString("yyyy.MM.dd");
+            userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate;
             userProfile.gender = request.gender == default(genderEnum) ? userProfile.gender : request.gender;
             userProfile.goalWeight = request.goalWeight == default(double) ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;
             userProfile = _genericServicesUserProfile.Update(userProfile);
@@ -92,7 +120,7 @@ namespace Salus.Services.UserProfileServices
             if (request.gender == genderEnum.nondefined)
                 throw new EGenderNotSelected();
 
-            if (request.gender < genderEnum.nondefined || request.gender > genderEnum.other)
+            if (request.gender < genderEnum.nondefined || request.gender > genderEnum.female)
                 throw new EInvalidGender();
 
             if (request.goalWeight != default(double) &&
@@ -112,7 +140,7 @@ namespace Salus.Services.UserProfileServices
                 (request.height < 40 || request.height > 250))
                 throw new EInvalidHeight();
 
-            if (request.gender < genderEnum.nondefined || request.gender > genderEnum.other)
+            if (request.gender < genderEnum.nondefined || request.gender > genderEnum.female)
                 throw new EInvalidGender();
 
             if (request.goalWeight != default(double) &&

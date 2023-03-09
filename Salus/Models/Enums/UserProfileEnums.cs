@@ -4,8 +4,7 @@
     {
         nondefined,
         male,
-        female,
-        other
+        female
     }
     public enum hairEnum
     {
