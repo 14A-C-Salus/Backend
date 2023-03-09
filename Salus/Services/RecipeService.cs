@@ -27,6 +27,11 @@ namespace Salus.Services.RecipeServices
             _genericServices.Delete(recipe);
         }
 
+        public List<Recipe> GetAll(int authId) 
+        {
+            return _genericServices.ReadAll().Where(r => r.Author.id == authId).ToList();
+        }
+
         public Recipe Create(WriteRecipeRequest request)
         {
             var userProfile = _genericServices.GetAuthenticatedUserProfile();

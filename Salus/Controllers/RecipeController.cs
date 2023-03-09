@@ -13,6 +13,14 @@ namespace Salus.Controllers
         {
             _recipeService = recipeService;
         }
+        [HttpGet("get-all-recipe-by-auth-id")]
+        public IActionResult GetAllRecipe(int authId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetAll(authId));
+            });
+        }
 
         [HttpPut("create")]
         public IActionResult Create(WriteRecipeRequest request)

@@ -24,6 +24,17 @@ namespace Salus.Services.AuthServices
 
         //public methods
 
+        public UserProfile? GetUserProfile(int authId)
+        {
+            var auth = _genericServices.Read(authId);
+            if (auth == null)
+                throw new EAuthNotFound();
+            var userProfile = _dataContext.Set<UserProfile>().SingleOrDefault(u => u.auth == auth);
+            if (userProfile == null)
+                throw new EUserProfileNotFound();
+            return userProfile;
+        }
+
         public Auth Register(AuthRegisterRequest request)
         {
             if (_dataContext.Set<Auth>().Any(a => a.email == request.email))
