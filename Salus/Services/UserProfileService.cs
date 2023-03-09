@@ -44,6 +44,21 @@ namespace Salus.Services.UserProfileServices
 
             return _genericServicesDiet.ReadAll().Where(d => (d.maxKcal < goalKcal) && (d.minDl > goalDl)).ToList();
         }
+
+        public UserProfile AddDiet(int dietId)
+        {
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
+            if (auth == null)
+                throw new ELoginRequired();
+            var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
+
+            var diet = _genericServicesDiet.Read(dietId);
+            if (diet == null)
+                throw new EInvalidDiet();
+
+            userProfile.diet = diet;
+            return _genericServicesUserProfile.Update(userProfile);
+        }
         //public methods
         public UserProfile SetProfilePicture(UserSetProfilePictureRequset request)
         {

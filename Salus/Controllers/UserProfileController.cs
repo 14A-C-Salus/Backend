@@ -26,6 +26,24 @@ namespace Salus.Controllers
             });
         }
 
+        [HttpGet("get-recommended-diets")]
+        public IActionResult GetRecommendedDiets()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.GetRecommendedDiets());
+            });
+        }
+
+        [HttpPut("")]
+        public IActionResult AddDiet(int dietId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.AddDiet(dietId));
+            });
+        }
+
         [HttpPut("create-profile")]
         public IActionResult CreateProfile(UserSetDatasRequest request)
         {

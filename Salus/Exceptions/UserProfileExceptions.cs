@@ -1,5 +1,8 @@
 ﻿namespace Salus.Exceptions
 {
+    public class EInvalidDiet : Exception
+    {
+    }
     public class ELoginRequired : Exception
     {
     }
