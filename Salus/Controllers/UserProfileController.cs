@@ -16,6 +16,15 @@ namespace Salus.Controllers
         {
             _userProfileService = userProfileService;
         }
+        [AllowAnonymous]
+        [HttpGet("read-profile")]
+        public IActionResult ReadProfile(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.GetProfile(id));
+            });
+        }
 
         [HttpPut("create-profile")]
         public IActionResult CreateProfile(UserSetDatasRequest request)

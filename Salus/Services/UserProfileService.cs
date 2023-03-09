@@ -12,13 +12,14 @@ namespace Salus.Services.UserProfileServices
         {
             _genericServicesAuth = new(dataContext, httpContextAccessor);
             _genericServicesUserProfile = new(dataContext, httpContextAccessor);
-            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
-            if (auth == null)
-                throw new ELoginRequired();
+
         }
         //public methods
         public UserProfile SetProfilePicture(UserSetProfilePictureRequset request)
         {
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
+            if (auth == null)
+                throw new ELoginRequired();
             var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
 
             userProfile.hairIndex = request.hairIndex == hairEnum.nondefined ? userProfile.hairIndex : request.hairIndex;
@@ -32,12 +33,20 @@ namespace Salus.Services.UserProfileServices
             return userProfile;
         }
 
+        public UserProfile GetProfile(int id)
+        {
+            var userProfile = _genericServicesUserProfile.Read(id);
+            if (userProfile == null)
+                throw new EInvalidUserProfilId();
+            return userProfile;
+        }
+
         public UserProfile CreateProfile(UserSetDatasRequest request)
         {
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
+            if (auth == null)
+                throw new ELoginRequired();
             CheckCreateRequest(request);
-
-
-
             var userProfile = new UserProfile();
             userProfile.auth = auth;
 
@@ -53,10 +62,11 @@ namespace Salus.Services.UserProfileServices
 
         public UserProfile ModifyProfile(UserSetDatasRequest request)
         {
+            auth = _genericServicesAuth.Read(_genericServicesAuth.GetAuthId());
+            if (auth == null)
+                throw new ELoginRequired();
             CheckUpdateRequest(request);
-
             var userProfile = _genericServicesUserProfile.GetAuthenticatedUserProfile();
-
             userProfile.weight = request.weight == default(double) ? userProfile.weight : request.weight;
             userProfile.height = request.height == default(double) ? userProfile.weight : request.weight;
             userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate.ToString("yyyy.MM.dd");

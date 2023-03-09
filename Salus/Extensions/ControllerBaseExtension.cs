@@ -21,7 +21,7 @@ namespace Salus.WebAPI
 #if DEBUG
                 return controller.StatusCode(500, new
                 {
-                    error = ex.InnerException.GetType().Name,
+                    error = ex.InnerException == null ? ex.GetType().Name : ex.InnerException.GetType().Name,
                     stackTrace = ex.StackTrace
                 });
 #else

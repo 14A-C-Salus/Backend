@@ -3,6 +3,9 @@
     public class ELoginRequired : Exception
     {
     }
+    public class EInvalidUserProfilId : Exception
+    {
+    }
 
     public class EInvalidGender : Exception
     {

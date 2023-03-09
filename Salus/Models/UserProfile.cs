@@ -20,6 +20,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         //Connections
         [Required, JsonIgnore]
         public Auth? auth { get; set; }
+        [JsonIgnore]
         public Last24h? last24h { get; set; }
         [JsonIgnore]
         public int authOfProfileId { get; set; }
@@ -31,7 +32,9 @@ namespace Salus.Controllers.Models.UserProfileModels
         public IList<Comment>? commenters { get; set; }
         [JsonIgnore]
         public IList<Comment>? commenteds { get; set; }
+        [JsonIgnore]
         public IList<UsersLikeRecipes>? likedRecipes { get; set; }
+        [JsonIgnore]
         public IList<UsersPreferTags>? preferredTags { get; set; }
     }
 }
