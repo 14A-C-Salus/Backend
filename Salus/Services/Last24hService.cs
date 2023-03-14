@@ -1,4 +1,5 @@
-﻿using Salus.Exceptions;
+﻿using Salus.Controllers.Models.FoodModels;
+using Salus.Exceptions;
 using Salus.Models.Requests;
 
 namespace Salus.Services.Last24hServices
@@ -40,6 +41,46 @@ namespace Salus.Services.Last24hServices
             last24h.carbohydrate = food.carbohydrate * (request.portion / 100);
 
             return _genericServicesLast24hService.Create(last24h);
+        }
+
+        public void Delete(int id)
+        {
+            var last24H = _genericServicesLast24hService.Read(id);
+            if (last24H == null)
+                throw new ELast24HNotFound();
+            _genericServicesLast24hService.Delete(last24H);
+        }
+
+        public Last24h DoublePortion(int id)
+        {
+            return SetPortion(id, 2);
+        }
+
+        private Last24h SetPortion(int id, double multiplier)
+        {
+            var last24H = _genericServicesLast24hService.Read(id);
+            if (last24H == null)
+                throw new ELast24HNotFound();
+            last24H.fat = (int)Math.Floor(last24H.fat * multiplier);
+            last24H.kcal *= (int)Math.Floor(last24H.kcal * multiplier);
+            last24H.protein *= (int)Math.Floor(last24H.protein * multiplier);
+            last24H.carbohydrate *= (int)Math.Floor(last24H.carbohydrate * multiplier);
+            return last24H;
+        }
+
+        public Last24h HalfPortion(int id)
+        {
+            return SetPortion(id, 1/2);
+        }
+
+        public Last24h QuarterPortion(int id)
+        {
+            return SetPortion(id, 1/4);
+        }
+
+        public Last24h ThirdPortion(int id)
+        {
+            return SetPortion(id, 1/3);
         }
     }
 }

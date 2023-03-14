@@ -21,5 +21,48 @@ namespace Salus.Controllers
                 return Ok(_last24HService.Add(request));
             });
         }
+
+        [HttpDelete("delete")]
+        public IActionResult Delete(int id)
+        {
+            return this.Run(() =>
+            {
+                _last24HService.Delete(id);
+                return Ok();
+            });
+        }
+
+        [HttpPatch("half-portion")]
+        public IActionResult HalfPortion(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_last24HService.HalfPortion(id));
+            });
+        }
+        [HttpPatch("third-portion")]
+        public IActionResult ThirdPortion(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_last24HService.ThirdPortion(id));
+            });
+        }
+        [HttpPatch("quarter-portion")]
+        public IActionResult QuarterPortion(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_last24HService.QuarterPortion(id));
+            });
+        }
+        [HttpPatch("double-portion")]
+        public IActionResult DoublePortion(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_last24HService.DoublePortion(id));
+            });
+        }
     }
 }
