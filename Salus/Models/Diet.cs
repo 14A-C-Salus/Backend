@@ -9,7 +9,7 @@
         public Between<int>? carbohydrate { get; set; }
         public Between<int>? protein { get; set; }
         public Between<int>? kcal { get; set; }
-        public int minDl { get; set; }
+        public Between<int>? dl { get; set; }
         public virtual IList<UserProfile>? userProfiles { get; set; }
     }
 }

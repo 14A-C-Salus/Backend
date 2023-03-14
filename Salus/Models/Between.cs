@@ -2,7 +2,7 @@
 {
     /// <summary>The Range class.</summary>
     /// <typeparam name="T">Generic parameter.</typeparam>
-    public class IntRange<T> where T : IComparable<T>
+    public class Between<T> where T : IComparable<T>
     {
         /// <summary>Minimum value of the range.</summary>
         public T Minimum { get; set; }
@@ -35,7 +35,7 @@
         /// <summary>Determines if this Range is inside the bounds of another range.</summary>
         /// <param name="Range">The parent range to test on</param>
         /// <returns>True if range is inclusive, else false</returns>
-        public bool IsInsideRange(IntRange<T> range)
+        public bool IsInsideRange(Between<T> range)
         {
             return this.IsValid() && range.IsValid() && range.ContainsValue(this.Minimum) && range.ContainsValue(this.Maximum);
         }
@@ -43,7 +43,7 @@
         /// <summary>Determines if another range is inside the bounds of this range.</summary>
         /// <param name="Range">The child range to test</param>
         /// <returns>True if range is inside, else false</returns>
-        public bool ContainsRange(IntRange<T> range)
+        public bool ContainsRange(Between<T> range)
         {
             return this.IsValid() && range.IsValid() && this.ContainsValue(range.Minimum) && this.ContainsValue(range.Maximum);
         }

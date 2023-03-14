@@ -23,8 +23,15 @@ namespace Salus.Services.UserProfileServices
             if (auth == null)
                 throw new ELoginRequired();
             var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
-
-            return _genericServicesDiet.ReadAll().Where(d => (d.maxKcal < userProfile.maxKcal) && (d.minDl > userProfile.minDl)).ToList();
+            List<Diet> diets = new();
+            foreach (var diet in _genericServicesDiet.ReadAll())
+            {
+                if (diet.kcal != null && diet.kcal.Maximum < userProfile.maxKcal)
+                {
+                    diets.Add(diet);
+                }
+            }
+            return diets;
         }
 
         public UserProfile AddDiet(int dietId)
