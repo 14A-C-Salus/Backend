@@ -26,7 +26,7 @@ namespace Salus.Controllers.Models.UserProfileModels
                 }
                 else
                 {
-                    return diet.maxKcal;
+                    return diet.kcal.Maximum;
                 }
             }
             set
@@ -47,7 +47,7 @@ namespace Salus.Controllers.Models.UserProfileModels
                         return 27;
                     throw new EGenderNotSelected();
                 }
-                else { return diet.minDl; }
+                else { return diet.dl.Minimum; }
             }
             set { }
         }
