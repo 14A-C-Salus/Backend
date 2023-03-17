@@ -23,7 +23,13 @@ namespace Salus.Services.AuthServices
         }
 
         //public methods
-
+        public Auth? GetAuth(int authId)
+        {
+            var auth = _genericServices.Read(authId);
+            if (auth == null)
+                throw new EAuthNotFound();
+            return auth;
+        }
         public UserProfile? GetUserProfile(int authId)
         {
             var auth = _genericServices.Read(authId);
