@@ -1,7 +1,10 @@
 ﻿namespace Salus.Exceptions
 {
-
+    
     public class ERecipeNotFound : Exception
+    {
+    }
+    public class EInvalidDescription : Exception
     {
     }
 

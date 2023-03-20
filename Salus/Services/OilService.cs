@@ -28,7 +28,7 @@ namespace Salus.Services.FoodServices
         {
             var oil = _genericServices.Read(request.id);
             if (oil == null)
-                throw new Exception("This oil doesn't exist.");
+                throw new EOilNotFound();
 
             oil.name = request.name.Length == 0 ? oil.name : request.name;
             oil.calIn14Ml = request.calIn14Ml == 0 ? oil.calIn14Ml : request.calIn14Ml;

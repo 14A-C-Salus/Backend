@@ -9,13 +9,11 @@ namespace Salus.Services.Last24hServices
         private readonly DataContext _dataContext;
         private readonly GenericService<Food> _genericServicesFood;
         private readonly GenericService<Last24h> _genericServicesLast24hService;
-        private readonly GenericService<UserProfile> _genericServicesUserProfile;
         public Last24hService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
             _genericServicesFood = new(dataContext, httpContextAccessor);
             _genericServicesLast24hService = new(dataContext, httpContextAccessor);
-            _genericServicesUserProfile = new(dataContext, httpContextAccessor);
         }
 
         public Last24h Add(AddFoodToLast24H request)
