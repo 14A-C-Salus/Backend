@@ -212,7 +212,7 @@ namespace Salus.Services.RecipeServices
             if ((request.name.Length < 2 && request.name != string.Empty) || request.name.Length > 200) throw new ERecipeName();
             if ((request.timeInMinutes < 0 && request.timeInMinutes != -1) || request.timeInMinutes > 2000) throw new EInvalidTime();
             if ((request.oilPortionMl < 0 && request.oilPortionMl != -1) || request.oilPortionMl > 2000) throw new EInvalidOilPortion();
-            if (!request.generateDescription && ((request.description.Length < 10 && request.description != string.Empty) || request.description.Length > 2000)) throw EInvalidDescription();
+            if (!request.generateDescription && ((request.description.Length < 10 && request.description != string.Empty) || request.description.Length > 2000)) throw new EInvalidDescription();
         }
 
         private string GenerateDescription(Recipe recipe)
