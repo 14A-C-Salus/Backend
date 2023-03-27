@@ -27,7 +27,7 @@ namespace Salus.WebAPI
 #else
                 return controller.StatusCode(500, new
                 {
-                    error = "Belső hiba"
+                    error = ex.InnerException == null ? ex.GetType().Name : ex.InnerException.GetType().Name,
                 });
 
 #endif
