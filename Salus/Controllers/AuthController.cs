@@ -15,6 +15,25 @@ namespace Salus.Controllers
         {
             _authService = authService;
         }
+
+        [HttpGet("get-auth")]
+        public IActionResult GetAuth(int authId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_authService.GetAuth(authId));
+            });
+        }
+
+        [HttpGet("get-userprofile")]
+        public IActionResult GetUserProfile(int authId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_authService.GetUserProfile(authId));
+            });
+        }
+
         [HttpPut("register")]
         public IActionResult Register(AuthRegisterRequest request)
         {

@@ -13,13 +13,44 @@ namespace Salus.Controllers
         {
             _recipeService = recipeService;
         }
+        [HttpGet("get-all-recipe-by-auth-id")]
+        public IActionResult GetAllRecipe(int authId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetAll(authId));
+            });
+        }
+
         [HttpPut("create")]
         public IActionResult Create(WriteRecipeRequest request)
         {
             return this.Run(() =>
             {
-                return Ok(_recipeService.WriteRecipe(request));
+                return Ok(_recipeService.Create(request));
             });
         }
+
+        [HttpPut("update")]
+        public IActionResult Update(UpdateRecipeRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.Update(request));
+            });
+        }
+
+        [HttpDelete("delete")]
+        public IActionResult Delete(int id)
+        {
+            return this.Run(() =>
+            {
+                _recipeService.Delete(id);
+                return Ok();
+            });
+        }
+
+        //todo:like
+        //todo:kicserélni az emaileket idra
     }
 }

@@ -43,6 +43,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDietService, DietService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ILast24hService, Last24hService>();
 builder.Services.AddScoped<IOilService, OilService>();

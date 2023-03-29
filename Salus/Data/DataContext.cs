@@ -1,4 +1,5 @@
 ﻿using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Salus.Models;
 
 namespace Salus.Data
 {
@@ -6,6 +7,7 @@ namespace Salus.Data
     {
         public DbSet<Auth> auths { get; set; }
         public DbSet<Comment> comments { get; set; }
+        public DbSet<Diet> diets { get; set; }
         public DbSet<Following> followings { get; set; }
         public DbSet<Food> foods { get; set; }
         public DbSet<Last24h> last24Hs { get; set; }
@@ -18,8 +20,8 @@ namespace Salus.Data
         private readonly IConfiguration _configuration;
 
         readonly string connectionString;
-
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        // Reaseon: Properties need to make datebase, but we never use them in code.
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable. 
         public DataContext(IConfiguration configuration)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
@@ -57,6 +59,11 @@ namespace Salus.Data
                 .Entity<Recipe>()
                 .HasOne<Oil>(r => r.oil)
                 .WithMany(o => o.recipes);
+
+            modelBuilder
+                .Entity<UserProfile>()
+                .HasOne<Diet>(u => u.diet)
+                .WithMany(d => d.userProfiles);
 
             modelBuilder
                 .Entity<Food>()

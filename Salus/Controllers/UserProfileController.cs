@@ -16,6 +16,42 @@ namespace Salus.Controllers
         {
             _userProfileService = userProfileService;
         }
+        [AllowAnonymous]
+        [HttpGet("read-profile")]
+        public IActionResult ReadProfile(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.GetProfile(id));
+            });
+        }
+
+        [HttpGet("get-recommended-diets")]
+        public IActionResult GetRecommendedDiets()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.GetRecommendedDiets());
+            });
+        }
+
+        [HttpPatch("add-diet")]
+        public IActionResult AddDiet(int dietId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.AddDiet(dietId));
+            });
+        }
+
+        [HttpPatch("remove-diet")]
+        public IActionResult RemoveDiet()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.RemoveDiet());
+            });
+        }
 
         [HttpPut("create-profile")]
         public IActionResult CreateProfile(UserSetDatasRequest request)
