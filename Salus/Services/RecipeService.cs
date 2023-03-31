@@ -9,14 +9,112 @@ namespace Salus.Services.RecipeServices
     {
         private readonly DataContext _dataContext;
         private readonly GenericService<Recipe> _genericServices;
+        private readonly GenericService<Tag> _genericServicesTag;
 
         public RecipeService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
             _genericServices = new(dataContext, httpContextAccessor);
+            _genericServicesTag = new(dataContext, httpContextAccessor);
         }
 
-        //public methods
+        //----------------------------------------------------------------------------
+        //------------------------------- Public Methods -----------------------------
+        //----------------------------------------------------------------------------
+
+        //--------- Tags Start ----------//
+        public List<Tag> GetRecommendedTags(int recipeId)
+        {
+            var recipe = _genericServices.Read(recipeId);
+            if (recipe == null)
+                throw new EFoodNotFound();
+            List<Tag> tags = new();
+            foreach (Tag tag in _genericServicesTag.ReadAll())
+            {
+                tag.recipe = recipe;
+                if (tag.recommend)
+                    tags.Add(tag);
+            }
+            return tags;
+        }
+
+        public Recipe AddTags(AddTagsToFoodRequest request)
+        {
+            var recipe = _genericServices.Read(request.recipeId);
+            if (recipe == null)
+                throw new EFoodNotFound();
+
+            List<RecepiesHaveTags> foodHasTags = new();
+            foreach (var tagId in request.tagIds)
+            {
+                var tag = _genericServicesTag.Read(tagId);
+                if (tag == null)
+                    throw new ETagNotFound();
+
+                var foodHasTag = new RecepiesHaveTags
+                {
+                    recipe = recipe,
+                    tag = tag
+                };
+                foodHasTags.Add(foodHasTag);
+
+                if (_dataContext.Set<RecepiesHaveTags>().Any(fHT => fHT.recipeId == foodHasTag.recipeId && fHT.tagId == foodHasTag.tagId))
+                    throw new EFoodAlreadyHasTag();
+
+                _dataContext.Set<RecepiesHaveTags>().Add(foodHasTag);
+                tag.recepiesThatHave.Add(foodHasTag);
+            }
+
+            recipe.tags = foodHasTags;
+            recipe = _genericServices.Update(recipe);
+
+            return recipe;
+        }
+        //--------- Tags End ----------//
+
+        //--------- Simple CRUD Start ----------//
+        public Recipe CreateSimple(FoodCreateRequest request)
+        {
+            var recipe = new Recipe()
+            {
+                name = request.name,
+                carbohydrate = request.carbohydrate,
+                fat = request.fat,
+                protein = request.protein,
+                verifeid = false,
+                kcal = 0
+            };
+            recipe.kcal = (int)(request.kcal == null ? CalculateKcal(recipe) : request.kcal);
+            CheckData(recipe);
+            recipe = _genericServices.Create(recipe);
+            return recipe;
+        }
+
+        public Recipe UpdateSimple(FoodUpdateRequest request)
+        {
+            var recipe = _genericServices.Read(request.id);
+            if (recipe == null)
+                throw new EFoodNotFound();
+
+            recipe.name = request.name.Length == 0 ? recipe.name : request.name;
+            recipe.carbohydrate = request.carbohydrate == -1 ? recipe.carbohydrate : request.carbohydrate;
+            recipe.fat = request.fat == -1 ? recipe.fat : request.fat;
+            recipe.protein = request.protein == -1 ? recipe.protein : request.protein;
+            recipe.kcal = (int)(request.kcal == null ? CalculateKcal(recipe) : request.kcal);
+
+            CheckData(recipe);
+            recipe = _genericServices.Update(recipe);
+            return recipe;
+        }
+        //--------- Simple CRUD End ----------//
+
+
+        //--------- CRUD Start ----------//
+        public List<Recipe> GetAll(int authId) 
+        {
+            return _genericServices.ReadAll().Where(r => r.Author.id == authId).ToList();
+        }
+
         public void Delete(int recipeId)
         {
             var recipe = _genericServices.Read(recipeId);
@@ -27,10 +125,6 @@ namespace Salus.Services.RecipeServices
             _genericServices.Delete(recipe);
         }
 
-        public List<Recipe> GetAll(int authId) 
-        {
-            return _genericServices.ReadAll().Where(r => r.Author.id == authId).ToList();
-        }
 
         public Recipe Create(WriteRecipeRequest request)
         {
@@ -69,11 +163,11 @@ namespace Salus.Services.RecipeServices
                 if (ingredient.tags != null && ingredient.tags.Count() != 0)
                     foreach (var foodsHasTag in ingredient.tags)
                         if (foodsHasTag.tag != null)
-                            recipe.tags.Add(foodsHasTag.tag);
+                            recipe.tags.Add(foodsHasTag);
 
                 var recipeIncludeIngredients = new RecipesIncludeIngredients()
                 {
-                    food = ingredient,
+                    ingredient = ingredient,
                     recipe = recipe,
                     portionInGramm = portion
                 };
@@ -93,13 +187,13 @@ namespace Salus.Services.RecipeServices
                     / 14) //14Ml to 1Ml
                     * request.oilPortionMl //1Ml to request Ml
                     / 9 //kcal to fat
-                    * 0.018)); //1.8% of the oil is in the food
+                    * 0.018)); //1.8% of the oil is in the recipe
 
                 recipe.kcal += (int)Math.Round((decimal)(
                     ((oil.calIn14Ml / 1000) //cal to kcal
                     / 14) //14Ml to 1Ml
                     * request.oilPortionMl //1Ml to request Ml
-                    * 0.018)); //1.8% of the oil is in the food
+                    * 0.018)); //1.8% of the oil is in the recipe
 
                 recipe.oilPortionMl = request.oilPortionMl;
             }
@@ -154,11 +248,11 @@ namespace Salus.Services.RecipeServices
                 if (ingredient.tags != null && ingredient.tags.Count() != 0)
                     foreach (var foodsHasTag in ingredient.tags)
                         if (foodsHasTag.tag != null)
-                            recipe.tags.Add(foodsHasTag.tag);
+                            recipe.tags.Add(foodsHasTag);
 
                 var recipeIncludeIngredients = new RecipesIncludeIngredients()
                 {
-                    food = ingredient,
+                    ingredient = ingredient,
                     recipe = recipe,
                     portionInGramm = portion
                 };
@@ -178,13 +272,13 @@ namespace Salus.Services.RecipeServices
                     / 14) //14Ml to 1Ml
                     * request.oilPortionMl //1Ml to request Ml
                     / 9 //kcal to fat
-                    * 0.018)); //1.8% of the oil is in the food
+                    * 0.018)); //1.8% of the oil is in the recipe
 
                 recipe.kcal += (int)Math.Round((decimal)(
                     ((oil.calIn14Ml / 1000) //cal to kcal
                     / 14) //14Ml to 1Ml
                     * request.oilPortionMl //1Ml to request Ml
-                    * 0.018)); //1.8% of the oil is in the food
+                    * 0.018)); //1.8% of the oil is in the recipe
 
                 recipe.oilPortionMl = request.oilPortionMl;
             }
@@ -196,24 +290,24 @@ namespace Salus.Services.RecipeServices
 
             return recipe;
         }
+        //--------- Simple CRUD End ----------//
 
-        //private methods
-        private void Check(WriteRecipeRequest request)
+        //--------- Other Start ----------//
+        public Recipe VerifyUnVerify(int id)
         {
-            if (request.method == makeingMethodEnum.nondefined) throw new EMakingMethodMissing();
-            if (request.name.Length < 2 || request.name.Length > 200) throw new ERecipeName();
-            if (request.timeInMinutes < 0 || request.timeInMinutes > 2000) throw new EInvalidTime();
-            if (request.oilPortionMl < 0 || request.oilPortionMl > 2000) throw new EInvalidOilPortion();
-            if (!request.generateDescription && (request.description.Length < 10 || request.description.Length > 2000)) throw new EInvalidDescription();
+            var recipe = _genericServices.Read(id);
+            if (recipe == null)
+                throw new EFoodNotFound();
+            recipe.verifeid = !recipe.verifeid;
+            recipe = _genericServices.Update(recipe);
+            return recipe;
         }
+        //--------- Other End ----------//
 
-        private void UpdateCheck(UpdateRecipeRequest request)
-        {
-            if ((request.name.Length < 2 && request.name != string.Empty) || request.name.Length > 200) throw new ERecipeName();
-            if ((request.timeInMinutes < 0 && request.timeInMinutes != -1) || request.timeInMinutes > 2000) throw new EInvalidTime();
-            if ((request.oilPortionMl < 0 && request.oilPortionMl != -1) || request.oilPortionMl > 2000) throw new EInvalidOilPortion();
-            if (!request.generateDescription && ((request.description.Length < 10 && request.description != string.Empty) || request.description.Length > 2000)) throw new EInvalidDescription();
-        }
+
+        //----------------------------------------------------------------------------
+        //------------------------------- Private Methods -----------------------------
+        //----------------------------------------------------------------------------
 
         private string GenerateDescription(Recipe recipe)
         {
@@ -226,7 +320,7 @@ namespace Salus.Services.RecipeServices
             {
                 //Reason: Nullable need to the optional relationship, but it can't be null here.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                var ingredient = recipe.ingredients[i].food.name;
+                var ingredient = recipe.ingredients[i].recipe.name;
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
                 var portion = recipe.ingredients[i].portionInGramm.ToString();
                 desc += $"\t {ingredient} - {portion} g \n";
@@ -256,19 +350,66 @@ namespace Salus.Services.RecipeServices
             return desc;
         }
 
-        private async Task<List<Food>> GetAllIngredients(List<int>? ids)
+        private async Task<List<Recipe>> GetAllIngredients(List<int>? ids)
         {
             if (ids == null || ids.Count() == 0)
                 throw new EIngredientsMissing();
 
-            List<Food> ingredients = new();
+            List<Recipe> ingredients = new();
 
             foreach (var ingredientId in ids)
             {
-                ingredients.Add(await _dataContext.Set<Food>().SingleAsync(i => i.id == ingredientId));
+                ingredients.Add(await _dataContext.Set<Recipe>().SingleAsync(i => i.id == ingredientId));
             }
 
             return ingredients;
         }
+
+        private int CalculateKcal(Recipe recipe)
+        {
+            return (int)Math.Round((recipe.carbohydrate * 3.86) + (recipe.fat * 9) + (recipe.protein * 4));
+        }
+
+
+        //--------- Checks Start ----------//
+        private void Check(WriteRecipeRequest request)
+        {
+            if (request.method == makeingMethodEnum.nondefined) throw new EMakingMethodMissing();
+            if (request.name.Length < 2 || request.name.Length > 200) throw new ERecipeName();
+            if (request.timeInMinutes < 0 || request.timeInMinutes > 2000) throw new EInvalidTime();
+            if (request.oilPortionMl < 0 || request.oilPortionMl > 2000) throw new EInvalidOilPortion();
+            if (!request.generateDescription && (request.description.Length < 10 || request.description.Length > 2000)) throw new EInvalidDescription();
+        }
+
+        private void UpdateCheck(UpdateRecipeRequest request)
+        {
+            if ((request.name.Length < 2 && request.name != string.Empty) || request.name.Length > 200) throw new ERecipeName();
+            if ((request.timeInMinutes < 0 && request.timeInMinutes != -1) || request.timeInMinutes > 2000) throw new EInvalidTime();
+            if ((request.oilPortionMl < 0 && request.oilPortionMl != -1) || request.oilPortionMl > 2000) throw new EInvalidOilPortion();
+            if (!request.generateDescription && ((request.description.Length < 10 && request.description != string.Empty) || request.description.Length > 2000)) throw new EInvalidDescription();
+        }
+
+        private void CheckData(Recipe recipe)
+        {
+            if (recipe.name.Length > 50)
+                throw new EFoodNameLength();
+            if (recipe.name.Length < 5)
+                throw new EFoodNameNull();
+            if (recipe.fat > 100)
+                throw new EFoodFatValue();
+            if (recipe.protein > 100)
+                throw new EFoodProteinValue();
+            if (recipe.carbohydrate > 100)
+                throw new EFoodCarbohydrateValue();
+            if (recipe.fat < 0)
+                throw new EFoodFatNegativeValue();
+            if (recipe.protein < 0)
+                throw new EFoodProteinNegativeValue();
+            if (recipe.carbohydrate < 0)
+                throw new EFoodCarbohydrateNegativeValue();
+            if (recipe.kcal < 0)
+                throw new EFoodCarbohydrateValue();
+        }
+        //--------- Checks End ----------//
     }
 }

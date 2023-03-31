@@ -2,11 +2,11 @@
 
 namespace Salus.Controllers.Models.JoiningEntity
 {
-    public class FoodsHaveTags
+    public class RecepiesHaveTags
     {
         [Required, JsonIgnore]
-        public Food? food { get; set; }
-        public int foodId { get; set; }
+        public Recipe? recipe { get; set; }
+        public int recipeId { get; set; }
         [Required, JsonIgnore]
         public Tag? tag { get; set; }
         public int tagId { get; set; }

@@ -13,6 +13,53 @@ namespace Salus.Controllers
         {
             _recipeService = recipeService;
         }
+
+        [HttpGet("get-recommended-tags")]
+        public IActionResult GetRecommendedTags(int recipeId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetRecommendedTags(recipeId));
+            });
+        }
+
+        [HttpPut("create-simple")]
+        public IActionResult CreateSimple(FoodCreateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.CreateSimple(request));
+            });
+        }
+
+        [HttpPatch("update")]
+        public IActionResult UpdateSimple(FoodUpdateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.UpdateSimple(request));
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("verify")]
+        public IActionResult Verify(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.VerifyUnVerify(id));
+            });
+        }
+
+        [HttpPatch("add-tags")]
+        public IActionResult AddTags(AddTagsToFoodRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.AddTags(request));
+            });
+        }
+
         [HttpGet("get-all-recipe-by-auth-id")]
         public IActionResult GetAllRecipe(int authId)
         {
@@ -51,6 +98,5 @@ namespace Salus.Controllers
         }
 
         //todo:like
-        //todo:kicserélni az emaileket idra
     }
 }

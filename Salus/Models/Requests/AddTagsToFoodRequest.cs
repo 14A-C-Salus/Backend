@@ -2,7 +2,7 @@
 {
     public class AddTagsToFoodRequest
     {
-        public int foodId { get; set; }
+        public int recipeId { get; set; }
         public List<int> tagIds { get; set; } = new();
     }
 }

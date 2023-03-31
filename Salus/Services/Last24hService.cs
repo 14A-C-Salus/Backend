@@ -7,7 +7,7 @@ namespace Salus.Services.Last24hServices
     public class Last24hService : ILast24hService
     {
         private readonly DataContext _dataContext;
-        private readonly GenericService<Food> _genericServicesFood;
+        private readonly GenericService<Recipe> _genericServicesFood;
         private readonly GenericService<Last24h> _genericServicesLast24hService;
         public Last24hService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
@@ -19,24 +19,25 @@ namespace Salus.Services.Last24hServices
         public Last24h Add(AddFoodToLast24H request)
         {
             var last24h = new Last24h();
-            var food = _genericServicesFood.Read(request.foodId);
+            var recipe = _genericServicesFood.Read(request.recipeId);
 
-            if (food == null)
+            if (recipe == null)
                 throw new EFoodNotFound();
-            else if (last24h.foods == null)
-                last24h.foods = new List<Food>();
+            else if (last24h.recipes == null)
+                last24h.recipes = new List<Recipe>();
 
-                last24h.foods.Add(food);
+                last24h.recipes.Add(recipe);
 
             if (request.isLiquid)
                 last24h.liquidInDl = request.dl;
             else
                 last24h.liquidInDl = null;
 
-            last24h.fat = food.fat * (request.portion / 100);
-            last24h.kcal = food.kcal * (request.portion/100);
-            last24h.protein = food.protein * (request.portion/100);
-            last24h.carbohydrate = food.carbohydrate * (request.portion / 100);
+            last24h.fat = recipe.fat * (request.portion / 100);
+            last24h.kcal = recipe.kcal * (request.portion/100);
+            last24h.protein = recipe.protein * (request.portion/100);
+            last24h.carbohydrate = recipe.carbohydrate * (request.portion / 100);
+            last24h.time = DateTime.Now;
 
             return _genericServicesLast24hService.Create(last24h);
         }
