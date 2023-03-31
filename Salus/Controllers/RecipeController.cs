@@ -24,7 +24,7 @@ namespace Salus.Controllers
         }
 
         [HttpPut("create-simple")]
-        public IActionResult CreateSimple(FoodCreateRequest request)
+        public IActionResult CreateSimple(RecipeCreateRequest request)
         {
             return this.Run(() =>
             {
@@ -33,7 +33,7 @@ namespace Salus.Controllers
         }
 
         [HttpPatch("update")]
-        public IActionResult UpdateSimple(FoodUpdateRequest request)
+        public IActionResult UpdateSimple(RecipeUpdateRequest request)
         {
             return this.Run(() =>
             {
@@ -52,11 +52,20 @@ namespace Salus.Controllers
         }
 
         [HttpPatch("add-tags")]
-        public IActionResult AddTags(AddTagsToFoodRequest request)
+        public IActionResult AddTags(AddTagsToRecipeRequest request)
         {
             return this.Run(() =>
             {
                 return Ok(_recipeService.AddTags(request));
+            });
+        }
+
+        [HttpPatch("like-unlike")]
+        public IActionResult LikeUnlike(int recipeId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.LikeUnlike(recipeId));
             });
         }
 
@@ -97,6 +106,5 @@ namespace Salus.Controllers
             });
         }
 
-        //todo:like
     }
 }

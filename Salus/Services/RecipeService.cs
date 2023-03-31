@@ -27,7 +27,7 @@ namespace Salus.Services.RecipeServices
         {
             var recipe = _genericServices.Read(recipeId);
             if (recipe == null)
-                throw new EFoodNotFound();
+                throw new ERecipeNotFound();
             List<Tag> tags = new();
             foreach (Tag tag in _genericServicesTag.ReadAll())
             {
@@ -38,34 +38,34 @@ namespace Salus.Services.RecipeServices
             return tags;
         }
 
-        public Recipe AddTags(AddTagsToFoodRequest request)
+        public Recipe AddTags(AddTagsToRecipeRequest request)
         {
             var recipe = _genericServices.Read(request.recipeId);
             if (recipe == null)
-                throw new EFoodNotFound();
+                throw new ERecipeNotFound();
 
-            List<RecepiesHaveTags> foodHasTags = new();
+            List<RecepiesHaveTags> recipeHasTags = new();
             foreach (var tagId in request.tagIds)
             {
                 var tag = _genericServicesTag.Read(tagId);
                 if (tag == null)
                     throw new ETagNotFound();
 
-                var foodHasTag = new RecepiesHaveTags
+                var recipeHasTag = new RecepiesHaveTags
                 {
                     recipe = recipe,
                     tag = tag
                 };
-                foodHasTags.Add(foodHasTag);
+                recipeHasTags.Add(recipeHasTag);
 
-                if (_dataContext.Set<RecepiesHaveTags>().Any(fHT => fHT.recipeId == foodHasTag.recipeId && fHT.tagId == foodHasTag.tagId))
-                    throw new EFoodAlreadyHasTag();
+                if (_dataContext.Set<RecepiesHaveTags>().Any(fHT => fHT.recipeId == recipeHasTag.recipeId && fHT.tagId == recipeHasTag.tagId))
+                    throw new ERecipeAlreadyHasTag();
 
-                _dataContext.Set<RecepiesHaveTags>().Add(foodHasTag);
-                tag.recepiesThatHave.Add(foodHasTag);
+                _dataContext.Set<RecepiesHaveTags>().Add(recipeHasTag);
+                tag.recepiesThatHave.Add(recipeHasTag);
             }
 
-            recipe.tags = foodHasTags;
+            recipe.tags = recipeHasTags;
             recipe = _genericServices.Update(recipe);
 
             return recipe;
@@ -73,7 +73,7 @@ namespace Salus.Services.RecipeServices
         //--------- Tags End ----------//
 
         //--------- Simple CRUD Start ----------//
-        public Recipe CreateSimple(FoodCreateRequest request)
+        public Recipe CreateSimple(RecipeCreateRequest request)
         {
             var recipe = new Recipe()
             {
@@ -90,11 +90,11 @@ namespace Salus.Services.RecipeServices
             return recipe;
         }
 
-        public Recipe UpdateSimple(FoodUpdateRequest request)
+        public Recipe UpdateSimple(RecipeUpdateRequest request)
         {
             var recipe = _genericServices.Read(request.id);
             if (recipe == null)
-                throw new EFoodNotFound();
+                throw new ERecipeNotFound();
 
             recipe.name = request.name.Length == 0 ? recipe.name : request.name;
             recipe.carbohydrate = request.carbohydrate == -1 ? recipe.carbohydrate : request.carbohydrate;
@@ -161,9 +161,9 @@ namespace Salus.Services.RecipeServices
                 recipe.kcal += ingredient.kcal * portion / 100;
 
                 if (ingredient.tags != null && ingredient.tags.Count() != 0)
-                    foreach (var foodsHasTag in ingredient.tags)
-                        if (foodsHasTag.tag != null)
-                            recipe.tags.Add(foodsHasTag);
+                    foreach (var recipesHasTag in ingredient.tags)
+                        if (recipesHasTag.tag != null)
+                            recipe.tags.Add(recipesHasTag);
 
                 var recipeIncludeIngredients = new RecipesIncludeIngredients()
                 {
@@ -246,9 +246,9 @@ namespace Salus.Services.RecipeServices
                 recipe.kcal += ingredient.kcal * portion / 100;
 
                 if (ingredient.tags != null && ingredient.tags.Count() != 0)
-                    foreach (var foodsHasTag in ingredient.tags)
-                        if (foodsHasTag.tag != null)
-                            recipe.tags.Add(foodsHasTag);
+                    foreach (var recipesHasTag in ingredient.tags)
+                        if (recipesHasTag.tag != null)
+                            recipe.tags.Add(recipesHasTag);
 
                 var recipeIncludeIngredients = new RecipesIncludeIngredients()
                 {
@@ -297,10 +297,32 @@ namespace Salus.Services.RecipeServices
         {
             var recipe = _genericServices.Read(id);
             if (recipe == null)
-                throw new EFoodNotFound();
+                throw new ERecipeNotFound();
             recipe.verifeid = !recipe.verifeid;
             recipe = _genericServices.Update(recipe);
             return recipe;
+        }
+
+        public List<UsersLikeRecipes> LikeUnlike(int recipeId)
+        {
+            var recipe = _genericServices.Read(recipeId);
+            if (recipe == null)
+                throw new ERecipeNotFound();
+
+            var userProfile = _genericServices.GetAuthenticatedUserProfile();
+            if (userProfile == null)
+                throw new EUserProfileNotFound();
+
+            var like = new UsersLikeRecipes() { userId = userProfile.id, recipeId = recipe.id };
+            var alreadyLiked = recipe.usersWhoLiked.Contains(like);
+
+            if (alreadyLiked)
+                _dataContext.Set<UsersLikeRecipes>().Remove(like);
+            else
+                _dataContext.Set<UsersLikeRecipes>().Add(like);
+
+            _dataContext.SaveChanges();
+            return recipe.usersWhoLiked;
         }
         //--------- Other End ----------//
 
@@ -392,23 +414,23 @@ namespace Salus.Services.RecipeServices
         private void CheckData(Recipe recipe)
         {
             if (recipe.name.Length > 50)
-                throw new EFoodNameLength();
+                throw new ERecipeNameLength();
             if (recipe.name.Length < 5)
-                throw new EFoodNameNull();
+                throw new ERecipeNameNull();
             if (recipe.fat > 100)
-                throw new EFoodFatValue();
+                throw new ERecipeFatValue();
             if (recipe.protein > 100)
-                throw new EFoodProteinValue();
+                throw new ERecipeProteinValue();
             if (recipe.carbohydrate > 100)
-                throw new EFoodCarbohydrateValue();
+                throw new ERecipeCarbohydrateValue();
             if (recipe.fat < 0)
-                throw new EFoodFatNegativeValue();
+                throw new ERecipeFatNegativeValue();
             if (recipe.protein < 0)
-                throw new EFoodProteinNegativeValue();
+                throw new ERecipeProteinNegativeValue();
             if (recipe.carbohydrate < 0)
-                throw new EFoodCarbohydrateNegativeValue();
+                throw new ERecipeCarbohydrateNegativeValue();
             if (recipe.kcal < 0)
-                throw new EFoodCarbohydrateValue();
+                throw new ERecipeCarbohydrateValue();
         }
         //--------- Checks End ----------//
     }

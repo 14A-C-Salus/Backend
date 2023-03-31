@@ -22,8 +22,8 @@ namespace Salus.Controllers.Models.RecipeModels
         public UserProfile Author { get; set; } = new ();
 
         //Connections
-        public IList<RecipesIncludeIngredients>? ingredients { get; set; }
-        public IList<UsersLikeRecipes>? usersWhoLiked { get; set; }
+        public List<RecipesIncludeIngredients> ingredients { get; set; } = new();
+        public List<UsersLikeRecipes> usersWhoLiked { get; set; } = new();
 
         public int? oilId { get; set; }
         [ForeignKey("oilId")]
@@ -31,10 +31,10 @@ namespace Salus.Controllers.Models.RecipeModels
 
         //Connections
         [Required, JsonIgnore]
-        public IList<RecipesIncludeIngredients>? recipes { get; set; }
+        public List<RecipesIncludeIngredients> recipes { get; set; } = new();
 
         [Required, JsonIgnore]
-        public List<RecepiesHaveTags>? tags { get; set; } = new();
+        public List<RecepiesHaveTags> tags { get; set; } = new();
         public Last24h? last24h { get; set; }
     }
 }

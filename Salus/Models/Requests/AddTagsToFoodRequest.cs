@@ -1,6 +1,6 @@
-﻿namespace Salus.Controllers.Models.FoodModels
+﻿namespace Salus.Controllers.Models.RecipeModels
 {
-    public class AddTagsToFoodRequest
+    public class AddTagsToRecipeRequest
     {
         public int recipeId { get; set; }
         public List<int> tagIds { get; set; } = new();

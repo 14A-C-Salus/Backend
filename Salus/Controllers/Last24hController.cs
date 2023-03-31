@@ -14,7 +14,7 @@ namespace Salus.Controllers
             _last24HService = last24HService;
         }
         [HttpPut("add-new-recipe")]
-        public IActionResult AddNewFood(AddFoodToLast24H request)
+        public IActionResult AddNewRecipe(AddRecipeToLast24H request)
         {
             return this.Run(() =>
             {

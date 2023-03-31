@@ -1,4 +1,4 @@
-﻿namespace Salus.Controllers.Models.FoodModels
+﻿namespace Salus.Controllers.Models.RecipeModels
 {
     public class OilCreateRequest
     {

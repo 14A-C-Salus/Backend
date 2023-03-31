@@ -12,7 +12,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         public DateTime birthDate { get; set; }
         public genderEnum gender { get; set; }
         public double goalWeight { get; set; }
-        public int maxKcal {
+        public int? maxKcal {
             get
             {
                 if (diet == null)
@@ -26,7 +26,7 @@ namespace Salus.Controllers.Models.UserProfileModels
                 }
                 else
                 {
-                    return diet.kcal.Maximum;
+                    return diet.maxKcal;
                 }
             }
             set
@@ -34,7 +34,7 @@ namespace Salus.Controllers.Models.UserProfileModels
 
             }
         }
-        public int minDl 
+        public int? minDl 
         {
             get
             {
@@ -47,7 +47,7 @@ namespace Salus.Controllers.Models.UserProfileModels
                         return 27;
                     throw new EGenderNotSelected();
                 }
-                else { return diet.dl.Minimum; }
+                else { return diet.minDl; }
             }
             set { }
         }

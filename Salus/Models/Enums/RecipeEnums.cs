@@ -10,5 +10,13 @@
             roasting, //pirítás
             cooking //főzés
         }
+        public enum recipePropertiesEnum
+        {
+            nondefined,
+            kcal,
+            protein,
+            fat,
+            carbohydrate
+        }
     }
 }

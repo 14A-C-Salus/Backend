@@ -26,7 +26,7 @@ namespace Salus.Services.UserProfileServices
             List<Diet> diets = new();
             foreach (var diet in _genericServicesDiet.ReadAll())
             {
-                if (diet.kcal != null && diet.kcal.Maximum < userProfile.maxKcal)
+                if (diet.maxKcal != null && diet.maxKcal < userProfile.maxKcal)
                 {
                     diets.Add(diet);
                 }

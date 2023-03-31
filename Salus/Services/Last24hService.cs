@@ -1,4 +1,4 @@
-﻿using Salus.Controllers.Models.FoodModels;
+﻿using Salus.Controllers.Models.RecipeModels;
 using Salus.Exceptions;
 using Salus.Models.Requests;
 
@@ -7,22 +7,22 @@ namespace Salus.Services.Last24hServices
     public class Last24hService : ILast24hService
     {
         private readonly DataContext _dataContext;
-        private readonly GenericService<Recipe> _genericServicesFood;
+        private readonly GenericService<Recipe> _genericServicesRecipe;
         private readonly GenericService<Last24h> _genericServicesLast24hService;
         public Last24hService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _dataContext = dataContext;
-            _genericServicesFood = new(dataContext, httpContextAccessor);
+            _genericServicesRecipe = new(dataContext, httpContextAccessor);
             _genericServicesLast24hService = new(dataContext, httpContextAccessor);
         }
 
-        public Last24h Add(AddFoodToLast24H request)
+        public Last24h Add(AddRecipeToLast24H request)
         {
             var last24h = new Last24h();
-            var recipe = _genericServicesFood.Read(request.recipeId);
+            var recipe = _genericServicesRecipe.Read(request.recipeId);
 
             if (recipe == null)
-                throw new EFoodNotFound();
+                throw new ERecipeNotFound();
             else if (last24h.recipes == null)
                 last24h.recipes = new List<Recipe>();
 

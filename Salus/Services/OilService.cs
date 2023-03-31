@@ -1,8 +1,8 @@
-﻿using Salus.Controllers.Models.FoodModels;
+﻿using Salus.Controllers.Models.RecipeModels;
 using Salus.Exceptions;
 using System.Security.Cryptography;
 
-namespace Salus.Services.FoodServices
+namespace Salus.Services.RecipeServices
 {
     public class OilService:IOilService
     {

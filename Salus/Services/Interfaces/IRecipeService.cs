@@ -6,10 +6,11 @@
         Recipe Create(WriteRecipeRequest request);
         Recipe Update(UpdateRecipeRequest request);
         void Delete(int recipeId);
-        Recipe CreateSimple(FoodCreateRequest request);
-        Recipe UpdateSimple(FoodUpdateRequest request);
+        Recipe CreateSimple(RecipeCreateRequest request);
+        Recipe UpdateSimple(RecipeUpdateRequest request);
         Recipe VerifyUnVerify(int id);
-        Recipe AddTags(AddTagsToFoodRequest request);
+        Recipe AddTags(AddTagsToRecipeRequest request);
         List<Tag> GetRecommendedTags(int recipeId);
+        List<UsersLikeRecipes> LikeUnlike(int recipeId);
     }
 }

@@ -1,18 +1,16 @@
 //models
 global using Salus.Controllers.Models.AuthModels;
-global using Salus.Controllers.Models.FoodModels;
+global using Salus.Controllers.Models.RecipeModels;
 global using Salus.Controllers.Models.JoiningEntity;
 global using Salus.Controllers.Models.Last24hModels;
-global using Salus.Controllers.Models.RecipeModels;
 global using Salus.Controllers.Models.SocialMediaModels;
 global using Salus.Controllers.Models.TagModels;
 global using Salus.Controllers.Models.UserProfileModels;
 
 //services
 global using Salus.Services.AuthServices;
-global using Salus.Services.FoodServices;
-global using Salus.Services.Last24hServices;
 global using Salus.Services.RecipeServices;
+global using Salus.Services.Last24hServices;
 global using Salus.Services.SocialMediaServices;
 global using Salus.Services.TagServices;
 global using Salus.Services.UserProfileServices;

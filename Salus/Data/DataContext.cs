@@ -166,14 +166,14 @@ namespace Salus.Data
 
             modelBuilder.Entity<RecipesIncludeIngredients>()
                 .HasOne(ri => ri.recipe)
-                .WithMany(f => f.recipes)
+                .WithMany(r => r.ingredients)
                 .HasForeignKey(ri => ri.recipeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<RecipesIncludeIngredients>()
-                .HasOne(ri => ri.recipe)
-                .WithMany(r => r.ingredients)
-                .HasForeignKey(ri => ri.recipeId)
+                .HasOne(ri => ri.ingredient)
+                .WithMany(r => r.recipes)
+                .HasForeignKey(ri => ri.ingredientId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
