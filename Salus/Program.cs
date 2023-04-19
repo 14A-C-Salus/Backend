@@ -11,6 +11,7 @@ global using Salus.Services.Last24hServices;
 global using Salus.Services.SocialMediaServices;
 global using Salus.Services.TagServices;
 global using Salus.Services.UserProfileServices;
+global using Salus.Services.Interfaces;
 
 global using Microsoft.AspNetCore.Mvc;
 global using System.ComponentModel.DataAnnotations;

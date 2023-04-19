@@ -1,6 +1,6 @@
 ﻿using Salus.Models.Requests;
 
-namespace Salus.Services.Last24hServices
+namespace Salus.Services.Interfaces
 {
     public interface ILast24hService
     {

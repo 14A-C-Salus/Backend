@@ -1,5 +1,5 @@
 ﻿
-namespace Salus.Services.AuthServices
+namespace Salus.Services.Interfaces
 {
     public interface IAuthService
     {

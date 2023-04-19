@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Salus.Data;
 
-namespace Salus.Services.SocialMediaServices
+namespace Salus.Services.Interfaces
 {
     public interface ISocialMediaService
     {

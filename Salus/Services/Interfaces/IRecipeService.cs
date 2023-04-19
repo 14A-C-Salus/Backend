@@ -1,4 +1,4 @@
-﻿namespace Salus.Services.RecipeServices
+﻿namespace Salus.Services.Interfaces
 {
     public interface IRecipeService
     {
