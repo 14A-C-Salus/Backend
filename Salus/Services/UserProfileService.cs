@@ -133,7 +133,14 @@ namespace Salus.Services.UserProfileServices
             userProfile = _genericServicesUserProfile.Update(userProfile);
             return userProfile;
         }
-
+        public List<UserProfile> GetUserprofilesByName(string name)
+        {
+            var auths = _genericServicesAuth.ReadAll().Where(a => a.username.Contains(name)).ToList();
+            List<UserProfile> users = new List<UserProfile>();
+            foreach (var auth in auths)
+                users.Add(_genericServicesUserProfile.ReadAll().First(u => u.authOfProfileId == auth.id));
+            return users;
+        }
 
         //private methods
         private void CheckCreateRequest(UserSetDatasRequest request)
@@ -219,5 +226,7 @@ namespace Salus.Services.UserProfileServices
 
             return idealBMI * heightInMeter * heightInMeter;
         }
+
+
     }
 }

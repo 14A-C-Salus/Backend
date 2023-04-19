@@ -34,7 +34,14 @@ namespace Salus.Controllers
                 return Ok(_userProfileService.GetRecommendedDiets());
             });
         }
-
+        [HttpGet("get-userprofiles-by-name")]
+        public IActionResult GetUserprofilesByName(string name)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_userProfileService.GetUserprofilesByName(name));
+            });
+        }
         [HttpPatch("add-diet")]
         public IActionResult AddDiet(int dietId)
         {
