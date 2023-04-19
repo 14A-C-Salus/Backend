@@ -77,7 +77,14 @@ namespace Salus.Controllers
                 return Ok(_recipeService.GetAll(authId));
             });
         }
-
+        [HttpGet("get-all-recipe-by-tag-id")]
+        public IActionResult GetAllRecipeByTagId(int tagId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetAll(authId));
+            });
+        }
         [HttpPut("create")]
         public IActionResult Create(WriteRecipeRequest request)
         {

@@ -124,7 +124,11 @@ namespace Salus.Services.RecipeServices
                 throw new EUnauthorized();
             _genericServices.Delete(recipe);
         }
-
+        public List<Recipe> GetAllByTagId(int tagId)
+        {
+            var tag = _dataContext.Set<Tag>().First(t => t.id == tagId);
+            return _genericServices.ReadAll().Where(r => r.tags.Any(rt => rt.tag == tag)).ToList();
+        }
 
         public Recipe Create(WriteRecipeRequest request)
         {
@@ -432,6 +436,8 @@ namespace Salus.Services.RecipeServices
             if (recipe.kcal < 0)
                 throw new ERecipeCarbohydrateValue();
         }
+
+
         //--------- Checks End ----------//
     }
 }
