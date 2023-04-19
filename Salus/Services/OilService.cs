@@ -1,5 +1,4 @@
-﻿using Salus.Controllers.Models.RecipeModels;
-using Salus.Exceptions;
+﻿using Salus.Exceptions;
 using System.Security.Cryptography;
 
 namespace Salus.Services.RecipeServices

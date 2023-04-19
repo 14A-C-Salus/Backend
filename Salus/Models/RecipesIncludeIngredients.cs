@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Salus.Controllers.Models.JoiningEntity
+namespace Salus.Models
 {
     public class RecipesIncludeIngredients
     {

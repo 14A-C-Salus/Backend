@@ -1,6 +1,7 @@
-﻿using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
+﻿
 
-namespace Salus.Controllers.Models.TagModels
+
+namespace Salus.Models.Requests
 {
     public class TagCreateRequest
     {

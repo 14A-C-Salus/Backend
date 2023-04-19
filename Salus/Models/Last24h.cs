@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Salus.Controllers.Models.Last24hModels
+namespace Salus.Models
 {
     public class Last24h
     {

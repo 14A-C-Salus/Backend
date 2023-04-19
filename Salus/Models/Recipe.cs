@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
+ 
 
-namespace Salus.Controllers.Models.RecipeModels
+namespace Salus.Models
 {
     public class Recipe
     {

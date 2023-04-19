@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
+using static Salus.Models.Enums.RecipeEnums;
 
-namespace Salus.Controllers.Models.TagModels
+namespace Salus.Models
 {
     public class Tag
     {

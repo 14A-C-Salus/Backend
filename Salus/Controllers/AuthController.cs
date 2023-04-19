@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Salus.Services;
-using Salus.WebAPI;
-using System.ComponentModel.DataAnnotations;
+﻿using Salus.WebAPI;
 namespace Salus.Controllers
 {
     [Route("api/[controller]")]

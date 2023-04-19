@@ -1,4 +1,4 @@
-﻿namespace Salus.Models.AuthModels
+﻿namespace Salus.Models.Requests
 {
     public class AuthRegisterRequest
     {

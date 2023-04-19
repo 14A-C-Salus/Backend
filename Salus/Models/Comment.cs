@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Salus.Controllers.Models.JoiningEntity
+namespace Salus.Models
 {
     public class Comment
     {

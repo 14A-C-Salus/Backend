@@ -1,6 +1,4 @@
-﻿using Salus.Controllers.Models.RecipeModels;
-using Salus.Exceptions;
-using Salus.Models.Requests;
+﻿using Salus.Exceptions;
 
 namespace Salus.Services.Last24hServices
 {

@@ -1,8 +1,7 @@
-﻿using Salus.Controllers.Models.AuthModels;
-using Salus.Exceptions;
+﻿using Salus.Exceptions;
 using System.Linq;
 using System.Xml.Linq;
-using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
+ 
 
 namespace Salus.Services.RecipeServices
 {
@@ -129,7 +128,9 @@ namespace Salus.Services.RecipeServices
         {
             var tag = _dataContext.Set<Tag>().First(t => t.id == tagId);
             var recipes = _dataContext.Set<RecepiesHaveTags>().Where(rht => rht.tag == tag).Select(r => r.recipe).ToList();
+#pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
             return recipes;
+#pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.
         }
 
         public Recipe Create(WriteRecipeRequest request)

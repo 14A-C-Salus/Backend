@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Salus.Controllers.Models.RecipeModels
+namespace Salus.Models.Requests
 {
     public class RecipeCreateRequest
     {
