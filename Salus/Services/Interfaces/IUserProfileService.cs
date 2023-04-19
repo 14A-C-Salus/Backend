@@ -1,4 +1,5 @@
 ﻿using Salus.Models;
+using Salus.Models.Requests;
 
 namespace Salus.Services.UserProfileServices
 {

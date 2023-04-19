@@ -1,5 +1,6 @@
 ﻿using Salus.Exceptions;
 using Salus.Models;
+using Salus.Models.Requests;
 using System.Reflection;
 
 namespace Salus.Services.UserProfileServices

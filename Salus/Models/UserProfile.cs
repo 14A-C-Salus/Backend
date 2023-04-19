@@ -2,7 +2,7 @@
 using Salus.Exceptions;
 using Salus.Models;
 
-namespace Salus.Controllers.Models.UserProfileModels
+namespace Salus.Models
 {
     public class UserProfile
     {

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Salus.Models.Requests;
 using Salus.Services;
 using Salus.WebAPI;
 
