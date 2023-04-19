@@ -1,5 +1,6 @@
 ﻿using Salus.Controllers.Models.AuthModels;
 using Salus.Exceptions;
+using System.Linq;
 using System.Xml.Linq;
 using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
 
@@ -127,7 +128,8 @@ namespace Salus.Services.RecipeServices
         public List<Recipe> GetAllByTagId(int tagId)
         {
             var tag = _dataContext.Set<Tag>().First(t => t.id == tagId);
-            return _genericServices.ReadAll().Where(r => r.tags.Any(rt => rt.tag == tag)).ToList();
+            var recipes = _dataContext.Set<RecepiesHaveTags>().Where(rht => rht.tag == tag).Select(r => r.recipe).ToList();
+            return recipes;
         }
 
         public Recipe Create(WriteRecipeRequest request)
@@ -316,14 +318,15 @@ namespace Salus.Services.RecipeServices
             var userProfile = _genericServices.GetAuthenticatedUserProfile();
             if (userProfile == null)
                 throw new EUserProfileNotFound();
+            var like = _dataContext.Set<UsersLikeRecipes>().SingleOrDefault(ulr => ulr.userId == userProfile.id && ulr.recipeId == recipe.id);
 
-            var like = new UsersLikeRecipes() { userId = userProfile.id, recipeId = recipe.id };
-            var alreadyLiked = recipe.usersWhoLiked.Contains(like);
-
-            if (alreadyLiked)
+            if (like != null)
                 _dataContext.Set<UsersLikeRecipes>().Remove(like);
             else
+            {
+                like = new() { recipe = recipe, user = userProfile, date = DateTime.Now };
                 _dataContext.Set<UsersLikeRecipes>().Add(like);
+            }
 
             _dataContext.SaveChanges();
             return recipe.usersWhoLiked;

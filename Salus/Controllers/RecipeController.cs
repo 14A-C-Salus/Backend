@@ -82,7 +82,7 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_recipeService.GetAll(authId));
+                return Ok(_recipeService.GetAllByTagId(tagId));
             });
         }
         [HttpPut("create")]

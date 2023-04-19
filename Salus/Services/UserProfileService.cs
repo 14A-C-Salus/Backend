@@ -1,5 +1,6 @@
 ﻿using Salus.Exceptions;
 using Salus.Models;
+using System.Reflection;
 
 namespace Salus.Services.UserProfileServices
 {
@@ -24,9 +25,23 @@ namespace Salus.Services.UserProfileServices
                 throw new ELoginRequired();
             var userProfile = _genericServicesAuth.GetAuthenticatedUserProfile();
             List<Diet> diets = new();
+            var userProfileMaxKcal = 0;
+            if (userProfile.diet == null)
+            {
+                if (userProfile.gender == genderEnum.male)
+                    userProfileMaxKcal=(int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) + 5);
+                else if (userProfile.gender == genderEnum.female)
+                    userProfileMaxKcal=(int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) - 161);
+                else
+                    throw new EGenderNotSelected();
+            }
+            else
+            {
+                userProfileMaxKcal = userProfile.diet.maxKcal == null ? 0 : (int)userProfile.diet.maxKcal;
+            }
             foreach (var diet in _genericServicesDiet.ReadAll())
             {
-                if (diet.maxKcal != null && diet.maxKcal < userProfile.maxKcal)
+                if (diet.maxKcal != null && diet.maxKcal < userProfileMaxKcal)
                 {
                     diets.Add(diet);
                 }
