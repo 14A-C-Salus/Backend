@@ -10,5 +10,6 @@ namespace Salus.Services.SocialMediaServices
         void DeleteCommentById(int commentId);
         List<Comment> CreateCommentListByAuthenticatedEmail();
         Task<Comment> ModifyComment(ModifyCommentRequest request);
+        List<Comment> CreateCommentListByUserprofileId(int userprofileId);
     }
 }
