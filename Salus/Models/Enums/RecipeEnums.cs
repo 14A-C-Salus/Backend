@@ -1,4 +1,4 @@
-﻿namespace Salus.Controllers.Models.RecipeModels
+﻿namespace Salus.Models.Enums
 {
     public class RecipeEnums
     {
@@ -9,6 +9,14 @@
             frying, //sütés, mint a sült krumplit
             roasting, //pirítás
             cooking //főzés
+        }
+        public enum recipePropertiesEnum
+        {
+            nondefined,
+            kcal,
+            protein,
+            fat,
+            carbohydrate
         }
     }
 }

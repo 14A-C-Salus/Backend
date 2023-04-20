@@ -16,13 +16,18 @@ namespace Salus.Services
         {
             var diet = new Diet()
             {
-                carbohydrate = request.carbohydrate,
                 description = request.description,
-                dl = request.dl,
-                fat = request.fat,
-                kcal = request.kcal,
                 name = request.name,
-                protein = request.protein
+                minDl = request.minDl,
+                minFat = request.minFat,
+                minKcal = request.minKcal,
+                minCarbohydrate = request.minCarbohydrate,
+                minProtein = request.minProtein,
+                maxDl = request.maxDl,
+                maxFat = request.maxFat,
+                maxKcal = request.maxKcal,
+                maxCarbohydrate = request.maxCarbohydrate,
+                maxProtein = request.maxProtein
             };
             CheckDiet(diet);
             _genericServices.Create(diet);
@@ -31,21 +36,22 @@ namespace Salus.Services
 
         private void CheckDiet(Diet diet)
         {
-            if (diet.carbohydrate != null && (diet.carbohydrate.Maximum > 10000 || diet.carbohydrate.Minimum < 0))
+            if (diet.maxCarbohydrate != null && (diet.maxCarbohydrate > 10000 || diet.maxCarbohydrate < 0))
                 throw new EInvalidCarbohydrate();
-            if (diet.fat != null && (diet.fat.Maximum > 10000 || diet.fat.Minimum < 0))
+            if (diet.maxFat != null && (diet.maxFat > 10000 || diet.maxFat < 0))
                 throw new EInvalidFat();
-            if (diet.dl != null && (diet.dl.Maximum > 500 || diet.dl.Minimum < 0))
+            if (diet.maxDl != null && (diet.maxDl > 500 || diet.maxDl < 0))
                 throw new EInvalidDl();
-            if (diet.kcal != null && (diet.kcal.Maximum > 10000 || diet.kcal.Minimum < 0))
+            if (diet.maxKcal != null && (diet.maxKcal > 10000 || diet.maxKcal < 0))
                 throw new EInvalidKcal();
-            if (diet.name.Length < 3 || diet.name.Length > 255)
+            if (string.IsNullOrEmpty(diet.name) || diet.name.Length < 3 || diet.name.Length > 255)
                 throw new EInvalidName();
-            if (diet.protein != null && (diet.protein.Maximum > 10000 || diet.protein.Minimum < 0))
+            if (diet.maxProtein != null && (diet.maxProtein > 10000 || diet.maxProtein < 0))
                 throw new EInvalidProtein();
-            if (diet.description.Length < 5 || diet.description.Length > 1000)
+            if (string.IsNullOrEmpty(diet.description) || diet.description.Length < 5 || diet.description.Length > 1000)
                 throw new EInvalidDescription();
         }
+
 
         public void Delete(int id)
         {
@@ -61,14 +67,17 @@ namespace Salus.Services
             if (diet == null)
                 throw new EDietNotFound();
 
-            diet.carbohydrate = request.carbohydrate == null ? diet.carbohydrate: request.carbohydrate;
-            diet.dl = request.dl == null ? diet.dl : request.dl;
-            diet.fat = request.fat == null ? diet.fat : request.fat;
-            diet.kcal = request.kcal == null ? diet.kcal : request.kcal;
-            diet.name = request.name == null ? diet.name : request.name;
-            diet.protein = request.protein == null ? diet.protein : request.protein;
+            diet.maxCarbohydrate = request.maxCarbohydrate ?? diet.maxCarbohydrate;
+            diet.maxDl = request.maxDl ?? diet.maxDl;
+            diet.maxFat = request.maxFat ?? diet.maxFat;
+            diet.maxKcal = request.maxKcal ?? diet.maxKcal;
+            diet.name = string.IsNullOrEmpty(request.name) ? diet.name : request.name;
+            diet.maxProtein = request.maxProtein ?? diet.maxProtein;
+
             CheckDiet(diet);
+
             diet = _genericServices.Update(diet);
+
             return diet;
         }
     }

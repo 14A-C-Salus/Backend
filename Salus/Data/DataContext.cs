@@ -9,7 +9,6 @@ namespace Salus.Data
         public DbSet<Comment> comments { get; set; }
         public DbSet<Diet> diets { get; set; }
         public DbSet<Following> followings { get; set; }
-        public DbSet<Food> foods { get; set; }
         public DbSet<Last24h> last24Hs { get; set; }
         public DbSet<Oil> oils { get; set; }
         public DbSet<Recipe> recipes { get; set; }
@@ -66,9 +65,9 @@ namespace Salus.Data
                 .WithMany(d => d.userProfiles);
 
             modelBuilder
-                .Entity<Food>()
+                .Entity<Recipe>()
                 .HasOne<Last24h>(f => f.last24h)
-                .WithMany(l24h => l24h.foods);
+                .WithMany(l24h => l24h.recipes);
 
             //many-to-many unable duplicate relationships
             //self join
@@ -124,19 +123,19 @@ namespace Salus.Data
 
 
             modelBuilder
-                .Entity<FoodsHaveTags>()
-                .HasKey(ft => new { ft.foodId, ft.tagId });
+                .Entity<RecepiesHaveTags>()
+                .HasKey(ft => new { ft.recipeId, ft.tagId });
 
-            modelBuilder.Entity<FoodsHaveTags>()
+            modelBuilder.Entity<RecepiesHaveTags>()
                 .HasOne(ft => ft.tag)
-                .WithMany(t => t.foodsThatHave)
+                .WithMany(t => t.recepiesThatHave)
                 .HasForeignKey(ft => ft.tagId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<FoodsHaveTags>()
-                .HasOne(ft => ft.food)
+            modelBuilder.Entity<RecepiesHaveTags>()
+                .HasOne(ft => ft.recipe)
                 .WithMany(f => f.tags)
-                .HasForeignKey(ft => ft.foodId)
+                .HasForeignKey(ft => ft.recipeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
@@ -166,15 +165,15 @@ namespace Salus.Data
                 .HasKey(ri => ri.id);
 
             modelBuilder.Entity<RecipesIncludeIngredients>()
-                .HasOne(ri => ri.food)
-                .WithMany(f => f.recipes)
-                .HasForeignKey(ri => ri.foodId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<RecipesIncludeIngredients>()
                 .HasOne(ri => ri.recipe)
                 .WithMany(r => r.ingredients)
                 .HasForeignKey(ri => ri.recipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<RecipesIncludeIngredients>()
+                .HasOne(ri => ri.ingredient)
+                .WithMany(r => r.recipes)
+                .HasForeignKey(ri => ri.ingredientId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

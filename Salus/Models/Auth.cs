@@ -1,4 +1,4 @@
-﻿namespace Salus.Controllers.Models.AuthModels
+﻿namespace Salus.Models
 {
     public class Auth
     {

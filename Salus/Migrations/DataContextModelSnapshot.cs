@@ -61,59 +61,6 @@ namespace Salus.Migrations
                     b.ToTable("auths");
                 });
 
-            modelBuilder.Entity("Salus.Controllers.Models.FoodModels.Food", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("carbohydrate")
-                        .HasColumnType("int");
-
-                    b.Property<int>("fat")
-                        .HasColumnType("int");
-
-                    b.Property<int>("kcal")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("last24hid")
-                        .HasColumnType("int");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("protein")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("verifeid")
-                        .HasColumnType("tinyint(1)");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("last24hid");
-
-                    b.ToTable("foods");
-                });
-
-            modelBuilder.Entity("Salus.Controllers.Models.FoodModels.Oil", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("calIn14Ml")
-                        .HasColumnType("int");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("id");
-
-                    b.ToTable("oils");
-                });
-
             modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.Comment", b =>
                 {
                     b.Property<int>("id")
@@ -163,19 +110,19 @@ namespace Salus.Migrations
                     b.ToTable("followings");
                 });
 
-            modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.FoodsHaveTags", b =>
+            modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.RecepiesHaveTags", b =>
                 {
-                    b.Property<int>("foodId")
+                    b.Property<int>("recipeId")
                         .HasColumnType("int");
 
                     b.Property<int>("tagId")
                         .HasColumnType("int");
 
-                    b.HasKey("foodId", "tagId");
+                    b.HasKey("recipeId", "tagId");
 
                     b.HasIndex("tagId");
 
-                    b.ToTable("FoodsHaveTags");
+                    b.ToTable("RecepiesHaveTags");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.RecipesIncludeIngredients", b =>
@@ -184,7 +131,7 @@ namespace Salus.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("foodId")
+                    b.Property<int>("ingredientId")
                         .HasColumnType("int");
 
                     b.Property<int>("portionInGramm")
@@ -195,7 +142,7 @@ namespace Salus.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("foodId");
+                    b.HasIndex("ingredientId");
 
                     b.HasIndex("recipeId");
 
@@ -250,17 +197,14 @@ namespace Salus.Migrations
                     b.Property<int>("kcal")
                         .HasColumnType("int");
 
-                    b.Property<int>("liquidInDl")
-                        .HasColumnType("int");
-
-                    b.Property<int>("maxKcal")
-                        .HasColumnType("int");
-
-                    b.Property<int>("minLiquidInDl")
+                    b.Property<int?>("liquidInDl")
                         .HasColumnType("int");
 
                     b.Property<int>("protein")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("time")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("userProfileId")
                         .HasColumnType("int");
@@ -271,6 +215,24 @@ namespace Salus.Migrations
                         .IsUnique();
 
                     b.ToTable("last24Hs");
+                });
+
+            modelBuilder.Entity("Salus.Controllers.Models.RecipeModels.Oil", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("calIn14Ml")
+                        .HasColumnType("int");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("id");
+
+                    b.ToTable("oils");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.RecipeModels.Recipe", b =>
@@ -295,6 +257,9 @@ namespace Salus.Migrations
                     b.Property<int>("kcal")
                         .HasColumnType("int");
 
+                    b.Property<int?>("last24hid")
+                        .HasColumnType("int");
+
                     b.Property<int>("method")
                         .HasColumnType("int");
 
@@ -314,7 +279,12 @@ namespace Salus.Migrations
                     b.Property<int>("timeInMinute")
                         .HasColumnType("int");
 
+                    b.Property<bool>("verifeid")
+                        .HasColumnType("tinyint(1)");
+
                     b.HasKey("id");
+
+                    b.HasIndex("last24hid");
 
                     b.HasIndex("oilId");
 
@@ -331,9 +301,6 @@ namespace Salus.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("foodProperty")
-                        .HasColumnType("int");
-
                     b.Property<int?>("max")
                         .HasColumnType("int");
 
@@ -343,6 +310,9 @@ namespace Salus.Migrations
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("recipeProperty")
+                        .HasColumnType("int");
 
                     b.HasKey("id");
 
@@ -358,9 +328,11 @@ namespace Salus.Migrations
                     b.Property<int>("authOfProfileId")
                         .HasColumnType("int");
 
-                    b.Property<string>("birthDate")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("birthDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("dietid")
+                        .HasColumnType("int");
 
                     b.Property<int>("eyesIndex")
                         .HasColumnType("int");
@@ -377,6 +349,12 @@ namespace Salus.Migrations
                     b.Property<double>("height")
                         .HasColumnType("double");
 
+                    b.Property<int?>("maxKcal")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("minDl")
+                        .HasColumnType("int");
+
                     b.Property<int>("mouthIndex")
                         .HasColumnType("int");
 
@@ -391,16 +369,58 @@ namespace Salus.Migrations
                     b.HasIndex("authOfProfileId")
                         .IsUnique();
 
+                    b.HasIndex("dietid");
+
                     b.ToTable("userProfiles");
                 });
 
-            modelBuilder.Entity("Salus.Controllers.Models.FoodModels.Food", b =>
+            modelBuilder.Entity("Salus.Models.Diet", b =>
                 {
-                    b.HasOne("Salus.Controllers.Models.Last24hModels.Last24h", "last24h")
-                        .WithMany("foods")
-                        .HasForeignKey("last24hid");
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Navigation("last24h");
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("maxCarbohydrate")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("maxDl")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("maxFat")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("maxKcal")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("maxProtein")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("minCarbohydrate")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("minDl")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("minFat")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("minKcal")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("minProtein")
+                        .HasColumnType("int");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("id");
+
+                    b.ToTable("diets");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.Comment", b =>
@@ -441,30 +461,30 @@ namespace Salus.Migrations
                     b.Navigation("follower");
                 });
 
-            modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.FoodsHaveTags", b =>
+            modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.RecepiesHaveTags", b =>
                 {
-                    b.HasOne("Salus.Controllers.Models.FoodModels.Food", "food")
+                    b.HasOne("Salus.Controllers.Models.RecipeModels.Recipe", "recipe")
                         .WithMany("tags")
-                        .HasForeignKey("foodId")
+                        .HasForeignKey("recipeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Salus.Controllers.Models.TagModels.Tag", "tag")
-                        .WithMany("foodsThatHave")
+                        .WithMany("recepiesThatHave")
                         .HasForeignKey("tagId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("food");
+                    b.Navigation("recipe");
 
                     b.Navigation("tag");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.JoiningEntity.RecipesIncludeIngredients", b =>
                 {
-                    b.HasOne("Salus.Controllers.Models.FoodModels.Food", "food")
+                    b.HasOne("Salus.Controllers.Models.RecipeModels.Recipe", "ingredient")
                         .WithMany("recipes")
-                        .HasForeignKey("foodId")
+                        .HasForeignKey("ingredientId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -474,7 +494,7 @@ namespace Salus.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("food");
+                    b.Navigation("ingredient");
 
                     b.Navigation("recipe");
                 });
@@ -530,9 +550,15 @@ namespace Salus.Migrations
 
             modelBuilder.Entity("Salus.Controllers.Models.RecipeModels.Recipe", b =>
                 {
-                    b.HasOne("Salus.Controllers.Models.FoodModels.Oil", "oil")
+                    b.HasOne("Salus.Controllers.Models.Last24hModels.Last24h", "last24h")
+                        .WithMany("recipes")
+                        .HasForeignKey("last24hid");
+
+                    b.HasOne("Salus.Controllers.Models.RecipeModels.Oil", "oil")
                         .WithMany("recipes")
                         .HasForeignKey("oilId");
+
+                    b.Navigation("last24h");
 
                     b.Navigation("oil");
                 });
@@ -545,7 +571,13 @@ namespace Salus.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Salus.Models.Diet", "diet")
+                        .WithMany("userProfiles")
+                        .HasForeignKey("dietid");
+
                     b.Navigation("auth");
+
+                    b.Navigation("diet");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.AuthModels.Auth", b =>
@@ -553,33 +585,30 @@ namespace Salus.Migrations
                     b.Navigation("userProfile");
                 });
 
-            modelBuilder.Entity("Salus.Controllers.Models.FoodModels.Food", b =>
-                {
-                    b.Navigation("recipes");
-
-                    b.Navigation("tags");
-                });
-
-            modelBuilder.Entity("Salus.Controllers.Models.FoodModels.Oil", b =>
-                {
-                    b.Navigation("recipes");
-                });
-
             modelBuilder.Entity("Salus.Controllers.Models.Last24hModels.Last24h", b =>
                 {
-                    b.Navigation("foods");
+                    b.Navigation("recipes");
+                });
+
+            modelBuilder.Entity("Salus.Controllers.Models.RecipeModels.Oil", b =>
+                {
+                    b.Navigation("recipes");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.RecipeModels.Recipe", b =>
                 {
                     b.Navigation("ingredients");
 
+                    b.Navigation("recipes");
+
+                    b.Navigation("tags");
+
                     b.Navigation("usersWhoLiked");
                 });
 
             modelBuilder.Entity("Salus.Controllers.Models.TagModels.Tag", b =>
                 {
-                    b.Navigation("foodsThatHave");
+                    b.Navigation("recepiesThatHave");
 
                     b.Navigation("usersWhoPrefer");
                 });
@@ -599,6 +628,11 @@ namespace Salus.Migrations
                     b.Navigation("likedRecipes");
 
                     b.Navigation("preferredTags");
+                });
+
+            modelBuilder.Entity("Salus.Models.Diet", b =>
+                {
+                    b.Navigation("userProfiles");
                 });
 #pragma warning restore 612, 618
         }

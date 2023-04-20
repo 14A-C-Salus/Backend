@@ -17,7 +17,7 @@ namespace Salus.Services.TagServices
             {
                 name = request.name,
                 description = request.description,
-                foodProperty = request.property,
+                recipeProperty = request.property,
                 max = request.maxValue,
                 min = request.minValue
             };
@@ -57,7 +57,7 @@ namespace Salus.Services.TagServices
                 throw new ENameTooShort();
             if (tag.description.Length < 10)
                 throw new EDescriptionTooShort();
-            if (tag.foodProperty == null && (tag.min != null || tag.max != null))
+            if (tag.recipeProperty == null && (tag.min != null || tag.max != null))
                 throw new EPropertyValue();
             if (tag.max > 100 || tag.max < 0)
                 throw new EMaxValueOutOfRange();

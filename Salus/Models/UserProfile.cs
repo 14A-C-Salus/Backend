@@ -2,7 +2,7 @@
 using Salus.Exceptions;
 using Salus.Models;
 
-namespace Salus.Controllers.Models.UserProfileModels
+namespace Salus.Models
 {
     public class UserProfile
     {
@@ -12,45 +12,7 @@ namespace Salus.Controllers.Models.UserProfileModels
         public DateTime birthDate { get; set; }
         public genderEnum gender { get; set; }
         public double goalWeight { get; set; }
-        public int maxKcal {
-            get
-            {
-                if (diet == null)
-                {
-                    if (gender == genderEnum.male)
-                        return (int)((10 * goalWeight) + (6.25 * height) - (5 * (DateTime.Now.Year - birthDate.Year)) + 5);
-                    else if (gender == genderEnum.female)
-                        return (int)((10 * goalWeight) + (6.25 * height) - (5 * (DateTime.Now.Year - birthDate.Year)) - 161);
-                    else
-                        throw new EGenderNotSelected();
-                }
-                else
-                {
-                    return diet.kcal.Maximum;
-                }
-            }
-            set
-            {
 
-            }
-        }
-        public int minDl 
-        {
-            get
-            {
-                if (diet == null)
-                {
-                    if (gender == genderEnum.male)
-                        return 37;
-                    if
-                        (gender == genderEnum.female)
-                        return 27;
-                    throw new EGenderNotSelected();
-                }
-                else { return diet.dl.Minimum; }
-            }
-            set { }
-        }
 
         //Profile picture data
         public hairEnum hairIndex { get; set; }

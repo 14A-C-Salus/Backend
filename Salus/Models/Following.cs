@@ -1,4 +1,4 @@
-﻿namespace Salus.Controllers.Models.JoiningEntity
+﻿namespace Salus.Models
 {
     public class Following
     {

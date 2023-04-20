@@ -1,4 +1,4 @@
-﻿namespace Salus.Services.TagServices
+﻿namespace Salus.Services.Interfaces
 {
     public interface ITagService
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Salus.Controllers.Models.SocialMediaModels
+namespace Salus.Models.Requests
 {
     public class UnFollowFollowRequest
     {

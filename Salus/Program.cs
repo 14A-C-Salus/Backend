@@ -1,21 +1,17 @@
 //models
-global using Salus.Controllers.Models.AuthModels;
-global using Salus.Controllers.Models.FoodModels;
-global using Salus.Controllers.Models.JoiningEntity;
-global using Salus.Controllers.Models.Last24hModels;
-global using Salus.Controllers.Models.RecipeModels;
-global using Salus.Controllers.Models.SocialMediaModels;
-global using Salus.Controllers.Models.TagModels;
-global using Salus.Controllers.Models.UserProfileModels;
-
+global using Salus.Models;
+global using Salus.Models.Requests;
+global using Salus.Models.Enums;
+global using static Salus.Models.Enums.RecipeEnums;
+global using static Salus.Models.Enums.UserProfileEnums;
 //services
 global using Salus.Services.AuthServices;
-global using Salus.Services.FoodServices;
-global using Salus.Services.Last24hServices;
 global using Salus.Services.RecipeServices;
+global using Salus.Services.Last24hServices;
 global using Salus.Services.SocialMediaServices;
 global using Salus.Services.TagServices;
 global using Salus.Services.UserProfileServices;
+global using Salus.Services.Interfaces;
 
 global using Microsoft.AspNetCore.Mvc;
 global using System.ComponentModel.DataAnnotations;
@@ -44,7 +40,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IDietService, DietService>();
-builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ILast24hService, Last24hService>();
 builder.Services.AddScoped<IOilService, OilService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();

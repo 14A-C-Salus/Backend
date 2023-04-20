@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Salus.Data;
 
-namespace Salus.Services.SocialMediaServices
+namespace Salus.Services.Interfaces
 {
     public interface ISocialMediaService
     {
@@ -10,5 +10,6 @@ namespace Salus.Services.SocialMediaServices
         void DeleteCommentById(int commentId);
         List<Comment> CreateCommentListByAuthenticatedEmail();
         Task<Comment> ModifyComment(ModifyCommentRequest request);
+        List<Comment> CreateCommentListByUserprofileId(int userprofileId);
     }
 }

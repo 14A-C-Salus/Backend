@@ -30,7 +30,16 @@ namespace Salus.Services.SocialMediaServices
             return comment;
         }
 
-
+        public List<Comment> CreateCommentListByUserprofileId(int userprofileId)
+        {
+            var userProfile = _dataContext.Set<UserProfile>().FirstOrDefault(u => u.id == userprofileId );
+            if (userProfile == null)
+            {
+                throw new EUserNotFound();
+            }
+            List<Comment> comments = _dataContext.Set<Comment>().Where(c => c.toId == userProfile.id).ToList();
+            return comments;
+        }
         public List<Comment> CreateCommentListByAuthenticatedEmail()
         {
             var userProfile = _genericServicesComment.GetAuthenticatedUserProfile();

@@ -1,7 +1,7 @@
 ﻿using Salus.Models;
 using Salus.Models.Requests;
 
-namespace Salus.Services
+namespace Salus.Services.Interfaces
 {
     public interface IDietService
     {

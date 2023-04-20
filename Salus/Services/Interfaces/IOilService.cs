@@ -1,4 +1,4 @@
-﻿namespace Salus.Services.FoodServices
+﻿namespace Salus.Services.Interfaces
 {
     public interface IOilService
     {

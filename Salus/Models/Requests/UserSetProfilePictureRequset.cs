@@ -1,4 +1,4 @@
-﻿namespace Salus.Controllers.Models.UserProfileModels
+﻿namespace Salus.Models.Requests
 {
     public class UserSetProfilePictureRequset
     {

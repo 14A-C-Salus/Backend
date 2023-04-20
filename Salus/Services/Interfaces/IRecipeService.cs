@@ -1,10 +1,18 @@
-﻿namespace Salus.Services.RecipeServices
+﻿namespace Salus.Services.Interfaces
 {
     public interface IRecipeService
     {
-        public List<Recipe> GetAll(int authId);
+        void Delete(int recipeId);
         Recipe Create(WriteRecipeRequest request);
         Recipe Update(UpdateRecipeRequest request);
-        public void Delete(int recipeId);
+        Recipe CreateSimple(RecipeCreateRequest request);
+        Recipe UpdateSimple(RecipeUpdateRequest request);
+        Recipe VerifyUnVerify(int id);
+        Recipe AddTags(AddTagsToRecipeRequest request);
+        List<Tag> GetRecommendedTags(int recipeId);
+        List<UsersLikeRecipes> LikeUnlike(int recipeId);
+        List<Recipe> GetAll(int authId);
+        List<Recipe> GetAllByTagId(int tagId);
+        List<Recipe> GetRecipesByName(string name);
     }
 }

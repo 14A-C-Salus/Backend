@@ -40,16 +40,65 @@ namespace Salus.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "diets",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    minFat = table.Column<int>(type: "int", nullable: true),
+                    minCarbohydrate = table.Column<int>(type: "int", nullable: true),
+                    minProtein = table.Column<int>(type: "int", nullable: true),
+                    minKcal = table.Column<int>(type: "int", nullable: true),
+                    minDl = table.Column<int>(type: "int", nullable: true),
+                    maxFat = table.Column<int>(type: "int", nullable: true),
+                    maxCarbohydrate = table.Column<int>(type: "int", nullable: true),
+                    maxProtein = table.Column<int>(type: "int", nullable: true),
+                    maxKcal = table.Column<int>(type: "int", nullable: true),
+                    maxDl = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_diets", x => x.id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "oils",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    kcalIn14Ml = table.Column<int>(type: "int", nullable: false)
+                    calIn14Ml = table.Column<int>(type: "int", nullable: false),
+                    name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_oils", x => x.id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "tags",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    recipeProperty = table.Column<int>(type: "int", nullable: true),
+                    min = table.Column<int>(type: "int", nullable: true),
+                    max = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tags", x => x.id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -61,14 +110,16 @@ namespace Salus.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     weight = table.Column<double>(type: "double", nullable: false),
                     height = table.Column<double>(type: "double", nullable: false),
-                    birthDate = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    birthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     gender = table.Column<int>(type: "int", nullable: false),
                     goalWeight = table.Column<double>(type: "double", nullable: false),
+                    maxKcal = table.Column<int>(type: "int", nullable: true),
+                    minDl = table.Column<int>(type: "int", nullable: true),
                     hairIndex = table.Column<int>(type: "int", nullable: false),
                     skinIndex = table.Column<int>(type: "int", nullable: false),
                     eyesIndex = table.Column<int>(type: "int", nullable: false),
                     mouthIndex = table.Column<int>(type: "int", nullable: false),
+                    dietid = table.Column<int>(type: "int", nullable: true),
                     authOfProfileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -80,6 +131,11 @@ namespace Salus.Migrations
                         principalTable: "auths",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_userProfiles_diets_dietid",
+                        column: x => x.dietid,
+                        principalTable: "diets",
+                        principalColumn: "id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -151,9 +207,8 @@ namespace Salus.Migrations
                     protein = table.Column<int>(type: "int", nullable: false),
                     fat = table.Column<int>(type: "int", nullable: false),
                     carbohydrate = table.Column<int>(type: "int", nullable: false),
-                    liquidInDl = table.Column<int>(type: "int", nullable: false),
-                    minLiquidInDl = table.Column<int>(type: "int", nullable: false),
-                    maxKcal = table.Column<int>(type: "int", nullable: false),
+                    liquidInDl = table.Column<int>(type: "int", nullable: true),
+                    time = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     userProfileId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -169,82 +224,118 @@ namespace Salus.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "UsersPreferTags",
+                columns: table => new
+                {
+                    userId = table.Column<int>(type: "int", nullable: false),
+                    tagId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UsersPreferTags", x => new { x.userId, x.tagId });
+                    table.ForeignKey(
+                        name: "FK_UsersPreferTags_tags_tagId",
+                        column: x => x.tagId,
+                        principalTable: "tags",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UsersPreferTags_userProfiles_userId",
+                        column: x => x.userId,
+                        principalTable: "userProfiles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "recipes",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    gramm = table.Column<int>(type: "int", nullable: false),
                     kcal = table.Column<int>(type: "int", nullable: false),
                     protein = table.Column<int>(type: "int", nullable: false),
                     fat = table.Column<int>(type: "int", nullable: false),
                     carbohydrate = table.Column<int>(type: "int", nullable: false),
+                    verifeid = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    timeInMinute = table.Column<int>(type: "int", nullable: false),
+                    oilPortionMl = table.Column<int>(type: "int", nullable: true),
+                    description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    verifeid = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Authorid = table.Column<int>(type: "int", nullable: false),
-                    oilId = table.Column<int>(type: "int", nullable: true)
+                    method = table.Column<int>(type: "int", nullable: false),
+                    oilId = table.Column<int>(type: "int", nullable: true),
+                    last24hid = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_recipes", x => x.id);
                     table.ForeignKey(
+                        name: "FK_recipes_last24Hs_last24hid",
+                        column: x => x.last24hid,
+                        principalTable: "last24Hs",
+                        principalColumn: "id");
+                    table.ForeignKey(
                         name: "FK_recipes_oils_oilId",
                         column: x => x.oilId,
                         principalTable: "oils",
                         principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_recipes_userProfiles_Authorid",
-                        column: x => x.Authorid,
-                        principalTable: "userProfiles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "foods",
+                name: "RecepiesHaveTags",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    kcal = table.Column<int>(type: "int", nullable: false),
-                    protein = table.Column<int>(type: "int", nullable: false),
-                    fat = table.Column<int>(type: "int", nullable: false),
-                    carbohydrate = table.Column<int>(type: "int", nullable: false),
-                    last24hid = table.Column<int>(type: "int", nullable: false)
+                    recipeId = table.Column<int>(type: "int", nullable: false),
+                    tagId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_foods", x => x.id);
+                    table.PrimaryKey("PK_RecepiesHaveTags", x => new { x.recipeId, x.tagId });
                     table.ForeignKey(
-                        name: "FK_foods_last24Hs_last24hid",
-                        column: x => x.last24hid,
-                        principalTable: "last24Hs",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "tags",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Recipeid = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_tags", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_tags_recipes_Recipeid",
-                        column: x => x.Recipeid,
+                        name: "FK_RecepiesHaveTags_recipes_recipeId",
+                        column: x => x.recipeId,
                         principalTable: "recipes",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RecepiesHaveTags_tags_tagId",
+                        column: x => x.tagId,
+                        principalTable: "tags",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "RecipesIncludeIngredients",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    portionInGramm = table.Column<int>(type: "int", nullable: false),
+                    recipeId = table.Column<int>(type: "int", nullable: false),
+                    ingredientId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecipesIncludeIngredients", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_RecipesIncludeIngredients_recipes_ingredientId",
+                        column: x => x.ingredientId,
+                        principalTable: "recipes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RecipesIncludeIngredients_recipes_recipeId",
+                        column: x => x.recipeId,
+                        principalTable: "recipes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -260,92 +351,14 @@ namespace Salus.Migrations
                 {
                     table.PrimaryKey("PK_UsersLikeRecipes", x => new { x.userId, x.recipeId });
                     table.ForeignKey(
-                        name: "FK_UsersLikeRecipes_recipes_userId",
-                        column: x => x.userId,
-                        principalTable: "recipes",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UsersLikeRecipes_userProfiles_recipeId",
-                        column: x => x.recipeId,
-                        principalTable: "userProfiles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "RecipesIncludeIngredients",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    portionInGramm = table.Column<int>(type: "int", nullable: false),
-                    recipeId = table.Column<int>(type: "int", nullable: false),
-                    foodId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RecipesIncludeIngredients", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_RecipesIncludeIngredients_foods_foodId",
-                        column: x => x.foodId,
-                        principalTable: "foods",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_RecipesIncludeIngredients_recipes_recipeId",
+                        name: "FK_UsersLikeRecipes_recipes_recipeId",
                         column: x => x.recipeId,
                         principalTable: "recipes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "FoodsHaveTags",
-                columns: table => new
-                {
-                    foodId = table.Column<int>(type: "int", nullable: false),
-                    tagId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FoodsHaveTags", x => new { x.foodId, x.tagId });
                     table.ForeignKey(
-                        name: "FK_FoodsHaveTags_foods_tagId",
-                        column: x => x.tagId,
-                        principalTable: "foods",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_FoodsHaveTags_tags_foodId",
-                        column: x => x.foodId,
-                        principalTable: "tags",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "UsersPreferTags",
-                columns: table => new
-                {
-                    userId = table.Column<int>(type: "int", nullable: false),
-                    tagId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UsersPreferTags", x => new { x.userId, x.tagId });
-                    table.ForeignKey(
-                        name: "FK_UsersPreferTags_tags_userId",
+                        name: "FK_UsersLikeRecipes_userProfiles_userId",
                         column: x => x.userId,
-                        principalTable: "tags",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UsersPreferTags_userProfiles_tagId",
-                        column: x => x.tagId,
                         principalTable: "userProfiles",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -368,25 +381,20 @@ namespace Salus.Migrations
                 column: "followerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_foods_last24hid",
-                table: "foods",
-                column: "last24hid");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FoodsHaveTags_tagId",
-                table: "FoodsHaveTags",
-                column: "tagId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_last24Hs_userProfileId",
                 table: "last24Hs",
                 column: "userProfileId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_recipes_Authorid",
+                name: "IX_RecepiesHaveTags_tagId",
+                table: "RecepiesHaveTags",
+                column: "tagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_recipes_last24hid",
                 table: "recipes",
-                column: "Authorid");
+                column: "last24hid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_recipes_oilId",
@@ -394,9 +402,9 @@ namespace Salus.Migrations
                 column: "oilId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecipesIncludeIngredients_foodId",
+                name: "IX_RecipesIncludeIngredients_ingredientId",
                 table: "RecipesIncludeIngredients",
-                column: "foodId");
+                column: "ingredientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RecipesIncludeIngredients_recipeId",
@@ -404,15 +412,15 @@ namespace Salus.Migrations
                 column: "recipeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tags_Recipeid",
-                table: "tags",
-                column: "Recipeid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_userProfiles_authOfProfileId",
                 table: "userProfiles",
                 column: "authOfProfileId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_userProfiles_dietid",
+                table: "userProfiles",
+                column: "dietid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsersLikeRecipes_recipeId",
@@ -434,7 +442,7 @@ namespace Salus.Migrations
                 name: "followings");
 
             migrationBuilder.DropTable(
-                name: "FoodsHaveTags");
+                name: "RecepiesHaveTags");
 
             migrationBuilder.DropTable(
                 name: "RecipesIncludeIngredients");
@@ -446,16 +454,13 @@ namespace Salus.Migrations
                 name: "UsersPreferTags");
 
             migrationBuilder.DropTable(
-                name: "foods");
+                name: "recipes");
 
             migrationBuilder.DropTable(
                 name: "tags");
 
             migrationBuilder.DropTable(
                 name: "last24Hs");
-
-            migrationBuilder.DropTable(
-                name: "recipes");
 
             migrationBuilder.DropTable(
                 name: "oils");
@@ -465,6 +470,9 @@ namespace Salus.Migrations
 
             migrationBuilder.DropTable(
                 name: "auths");
+
+            migrationBuilder.DropTable(
+                name: "diets");
         }
     }
 }

@@ -1,8 +1,9 @@
-﻿namespace Salus.Controllers.Models.FoodModels
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Salus.Models.Requests
 {
-    public class FoodUpdateRequest
+    public class RecipeCreateRequest
     {
-        public int id { get; set; }
         public string name { get; set; } = string.Empty;
         public int? kcal { get; set; }
         public int protein { get; set; }

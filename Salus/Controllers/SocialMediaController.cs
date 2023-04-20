@@ -63,5 +63,13 @@ namespace Salus.Controllers
                 return Ok(_socialMediaService.CreateCommentListByAuthenticatedEmail());
             });
         }
+        [HttpGet("get-all-comment-by-userprofile-id")]
+        public IActionResult GetAllCommentByUserprofileId(int userprofileId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_socialMediaService.CreateCommentListByUserprofileId(userprofileId));
+            });
+        }
     }
 }

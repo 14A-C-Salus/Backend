@@ -1,6 +1,7 @@
 ﻿using Salus.Models;
+using Salus.Models.Requests;
 
-namespace Salus.Services.UserProfileServices
+namespace Salus.Services.Interfaces
 {
     public interface IUserProfileService
     {
@@ -11,5 +12,6 @@ namespace Salus.Services.UserProfileServices
         UserProfile ModifyProfile(UserSetDatasRequest request);
         UserProfile SetProfilePicture(UserSetProfilePictureRequset request);
         UserProfile AddDiet(int dietId);
+        List<UserProfile> GetUserprofilesByName(string name);
     }
 }

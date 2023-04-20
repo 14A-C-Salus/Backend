@@ -1,6 +1,8 @@
-﻿using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
+﻿
 
-namespace Salus.Controllers.Models.RecipeModels
+using static Salus.Models.Enums.RecipeEnums;
+
+namespace Salus.Models.Requests
 {
     public class UpdateRecipeRequest
     {

@@ -45,4 +45,42 @@
     public class EInvalidTime : Exception
     {
     }
+
+
+
+    public class ERecipeAlreadyHasTag : Exception
+    {
+    }
+
+    public class ERecipeNameLength : Exception
+    {
+    }
+
+    public class ERecipeNameNull : Exception
+    {
+    }
+
+    public class ERecipeFatValue : Exception
+    {
+    }
+
+    public class ERecipeProteinValue : Exception
+    {
+    }
+
+    public class ERecipeCarbohydrateValue : Exception
+    {
+    }
+
+    public class ERecipeFatNegativeValue : Exception
+    {
+    }
+
+    public class ERecipeProteinNegativeValue : Exception
+    {
+    }
+
+    public class ERecipeCarbohydrateNegativeValue : Exception
+    {
+    }
 }

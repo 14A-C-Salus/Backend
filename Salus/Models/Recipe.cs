@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using static Salus.Controllers.Models.RecipeModels.RecipeEnums;
+using System.Text.Json.Serialization;
+ 
 
-namespace Salus.Controllers.Models.RecipeModels
+namespace Salus.Models
 {
     public class Recipe
     {
@@ -11,6 +12,7 @@ namespace Salus.Controllers.Models.RecipeModels
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
+        public bool verifeid { get; set; } = false;
         public int timeInMinute { get; set; }
         public int? oilPortionMl { get; set; } 
         public string description { get; set; } = string.Empty;
@@ -18,16 +20,21 @@ namespace Salus.Controllers.Models.RecipeModels
         public makeingMethodEnum method { get; set; }
         [Required, NotMapped]
         public UserProfile Author { get; set; } = new ();
-        [Required, NotMapped]
-        public List<Tag> tags { get; set; } = new ();
 
         //Connections
-        public IList<RecipesIncludeIngredients>? ingredients { get; set; }
-        public IList<UsersLikeRecipes>? usersWhoLiked { get; set; }
+        public List<RecipesIncludeIngredients> ingredients { get; set; } = new();
+        public List<UsersLikeRecipes> usersWhoLiked { get; set; } = new();
 
         public int? oilId { get; set; }
         [ForeignKey("oilId")]
         public virtual Oil? oil { get; set; }
 
+        //Connections
+        [Required, JsonIgnore]
+        public List<RecipesIncludeIngredients> recipes { get; set; } = new();
+
+        [Required, JsonIgnore]
+        public List<RecepiesHaveTags> tags { get; set; } = new();
+        public Last24h? last24h { get; set; }
     }
 }

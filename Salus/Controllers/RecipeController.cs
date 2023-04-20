@@ -13,6 +13,69 @@ namespace Salus.Controllers
         {
             _recipeService = recipeService;
         }
+
+        [HttpGet("get-recommended-tags")]
+        public IActionResult GetRecommendedTags(int recipeId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetRecommendedTags(recipeId));
+            });
+        }
+        [HttpGet("get-recipes-by-name")]
+        public IActionResult GetRecipesByName(string name)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetRecipesByName(name));
+            });
+        }
+        [HttpPut("create-simple")]
+        public IActionResult CreateSimple(RecipeCreateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.CreateSimple(request));
+            });
+        }
+
+        [HttpPatch("update")]
+        public IActionResult UpdateSimple(RecipeUpdateRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.UpdateSimple(request));
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("verify")]
+        public IActionResult Verify(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.VerifyUnVerify(id));
+            });
+        }
+
+        [HttpPatch("add-tags")]
+        public IActionResult AddTags(AddTagsToRecipeRequest request)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.AddTags(request));
+            });
+        }
+
+        [HttpPatch("like-unlike")]
+        public IActionResult LikeUnlike(int recipeId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.LikeUnlike(recipeId));
+            });
+        }
+
         [HttpGet("get-all-recipe-by-auth-id")]
         public IActionResult GetAllRecipe(int authId)
         {
@@ -21,7 +84,14 @@ namespace Salus.Controllers
                 return Ok(_recipeService.GetAll(authId));
             });
         }
-
+        [HttpGet("get-all-recipe-by-tag-id")]
+        public IActionResult GetAllRecipeByTagId(int tagId)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetAllByTagId(tagId));
+            });
+        }
         [HttpPut("create")]
         public IActionResult Create(WriteRecipeRequest request)
         {
@@ -50,7 +120,5 @@ namespace Salus.Controllers
             });
         }
 
-        //todo:like
-        //todo:kicserélni az emaileket idra
     }
 }
