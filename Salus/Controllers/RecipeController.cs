@@ -22,7 +22,14 @@ namespace Salus.Controllers
                 return Ok(_recipeService.GetRecommendedTags(recipeId));
             });
         }
-
+        [HttpGet("get-recipes-by-name")]
+        public IActionResult GetRecipesByName(string name)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetRecipesByName(name));
+            });
+        }
         [HttpPut("create-simple")]
         public IActionResult CreateSimple(RecipeCreateRequest request)
         {

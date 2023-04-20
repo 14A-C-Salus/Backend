@@ -376,7 +376,7 @@ namespace Salus.Services.RecipeServices
                 default:
                     break;
             }
-            desc += $"{methodVerb} for {recipe.timeInMinute} minute.";
+            desc += $"{methodVerb} for {recipe.timeInMinute} minutes.";
             return desc;
         }
 
@@ -439,6 +439,11 @@ namespace Salus.Services.RecipeServices
                 throw new ERecipeCarbohydrateNegativeValue();
             if (recipe.kcal < 0)
                 throw new ERecipeCarbohydrateValue();
+        }
+
+        public List<Recipe> GetRecipesByName(string name)
+        {
+            return _genericServices.ReadAll().Where(r => r.name.Contains(name)).ToList();
         }
 
 

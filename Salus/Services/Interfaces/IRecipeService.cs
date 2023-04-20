@@ -13,5 +13,6 @@
         List<UsersLikeRecipes> LikeUnlike(int recipeId);
         List<Recipe> GetAll(int authId);
         List<Recipe> GetAllByTagId(int tagId);
+        List<Recipe> GetRecipesByName(string name);
     }
 }
