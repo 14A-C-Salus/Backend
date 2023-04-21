@@ -297,7 +297,7 @@ namespace Salus.Services.RecipeServices
 
             return recipe;
         }
-        //--------- Simple CRUD End ----------//
+        //--------- CRUD End ----------//
 
         //--------- Other Start ----------//
         public Recipe VerifyUnVerify(int id)
