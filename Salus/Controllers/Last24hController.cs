@@ -13,6 +13,14 @@ namespace Salus.Controllers
         {
             _last24HService = last24HService;
         }
+        [HttpGet("get-all")]
+        public IActionResult GetAll(DateTimeOffset date)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_last24HService.GetAll());
+            });
+        }
         [HttpPut("add-new-recipe")]
         public IActionResult AddNewRecipe(AddRecipeToLast24H request)
         {

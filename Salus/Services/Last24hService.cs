@@ -14,6 +14,12 @@ namespace Salus.Services.Last24hServices
             _genericServicesLast24hService = new(dataContext, httpContextAccessor);
         }
 
+        public List<Last24h> GetAll()
+        {
+            UserProfile userProfile = _genericServicesRecipe.GetAuthenticatedUserProfile();
+            return _genericServicesLast24hService.ReadAll().Where(l => l.userProfileId == userProfile.id).ToList();
+        }
+
         public Last24h Add(AddRecipeToLast24H request)
         {
             var last24h = new Last24h();
@@ -36,7 +42,7 @@ namespace Salus.Services.Last24hServices
             last24h.protein = recipe.protein * (request.portion/100);
             last24h.carbohydrate = recipe.carbohydrate * (request.portion / 100);
             last24h.time = DateTime.Now;
-
+            last24h.userProfile = _genericServicesLast24hService.GetAuthenticatedUserProfile();
             return _genericServicesLast24hService.Create(last24h);
         }
 
