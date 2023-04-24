@@ -104,7 +104,7 @@ namespace Salus.Services.UserProfileServices
             UserProfileGetResponse res = new() 
             {
                 id = userProfile.id,
-                birthDate = string.Format("yyyy-MM-dd", userProfile.birthDate),
+                birthDate = userProfile.birthDate.ToString("yyyy-MM-dd"),
                 eyesIndex = userProfile.eyesIndex,
                 gender = userProfile.gender,
                 goalWeight = userProfile.goalWeight,
