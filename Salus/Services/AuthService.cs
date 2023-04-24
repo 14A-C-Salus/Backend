@@ -46,7 +46,9 @@ namespace Salus.Services.AuthServices
             if (_dataContext.Set<Auth>().Any(a => a.email == request.email))
                 throw new EEmailAlreadyExist();
             var auth = NewAuth(request);
+#if RELEASE
             SendToken(auth);
+#endif
             _genericServices.Create(auth);
             return auth;
         }
