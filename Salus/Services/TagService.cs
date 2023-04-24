@@ -64,5 +64,10 @@ namespace Salus.Services.TagServices
             if (tag.min < 0 || tag.min > 100)
                 throw new EMinValueOutOfRange();
         }
+
+        public List<Tag> GetAll()
+        {
+            return _genericServices.ReadAll().ToList();
+        }
     }
 }

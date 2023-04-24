@@ -39,7 +39,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPatch("update")]
+        [HttpPatch("update-simple")]
         public IActionResult UpdateSimple(RecipeUpdateRequest request)
         {
             return this.Run(() =>
@@ -81,7 +81,15 @@ namespace Salus.Controllers
         {
             return this.Run(() =>
             {
-                return Ok(_recipeService.GetAll(authId));
+                return Ok(_recipeService.GetAllByAuthId(authId));
+            });
+        }
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.GetAll());
             });
         }
         [HttpGet("get-all-recipe-by-tag-id")]

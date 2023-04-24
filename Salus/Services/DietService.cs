@@ -34,6 +34,11 @@ namespace Salus.Services
             return diet;
         }
 
+        public List<Diet> GetAll()
+        {
+            return _genericServices.ReadAll().ToList();
+        }
+
         private void CheckDiet(Diet diet)
         {
             if (diet.maxCarbohydrate != null && (diet.maxCarbohydrate > 10000 || diet.maxCarbohydrate < 0))

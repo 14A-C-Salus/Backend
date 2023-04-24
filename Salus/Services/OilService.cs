@@ -36,6 +36,11 @@ namespace Salus.Services.RecipeServices
             return oil;
         }
 
+        public List<Oil> GetAll ()
+        {
+            return _genericServices.ReadAll().ToList();
+        }
+
         public void Delete(int id)
         {
             var oil = _genericServices.Read(id);

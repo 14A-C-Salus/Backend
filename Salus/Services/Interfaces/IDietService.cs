@@ -8,5 +8,6 @@ namespace Salus.Services.Interfaces
         Diet? Create(CreateDietRequest request);
         Diet? Modify(ModifyDietRequest request);
         void Delete(int id);
+        List<Diet> GetAll();
     }
 }

@@ -110,11 +110,14 @@ namespace Salus.Services.RecipeServices
 
 
         //--------- CRUD Start ----------//
-        public List<Recipe> GetAll(int authId) 
+        public List<Recipe> GetAllByAuthId(int authId) 
         {
             return _genericServices.ReadAll().Where(r => r.Author.id == authId).ToList();
         }
-
+        public List<Recipe> GetAll()
+        {
+            return _genericServices.ReadAll().ToList();
+        }
         public void Delete(int recipeId)
         {
             var recipe = _genericServices.Read(recipeId);
@@ -297,7 +300,7 @@ namespace Salus.Services.RecipeServices
 
             return recipe;
         }
-        //--------- Simple CRUD End ----------//
+        //--------- CRUD End ----------//
 
         //--------- Other Start ----------//
         public Recipe VerifyUnVerify(int id)

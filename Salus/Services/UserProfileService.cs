@@ -5,6 +5,7 @@ using System.Reflection;
 
 namespace Salus.Services.UserProfileServices
 {
+
     public class UserProfileService : IUserProfileService
     {
         public GenericService<Auth> _genericServicesAuth;
@@ -30,9 +31,9 @@ namespace Salus.Services.UserProfileServices
             if (userProfile.diet == null)
             {
                 if (userProfile.gender == genderEnum.male)
-                    userProfileMaxKcal=(int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) + 5);
+                    userProfileMaxKcal = (int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) + 5);
                 else if (userProfile.gender == genderEnum.female)
-                    userProfileMaxKcal=(int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) - 161);
+                    userProfileMaxKcal = (int)((10 * userProfile.goalWeight) + (6.25 * userProfile.height) - (5 * (DateTime.Now.Year - userProfile.birthDate.Year)) - 161);
                 else
                     throw new EGenderNotSelected();
             }
@@ -87,19 +88,33 @@ namespace Salus.Services.UserProfileServices
             userProfile.skinIndex = request.skinIndex == skinEnum.nondefined ? userProfile.skinIndex : request.skinIndex;
             userProfile.eyesIndex = request.eyesIndex == eyesEnum.nondefined ? userProfile.eyesIndex : request.eyesIndex;
             userProfile.mouthIndex = request.mouthIndex == mouthEnum.nondefined ? userProfile.mouthIndex : request.mouthIndex;
-            
+
             CheckProfilePicture(userProfile);
 
             userProfile = _genericServicesUserProfile.Update(userProfile);
             return userProfile;
         }
 
-        public UserProfile GetProfile(int id)
+        public UserProfileGetResponse GetProfile(int id)
         {
             var userProfile = _genericServicesUserProfile.Read(id);
             if (userProfile == null)
                 throw new EInvalidUserProfilId();
-            return userProfile;
+
+            UserProfileGetResponse res = new() 
+            {
+                id = userProfile.id,
+                birthDate = userProfile.birthDate.ToString("yyyy-MM-dd"),
+                eyesIndex = userProfile.eyesIndex,
+                gender = userProfile.gender,
+                goalWeight = userProfile.goalWeight,
+                hairIndex = userProfile.hairIndex,
+                height = userProfile.height,
+                mouthIndex = userProfile.mouthIndex,
+                skinIndex = userProfile.skinIndex,
+                weight = userProfile.weight 
+            };
+            return res;
         }
 
         public UserProfile CreateProfile(UserSetDatasRequest request)
@@ -127,7 +142,7 @@ namespace Salus.Services.UserProfileServices
             CheckUpdateRequest(request);
             var userProfile = _genericServicesUserProfile.GetAuthenticatedUserProfile();
             userProfile.weight = request.weight == default(double) ? userProfile.weight : request.weight;
-            userProfile.height = request.height == default(double) ? userProfile.weight : request.weight;
+            userProfile.height = request.height == default(double) ? userProfile.height : request.height;
             userProfile.birthDate = request.birthDate == default(DateTime) ? userProfile.birthDate : request.birthDate;
             userProfile.gender = request.gender == default(genderEnum) ? userProfile.gender : request.gender;
             userProfile.goalWeight = request.goalWeight == default(double) ? SetGoalWeight(userProfile.height, userProfile.weight) : request.goalWeight;

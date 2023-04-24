@@ -89,9 +89,9 @@ namespace Salus.Services.AuthServices
             return auth;
         }
 
-        public async Task<Auth> ResetPassword(AuthResetPasswordRequest request)
+        public async Task<Auth> ResetPassword(AuthResetPasswordRequest request, string token)
         {
-            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
+            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.passwordResetToken == token);
             if (auth == null || auth.resetTokenExpires < DateTime.Now)
                 throw new EInvalidToken();
 
@@ -171,13 +171,13 @@ namespace Salus.Services.AuthServices
             string password = _configuration.GetSection("MailSettings:Password").Value;
             string subject = "Verify your account";
 
-            string url = $"http://salus.bsite.net/api/Auth/verify?token={auth.verificationToken}";
+            string url = $"http://salushl-001-site1.dtempurl.com/api/Auth/verify?token={auth.verificationToken}";
             string imgUrl = "https://i.ibb.co/Dg5h4zK/logo.png";
 
             if (_configuration.GetSection("Host:Use").Value == "LocalDB")
                 url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
             else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
-                url = $"http://anoblade-001-site1.atempurl.com/api/Auth/verify?token={auth.verificationToken}";
+                url = $"http://salushl-001-site1.dtempurl.com/api/Auth/verify?token={auth.verificationToken}";
 
             string body = File.ReadAllText("./Templates/EmailBody.html").Replace("IMAGEURL", imgUrl).Replace("USERNAME", auth.username).Replace("URL", url);
 
@@ -202,14 +202,8 @@ namespace Salus.Services.AuthServices
 
             sendMail.To.Add(new MailAddress(to));
 
-            try
-            {
                 client.Send(sendMail);
-            }
-            catch
-            {
-                throw new EEmailNotFound();
-            }
+
         }
         private string CreateToken(Auth auth)
         {

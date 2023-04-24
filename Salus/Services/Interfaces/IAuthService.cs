@@ -9,6 +9,6 @@ namespace Salus.Services.Interfaces
         Task<string> Login(AuthLoginRequest request);
         Task<Auth> Verify(string token);
         Task<Auth> ForgotPassword(string email);
-        Task<Auth> ResetPassword(AuthResetPasswordRequest request);
+        Task<Auth> ResetPassword(AuthResetPasswordRequest request, string token);
     }
 }

@@ -65,11 +65,11 @@ namespace Salus.Controllers
 
         }
         [HttpPatch("reset-password")]
-        public IActionResult ResetPassword(AuthResetPasswordRequest request)
+        public IActionResult ResetPassword(AuthResetPasswordRequest request, [FromQuery] string token)
         {
             return this.Run(() =>
             {
-                return Ok(_authService.ResetPassword(request).Result);
+                return Ok(_authService.ResetPassword(request, token).Result);
             });
         }
     }

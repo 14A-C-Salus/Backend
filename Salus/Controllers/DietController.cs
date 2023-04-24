@@ -40,5 +40,13 @@ namespace Salus.Controllers
                 return Ok();
             });
         }
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_dietService.GetAll());
+            });
+        }
     }
 }
