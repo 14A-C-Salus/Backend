@@ -39,7 +39,7 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpPatch("update")]
+        [HttpPatch("update-simple")]
         public IActionResult UpdateSimple(RecipeUpdateRequest request)
         {
             return this.Run(() =>
