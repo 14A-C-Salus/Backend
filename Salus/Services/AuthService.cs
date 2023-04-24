@@ -87,9 +87,9 @@ namespace Salus.Services.AuthServices
             return auth;
         }
 
-        public async Task<Auth> ResetPassword(AuthResetPasswordRequest request)
+        public async Task<Auth> ResetPassword(AuthResetPasswordRequest request, string token)
         {
-            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.passwordResetToken == request.token);
+            var auth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.passwordResetToken == token);
             if (auth == null || auth.resetTokenExpires < DateTime.Now)
                 throw new EInvalidToken();
 
