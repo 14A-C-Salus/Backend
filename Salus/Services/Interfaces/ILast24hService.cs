@@ -10,7 +10,7 @@ namespace Salus.Services.Interfaces
         Last24h ThirdPortion(int id);
         Last24h QuarterPortion(int id);
         Last24h DoublePortion(int id);
-        List<Last24h> GetAll();
+        List<Last24h> GetAll(DateTime? dateTime);
 
     }
 }

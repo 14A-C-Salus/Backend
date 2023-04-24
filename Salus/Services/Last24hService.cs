@@ -14,10 +14,18 @@ namespace Salus.Services.Last24hServices
             _genericServicesLast24hService = new(dataContext, httpContextAccessor);
         }
 
-        public List<Last24h> GetAll()
+        public List<Last24h> GetAll(DateTime? dateTime)
         {
             UserProfile userProfile = _genericServicesRecipe.GetAuthenticatedUserProfile();
-            return _genericServicesLast24hService.ReadAll().Where(l => l.userProfileId == userProfile.id).ToList();
+            List<Last24h> last24hs = _genericServicesLast24hService.ReadAll().Where(l => l.userProfileId == userProfile.id).ToList();
+            if (dateTime is null)
+            {
+                return last24hs;
+            }
+            else
+            {
+                return last24hs.Where(l => l.time.Year == dateTime.Value.Year && l.time.Month == dateTime.Value.Month && l.time.Day == dateTime.Value.Day).ToList();
+            }
         }
 
         public Last24h Add(AddRecipeToLast24H request)

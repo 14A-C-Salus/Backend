@@ -14,6 +14,14 @@ namespace Salus.Controllers
         {
             _tagService = tagService;
         }
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_tagService.GetAll());
+            });
+        }
         [HttpPut("create")]
         public IActionResult Create(TagCreateRequest request)
         {

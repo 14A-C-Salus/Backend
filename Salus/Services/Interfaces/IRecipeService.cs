@@ -11,7 +11,8 @@
         Recipe AddTags(AddTagsToRecipeRequest request);
         List<Tag> GetRecommendedTags(int recipeId);
         List<UsersLikeRecipes> LikeUnlike(int recipeId);
-        List<Recipe> GetAll(int authId);
+        List<Recipe> GetAllByAuthId(int authId);
+        List<Recipe> GetAll();
         List<Recipe> GetAllByTagId(int tagId);
         List<Recipe> GetRecipesByName(string name);
     }

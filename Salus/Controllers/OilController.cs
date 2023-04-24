@@ -22,6 +22,14 @@ namespace Salus.Controllers
                 return Ok(_oilService.Create(request));
             });
         }
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_oilService.GetAll());
+            });
+        }
         [HttpPatch("update")]
         public IActionResult Update(OilUpdateRequest request)
         {
