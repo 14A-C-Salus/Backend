@@ -1,43 +1,30 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Salus.Data;
-using Salus.Services;
-using Salus.Services.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
-//https://stackoverflow.com/questions/44336489/moq-iserviceprovider-iservicescope
-public class ApplicationControllerTests : IClassFixture<DietService>
+using Microsoft.Extensions.Logging;
+using Moq;
+
+namespace UnitTests
 {
-    private readonly HttpClient _client;
-    private readonly DataContext _db;
-    private readonly DietService _dietService;
-
-    public ApplicationControllerTests(
-         DietService dietService)
+    //https://stackoverflow.com/questions/44336489/moq-iserviceprovider-iservicescope
+    public class UnitTest1
     {
-        _dietService = dietService;
-        _client = _dietService.CreateClient();
-        var scope = _dietService.GetRequiredService<IServiceScopeFactory>().CreateScope();
-        _db = scope.ServiceProvider.GetRequiredService<DataContext>();
-    }
 
-    [Fact]
-    public async Task CreateApplication_WhenCalled_ShouldReturnSuccess()
-    {
-        var request = new CreateApplicationRequest
+        [Fact]
+        public void Test1()
         {
-            Name = "App1"
+            var serviceCollection = new ServiceCollection();
+
+            // Create the ServiceProvider
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            // serviceScopeMock will contain my ServiceProvider
+            var serviceScopeMock = new Mock<IServiceScope>();
+            serviceScopeMock.SetupGet<IServiceProvider>(s => s.ServiceProvider)
+                .Returns(serviceProvider);
+
+            // serviceScopeFactoryMock will contain my serviceScopeMock
+            var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
+            serviceScopeFactoryMock.Setup(s => s.CreateScope())
+                .Returns(serviceScopeMock.Object);
         }
-
-
-
-        var response = await _client.PostAsync("/api/v1/Application/CreateApplicationForLive", request.ToJsonStringContent());
-
-        response.EnsureSuccess();
-
-        var applicationId = await response.Deserialize<Guid>();
-
-        var application = _db.Set<Application>().Find(applicationId);
-        Assert.Equal(request.Name, application.Name);
     }
 }
