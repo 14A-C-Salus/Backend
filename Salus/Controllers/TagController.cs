@@ -14,6 +14,7 @@ namespace Salus.Controllers
         {
             _tagService = tagService;
         }
+        [Authorize(Roles = "User")]
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
