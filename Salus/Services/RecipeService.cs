@@ -116,7 +116,7 @@ namespace Salus.Services.RecipeServices
         }
         public List<Recipe> GetAll()
         {
-            return _genericServices.ReadAll().ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).ToList();
         }
         public void Delete(int recipeId)
         {
