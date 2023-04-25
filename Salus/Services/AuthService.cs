@@ -47,7 +47,7 @@ namespace Salus.Services.AuthServices
                 throw new EEmailAlreadyExist();
             var auth = NewAuth(request);
 #if RELEASE
-            SendToken(auth);
+            SendToken(auth, true);
 #endif
             _genericServices.Create(auth);
             return auth;
@@ -84,7 +84,7 @@ namespace Salus.Services.AuthServices
                 throw new EUserNotFound();
 
             SetTokenAndExpires(auth);
-
+            SendToken(auth, false);
             await _dataContext.SaveChangesAsync();
             return auth;
         }
@@ -164,22 +164,22 @@ namespace Salus.Services.AuthServices
 
             return auth;
         }
-        private void SendToken(Auth auth)
+        private void SendToken(Auth auth, bool isRegister)
         {
             string to = auth.email;
             string from = _configuration.GetSection("MailSettings:From").Value;
             string password = _configuration.GetSection("MailSettings:Password").Value;
             string subject = "Verify your account";
 
-            string url = $"http://salushl-001-site1.dtempurl.com/api/Auth/verify?token={auth.verificationToken}";
+            string url = $"http://localhost:4200/Verify?verify?token={auth.verificationToken}";
             string imgUrl = "https://i.ibb.co/Dg5h4zK/logo.png";
-
-            if (_configuration.GetSection("Host:Use").Value == "LocalDB")
-                url = $"https://localhost:7138/api/Auth/verify?token={auth.verificationToken}";
-            else if (_configuration.GetSection("Host:Use").Value == "MyAspDB")
-                url = $"http://salushl-001-site1.dtempurl.com/api/Auth/verify?token={auth.verificationToken}";
-
             string body = File.ReadAllText("./Templates/EmailBody.html").Replace("IMAGEURL", imgUrl).Replace("USERNAME", auth.username).Replace("URL", url);
+
+            if (!isRegister)
+            {
+                url = $"http://localhost:4200/ResetPassword?token={auth.verificationToken}";
+                body = File.ReadAllText("./Templates/ResetPassword.html").Replace("IMAGEURL", imgUrl).Replace("USERNAME", auth.username).Replace("URL", url);
+            }
 
             SmtpClient client = new SmtpClient
             {
