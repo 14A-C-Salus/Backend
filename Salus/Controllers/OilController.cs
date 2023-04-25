@@ -6,7 +6,6 @@ namespace Salus.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class OilController : Controller
     {
         private readonly IOilService _oilService;
@@ -14,6 +13,7 @@ namespace Salus.Controllers
         {
             _oilService = oilService;
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("create")]
         public IActionResult Create(OilCreateRequest request)
         {
@@ -30,6 +30,7 @@ namespace Salus.Controllers
                 return Ok(_oilService.GetAll());
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpPatch("update")]
         public IActionResult Update(OilUpdateRequest request)
         {
@@ -38,6 +39,7 @@ namespace Salus.Controllers
                 return Ok(_oilService.Update(request));
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete")]
         public IActionResult Delete(int id)
         {

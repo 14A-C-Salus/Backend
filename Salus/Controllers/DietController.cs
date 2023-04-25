@@ -7,7 +7,6 @@ namespace Salus.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class DietController : Controller
     {
         private readonly IDietService _dietService;
@@ -15,6 +14,7 @@ namespace Salus.Controllers
         {
             _dietService = dietService;
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("create")]
         public IActionResult Create(CreateDietRequest request)
         {
@@ -23,6 +23,7 @@ namespace Salus.Controllers
                 return Ok(_dietService.Create(request));
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpPatch("update")]
         public IActionResult Update(ModifyDietRequest request)
         {
@@ -31,6 +32,7 @@ namespace Salus.Controllers
                 return Ok(_dietService.Modify(request));
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete")]
         public IActionResult Delete(int id)
         {

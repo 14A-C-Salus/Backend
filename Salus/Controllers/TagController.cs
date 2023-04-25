@@ -1,11 +1,11 @@
-﻿using Salus.Services;
+﻿using Microsoft.OpenApi.Any;
+using Salus.Services;
 using Salus.WebAPI;
 
 namespace Salus.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class TagController : Controller
     {
         private readonly ITagService _tagService;
@@ -22,6 +22,7 @@ namespace Salus.Controllers
                 return Ok(_tagService.GetAll());
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("create")]
         public IActionResult Create(TagCreateRequest request)
         {
@@ -30,6 +31,7 @@ namespace Salus.Controllers
                 return Ok(_tagService.Create(request));
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpPatch("update")]
         public IActionResult Update(TagUpdateRequest request)
         {
@@ -38,6 +40,7 @@ namespace Salus.Controllers
                 return Ok(_tagService.Update(request));
             });
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("delete")]
         public IActionResult Delete(int id)
         {
