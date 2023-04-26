@@ -196,7 +196,7 @@ namespace Salus.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "last24Hs",
+                name: "recipes",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -206,19 +206,30 @@ namespace Salus.Migrations
                     protein = table.Column<int>(type: "int", nullable: false),
                     fat = table.Column<int>(type: "int", nullable: false),
                     carbohydrate = table.Column<int>(type: "int", nullable: false),
-                    liquidInDl = table.Column<int>(type: "int", nullable: true),
-                    time = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    userProfileId = table.Column<int>(type: "int", nullable: false)
+                    verified = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    timeInMinute = table.Column<int>(type: "int", nullable: false),
+                    oilPortionMl = table.Column<int>(type: "int", nullable: true),
+                    description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    method = table.Column<int>(type: "int", nullable: false),
+                    userProfileid = table.Column<int>(type: "int", nullable: true),
+                    oilId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_last24Hs", x => x.id);
+                    table.PrimaryKey("PK_recipes", x => x.id);
                     table.ForeignKey(
-                        name: "FK_last24Hs_userProfiles_userProfileId",
-                        column: x => x.userProfileId,
+                        name: "FK_recipes_oils_oilId",
+                        column: x => x.oilId,
+                        principalTable: "oils",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_recipes_userProfiles_userProfileid",
+                        column: x => x.userProfileid,
                         principalTable: "userProfiles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -248,7 +259,7 @@ namespace Salus.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "recipes",
+                name: "last24Hs",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "int", nullable: false)
@@ -258,36 +269,26 @@ namespace Salus.Migrations
                     protein = table.Column<int>(type: "int", nullable: false),
                     fat = table.Column<int>(type: "int", nullable: false),
                     carbohydrate = table.Column<int>(type: "int", nullable: false),
-                    verifeid = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    timeInMinute = table.Column<int>(type: "int", nullable: false),
-                    oilPortionMl = table.Column<int>(type: "int", nullable: true),
-                    description = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    method = table.Column<int>(type: "int", nullable: false),
-                    userProfileid = table.Column<int>(type: "int", nullable: true),
-                    oilId = table.Column<int>(type: "int", nullable: true),
-                    last24hid = table.Column<int>(type: "int", nullable: true)
+                    liquidInDl = table.Column<int>(type: "int", nullable: true),
+                    time = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    userProfileId = table.Column<int>(type: "int", nullable: false),
+                    recipeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_recipes", x => x.id);
+                    table.PrimaryKey("PK_last24Hs", x => x.id);
                     table.ForeignKey(
-                        name: "FK_recipes_last24Hs_last24hid",
-                        column: x => x.last24hid,
-                        principalTable: "last24Hs",
-                        principalColumn: "id");
+                        name: "FK_last24Hs_recipes_recipeId",
+                        column: x => x.recipeId,
+                        principalTable: "recipes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_recipes_oils_oilId",
-                        column: x => x.oilId,
-                        principalTable: "oils",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_recipes_userProfiles_userProfileid",
-                        column: x => x.userProfileid,
+                        name: "FK_last24Hs_userProfiles_userProfileId",
+                        column: x => x.userProfileId,
                         principalTable: "userProfiles",
-                        principalColumn: "id");
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -386,20 +387,19 @@ namespace Salus.Migrations
                 column: "followerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_last24Hs_recipeId",
+                table: "last24Hs",
+                column: "recipeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_last24Hs_userProfileId",
                 table: "last24Hs",
-                column: "userProfileId",
-                unique: true);
+                column: "userProfileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RecepiesHaveTags_tagId",
                 table: "RecepiesHaveTags",
                 column: "tagId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_recipes_last24hid",
-                table: "recipes",
-                column: "last24hid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_recipes_oilId",
@@ -452,6 +452,9 @@ namespace Salus.Migrations
                 name: "followings");
 
             migrationBuilder.DropTable(
+                name: "last24Hs");
+
+            migrationBuilder.DropTable(
                 name: "RecepiesHaveTags");
 
             migrationBuilder.DropTable(
@@ -468,9 +471,6 @@ namespace Salus.Migrations
 
             migrationBuilder.DropTable(
                 name: "tags");
-
-            migrationBuilder.DropTable(
-                name: "last24Hs");
 
             migrationBuilder.DropTable(
                 name: "oils");

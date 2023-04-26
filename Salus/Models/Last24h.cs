@@ -15,6 +15,8 @@ namespace Salus.Models
         [Required, JsonIgnore]
         public UserProfile? userProfile { get; set; }
         public int userProfileId { get; set; }
-        public List<Recipe>? recipes { get; set; }
+        [Required]
+        public Recipe? recipe { get; set; }
+        public int recipeId { get; set; }
     }
 }

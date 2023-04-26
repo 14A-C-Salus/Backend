@@ -48,11 +48,6 @@ namespace Salus.Data
                 .WithOne(ad => ad.auth)
                 .HasForeignKey<UserProfile>(ad => ad.authOfProfileId);
 
-            modelBuilder.Entity<UserProfile>()
-                .HasOne<Last24h>(u => u.last24h)
-                .WithOne(l24h => l24h.userProfile)
-                .HasForeignKey<Last24h>(l24h => l24h.userProfileId);
-
             //zero-or-one-to-many relationships
             modelBuilder
                 .Entity<Recipe>()
@@ -63,11 +58,6 @@ namespace Salus.Data
                 .Entity<UserProfile>()
                 .HasOne<Diet>(u => u.diet)
                 .WithMany(d => d.userProfiles);
-
-            modelBuilder
-                .Entity<Recipe>()
-                .HasOne<Last24h>(f => f.last24h)
-                .WithMany(l24h => l24h.recipes);
 
             modelBuilder.Entity<Recipe>()
                 .HasOne<UserProfile>(r => r.userProfile)
@@ -179,8 +169,24 @@ namespace Salus.Data
                 .WithMany(r => r.recipes)
                 .HasForeignKey(ri => ri.ingredientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<Last24h>()
+                .HasKey(l24h => l24h.id);
+
+            modelBuilder
+                .Entity<Last24h>()
+                .HasOne<Recipe>(l24h => l24h.recipe)
+                .WithMany(r => r.last24hs)
+                .HasForeignKey(l24h => l24h.recipeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<Last24h>()
+                .HasOne<UserProfile>(l24h => l24h.userProfile)
+                .WithMany(up => up.last24hs)
+                .HasForeignKey(l24h => l24h.userProfileId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
-
-
     }
 }

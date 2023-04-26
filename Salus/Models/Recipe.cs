@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
  
 
 namespace Salus.Models
@@ -12,7 +12,7 @@ namespace Salus.Models
         public int protein { get; set; }
         public int fat { get; set; }
         public int carbohydrate { get; set; }
-        public bool verifeid { get; set; } = false;
+        public bool verified { get; set; } = false;
         public int timeInMinute { get; set; }
         public int? oilPortionMl { get; set; } 
         public string description { get; set; } = string.Empty;
@@ -33,8 +33,9 @@ namespace Salus.Models
         [Required, JsonIgnore]
         public List<RecipesIncludeIngredients> recipes { get; set; } = new();
 
-        [Required, JsonIgnore]
+        [Required]
         public List<RecepiesHaveTags> tags { get; set; } = new();
-        public Last24h? last24h { get; set; }
+        [JsonIgnore]
+        public List<Last24h>? last24hs { get; set; }
     }
 }

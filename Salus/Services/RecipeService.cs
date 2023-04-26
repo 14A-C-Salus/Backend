@@ -81,7 +81,7 @@ namespace Salus.Services.RecipeServices
                 carbohydrate = request.carbohydrate,
                 fat = request.fat,
                 protein = request.protein,
-                verifeid = false,
+                verified = false,
                 kcal = 0,
                 gramm = 100
             };
@@ -114,15 +114,15 @@ namespace Salus.Services.RecipeServices
         //--------- CRUD Start ----------//
         public List<Recipe> GetAllByAuthId(int authId) 
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.userProfile).Where(r => r.userProfile.id == authId).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.userProfile.id == authId).ToList();
         }
         public List<Recipe> GetAll()
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.userProfile).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).ToList();
         }
         public void Delete(int recipeId)
         {
-            var recipe = _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.userProfile).FirstOrDefault(r => r.id == recipeId);
+            var recipe = _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).FirstOrDefault(r => r.id == recipeId);
             if (recipe == null)
                 throw new ERecipeNotFound();
             if (recipe.userProfile != _genericServices.GetAuthenticatedUserProfile())
@@ -310,7 +310,7 @@ namespace Salus.Services.RecipeServices
             var recipe = _genericServices.Read(id);
             if (recipe == null)
                 throw new ERecipeNotFound();
-            recipe.verifeid = !recipe.verifeid;
+            recipe.verified = !recipe.verified;
             recipe = _genericServices.Update(recipe);
             return recipe;
         }
@@ -448,7 +448,7 @@ namespace Salus.Services.RecipeServices
 
         public List<Recipe> GetRecipesByName(string name)
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.userProfile).Where(r => r.name.ToLower().Contains(name.ToLower())).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.name.ToLower().Contains(name.ToLower())).ToList();
         }
 
 

@@ -183,6 +183,9 @@ namespace Salus.Migrations
                     b.Property<int>("protein")
                         .HasColumnType("int");
 
+                    b.Property<int>("recipeId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("time")
                         .HasColumnType("datetime(6)");
 
@@ -191,8 +194,9 @@ namespace Salus.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("userProfileId")
-                        .IsUnique();
+                    b.HasIndex("recipeId");
+
+                    b.HasIndex("userProfileId");
 
                     b.ToTable("last24Hs");
                 });
@@ -252,9 +256,6 @@ namespace Salus.Migrations
                     b.Property<int>("kcal")
                         .HasColumnType("int");
 
-                    b.Property<int?>("last24hid")
-                        .HasColumnType("int");
-
                     b.Property<int>("method")
                         .HasColumnType("int");
 
@@ -277,12 +278,10 @@ namespace Salus.Migrations
                     b.Property<int?>("userProfileid")
                         .HasColumnType("int");
 
-                    b.Property<bool>("verifeid")
+                    b.Property<bool>("verified")
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("id");
-
-                    b.HasIndex("last24hid");
 
                     b.HasIndex("oilId");
 
@@ -465,11 +464,19 @@ namespace Salus.Migrations
 
             modelBuilder.Entity("Salus.Models.Last24h", b =>
                 {
-                    b.HasOne("Salus.Models.UserProfile", "userProfile")
-                        .WithOne("last24h")
-                        .HasForeignKey("Salus.Models.Last24h", "userProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("Salus.Models.Recipe", "recipe")
+                        .WithMany("last24hs")
+                        .HasForeignKey("recipeId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Salus.Models.UserProfile", "userProfile")
+                        .WithMany("last24hs")
+                        .HasForeignKey("userProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("recipe");
 
                     b.Navigation("userProfile");
                 });
@@ -495,10 +502,6 @@ namespace Salus.Migrations
 
             modelBuilder.Entity("Salus.Models.Recipe", b =>
                 {
-                    b.HasOne("Salus.Models.Last24h", "last24h")
-                        .WithMany("recipes")
-                        .HasForeignKey("last24hid");
-
                     b.HasOne("Salus.Models.Oil", "oil")
                         .WithMany("recipes")
                         .HasForeignKey("oilId");
@@ -506,8 +509,6 @@ namespace Salus.Migrations
                     b.HasOne("Salus.Models.UserProfile", "userProfile")
                         .WithMany("recipes")
                         .HasForeignKey("userProfileid");
-
-                    b.Navigation("last24h");
 
                     b.Navigation("oil");
 
@@ -598,11 +599,6 @@ namespace Salus.Migrations
                     b.Navigation("userProfiles");
                 });
 
-            modelBuilder.Entity("Salus.Models.Last24h", b =>
-                {
-                    b.Navigation("recipes");
-                });
-
             modelBuilder.Entity("Salus.Models.Oil", b =>
                 {
                     b.Navigation("recipes");
@@ -611,6 +607,8 @@ namespace Salus.Migrations
             modelBuilder.Entity("Salus.Models.Recipe", b =>
                 {
                     b.Navigation("ingredients");
+
+                    b.Navigation("last24hs");
 
                     b.Navigation("recipes");
 
@@ -636,7 +634,7 @@ namespace Salus.Migrations
 
                     b.Navigation("followers");
 
-                    b.Navigation("last24h");
+                    b.Navigation("last24hs");
 
                     b.Navigation("likedRecipes");
 

@@ -17,7 +17,7 @@ namespace Salus.Services.Last24hServices
         public List<Last24h> GetAll(DateTime? dateTime)
         {
             UserProfile userProfile = _genericServicesRecipe.GetAuthenticatedUserProfile();
-            var last24hs = _dataContext.Set<Last24h>().Include(l24h => l24h.recipes).Where(l => l.userProfileId == userProfile.id).ToList();
+            var last24hs = _dataContext.Set<Last24h>().Include(l => l.recipe).Where(l => l.userProfileId == userProfile.id).ToList();
             if (dateTime is null)
             {
                 return last24hs;
@@ -35,10 +35,8 @@ namespace Salus.Services.Last24hServices
 
             if (recipe == null)
                 throw new ERecipeNotFound();
-            else if (last24h.recipes == null)
-                last24h.recipes = new List<Recipe>();
-
-                last24h.recipes.Add(recipe);
+            else if (last24h.recipe == null)
+                last24h.recipe = recipe;
 
             if (request.isLiquid)
                 last24h.liquidInDl = request.dl;
