@@ -64,9 +64,9 @@ namespace Salus.Services.SocialMediaServices
             _genericServicesComment.Delete(comment);
        }
 
-        public async void StartOrStopFollow(UnFollowFollowRequest request)
+        public void StartOrStopFollow(UnFollowFollowRequest request)
         {
-            var followedAuth = await _dataContext.Set<Auth>().FirstOrDefaultAsync(a => a.email == request.email);
+            var followedAuth = _dataContext.Set<Auth>().FirstOrDefault(a => a.id == request.id);
             if (followedAuth == null)
                 throw new EAuthNotFound();
 
@@ -74,15 +74,15 @@ namespace Salus.Services.SocialMediaServices
             if (followerUserProfile == null)
                 throw new EUserProfileNotFound();
 
-            var followedUserProfile = await _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == followedAuth.id);
+            var followedUserProfile = _dataContext.Set<UserProfile>().FirstOrDefault(u => u.authOfProfileId == followedAuth.id);
             if (followedUserProfile == null)
                 throw new EUserProfileNotFound();
 
             if (followedUserProfile.id == followerUserProfile.id)
                 throw new ESelfFollow();
 
-            var follow = await _dataContext.Set<Following>()
-                .FirstOrDefaultAsync(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id);
+            var follow = _dataContext.Set<Following>()
+                .FirstOrDefault(f => f.followerId == followerUserProfile.id && f.followedId == followedUserProfile.id);
 
             if (follow != null)
             {
@@ -98,7 +98,7 @@ namespace Salus.Services.SocialMediaServices
                 });
             }
 
-            await _dataContext.SaveChangesAsync();
+            _dataContext.SaveChanges();
        }
 
         public async Task<Comment> SendComment(WriteCommentRequest request)

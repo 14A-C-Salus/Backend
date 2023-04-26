@@ -17,7 +17,7 @@ namespace Salus.Services.Last24hServices
         public List<Last24h> GetAll(DateTime? dateTime)
         {
             UserProfile userProfile = _genericServicesRecipe.GetAuthenticatedUserProfile();
-            List<Last24h> last24hs = _genericServicesLast24hService.ReadAll().Where(l => l.userProfileId == userProfile.id).ToList();
+            var last24hs = _dataContext.Set<Last24h>().Include(l => l.recipe).Where(l => l.userProfileId == userProfile.id).ToList();
             if (dateTime is null)
             {
                 return last24hs;
@@ -35,20 +35,18 @@ namespace Salus.Services.Last24hServices
 
             if (recipe == null)
                 throw new ERecipeNotFound();
-            else if (last24h.recipes == null)
-                last24h.recipes = new List<Recipe>();
-
-                last24h.recipes.Add(recipe);
+            else if (last24h.recipe == null)
+                last24h.recipe = recipe;
 
             if (request.isLiquid)
                 last24h.liquidInDl = request.dl;
             else
                 last24h.liquidInDl = null;
-
-            last24h.fat = recipe.fat * (request.portion / 100);
-            last24h.kcal = recipe.kcal * (request.portion/100);
-            last24h.protein = recipe.protein * (request.portion/100);
-            last24h.carbohydrate = recipe.carbohydrate * (request.portion / 100);
+            last24h.gramm = request.portion;
+            last24h.fat = recipe.fat * (request.portion / recipe.gramm);
+            last24h.kcal = recipe.kcal * (request.portion/ recipe.gramm);
+            last24h.protein = recipe.protein * (request.portion/ recipe.gramm);
+            last24h.carbohydrate = recipe.carbohydrate * (request.portion / recipe.gramm);
             last24h.time = DateTime.Now;
             last24h.userProfile = _genericServicesLast24hService.GetAuthenticatedUserProfile();
             return _genericServicesLast24hService.Create(last24h);

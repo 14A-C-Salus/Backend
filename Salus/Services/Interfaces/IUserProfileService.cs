@@ -12,6 +12,6 @@ namespace Salus.Services.Interfaces
         UserProfile ModifyProfile(UserSetDatasRequest request);
         UserProfile SetProfilePicture(UserSetProfilePictureRequset request);
         UserProfile AddDiet(int dietId);
-        List<UserProfile> GetUserprofilesByName(string name);
+        List<Auth> GetAuthsByName(string name);
     }
 }

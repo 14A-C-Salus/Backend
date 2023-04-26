@@ -4,7 +4,7 @@ namespace Salus.Models.Requests
 {
     public class UnFollowFollowRequest
     {
-        [EmailAddress, Required]
-        public string email { get; set; } = string.Empty;
+        [Required]
+        public int id { get; set; }
     }
 }

@@ -36,11 +36,11 @@ namespace Salus.Controllers
             });
         }
         [HttpGet("get-userprofiles-by-name")]
-        public IActionResult GetUserprofilesByName(string name)
+        public IActionResult GetAuthsByName(string name)
         {
             return this.Run(() =>
             {
-                return Ok(_userProfileService.GetUserprofilesByName(name));
+                return Ok(_userProfileService.GetAuthsByName(name));
             });
         }
         [HttpPatch("add-diet")]

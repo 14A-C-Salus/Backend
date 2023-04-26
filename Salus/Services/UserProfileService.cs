@@ -11,6 +11,7 @@ namespace Salus.Services.UserProfileServices
         public GenericService<Auth> _genericServicesAuth;
         public GenericService<UserProfile> _genericServicesUserProfile;
         public GenericService<Diet> _genericServicesDiet;
+        public DataContext _dataContext;
         Auth? auth;
 
         public UserProfileService(DataContext dataContext, IHttpContextAccessor httpContextAccessor)
@@ -18,6 +19,7 @@ namespace Salus.Services.UserProfileServices
             _genericServicesAuth = new(dataContext, httpContextAccessor);
             _genericServicesUserProfile = new(dataContext, httpContextAccessor);
             _genericServicesDiet = new(dataContext, httpContextAccessor);
+            _dataContext = dataContext;
         }
 
         public List<Diet> GetRecommendedDiets()
@@ -149,13 +151,9 @@ namespace Salus.Services.UserProfileServices
             userProfile = _genericServicesUserProfile.Update(userProfile);
             return userProfile;
         }
-        public List<UserProfile> GetUserprofilesByName(string name)
+        public List<Auth> GetAuthsByName(string name)
         {
-            var auths = _genericServicesAuth.ReadAll().Where(a => a.username.Contains(name)).ToList();
-            List<UserProfile> users = new List<UserProfile>();
-            foreach (var auth in auths)
-                users.Add(_genericServicesUserProfile.ReadAll().First(u => u.authOfProfileId == auth.id));
-            return users;
+            return _dataContext.Set<Auth>().Include(a => a.userProfile).Where(a => a.username.Contains(name)).ToList(); ;
         }
 
         //private methods

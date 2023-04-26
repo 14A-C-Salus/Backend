@@ -81,11 +81,13 @@ namespace Salus.Services.RecipeServices
                 carbohydrate = request.carbohydrate,
                 fat = request.fat,
                 protein = request.protein,
-                verifeid = false,
-                kcal = 0
+                verified = false,
+                kcal = 0,
+                gramm = 100
             };
             recipe.kcal = (int)(request.kcal == null ? CalculateKcal(recipe) : request.kcal);
             CheckData(recipe);
+            recipe.userProfile = null;
             recipe = _genericServices.Create(recipe);
             return recipe;
         }
@@ -112,18 +114,18 @@ namespace Salus.Services.RecipeServices
         //--------- CRUD Start ----------//
         public List<Recipe> GetAllByAuthId(int authId) 
         {
-            return _genericServices.ReadAll().Where(r => r.Author.id == authId).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.userProfile.id == authId).ToList();
         }
         public List<Recipe> GetAll()
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).ToList();
         }
         public void Delete(int recipeId)
         {
-            var recipe = _genericServices.Read(recipeId);
+            var recipe = _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).FirstOrDefault(r => r.id == recipeId);
             if (recipe == null)
                 throw new ERecipeNotFound();
-            if (recipe.Author != _genericServices.GetAuthenticatedUserProfile())
+            if (recipe.userProfile != _genericServices.GetAuthenticatedUserProfile())
                 throw new EUnauthorized();
             _genericServices.Delete(recipe);
         }
@@ -148,7 +150,7 @@ namespace Salus.Services.RecipeServices
 
             var recipe = new Recipe()
             {
-                Author = userProfile,
+                userProfile = userProfile,
                 name = request.name,
                 method = request.method,
                 timeInMinute = request.timeInMinutes,
@@ -232,9 +234,9 @@ namespace Salus.Services.RecipeServices
 
             UpdateCheck(request);
 
-            if (request.saveAs == false && recipe.Author != userProfile)
+            if (request.saveAs == false && recipe.userProfile.id != userProfile.id)
                 throw new EOnlyAuthorCanModifyRecipe();
-            recipe.Author = userProfile;
+            recipe.userProfile = userProfile;
             recipe.name = request.name == string.Empty ? recipe.name : request.name;
             recipe.method = request.method == RecipeEnums.makeingMethodEnum.nondefined ? recipe.method : request.method;
             recipe.fat = 0;
@@ -308,7 +310,7 @@ namespace Salus.Services.RecipeServices
             var recipe = _genericServices.Read(id);
             if (recipe == null)
                 throw new ERecipeNotFound();
-            recipe.verifeid = !recipe.verifeid;
+            recipe.verified = !recipe.verified;
             recipe = _genericServices.Update(recipe);
             return recipe;
         }
@@ -426,7 +428,7 @@ namespace Salus.Services.RecipeServices
         {
             if (recipe.name.Length > 50)
                 throw new ERecipeNameLength();
-            if (recipe.name.Length < 5)
+            if (recipe.name.Length < 2)
                 throw new ERecipeNameNull();
             if (recipe.fat > 100)
                 throw new ERecipeFatValue();
@@ -446,7 +448,7 @@ namespace Salus.Services.RecipeServices
 
         public List<Recipe> GetRecipesByName(string name)
         {
-            return _genericServices.ReadAll().Where(r => r.name.Contains(name)).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.name.ToLower().Contains(name.ToLower())).ToList();
         }
 
 

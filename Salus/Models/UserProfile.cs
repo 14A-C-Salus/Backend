@@ -24,7 +24,7 @@ namespace Salus.Models
         [Required, JsonIgnore]
         public Auth? auth { get; set; }
         [JsonIgnore]
-        public Last24h? last24h { get; set; }
+        public List<Last24h>? last24hs { get; set; }
         [JsonIgnore]
         public Diet? diet { get; set; }
         [JsonIgnore]
@@ -41,5 +41,7 @@ namespace Salus.Models
         public IList<UsersLikeRecipes>? likedRecipes { get; set; }
         [JsonIgnore]
         public IList<UsersPreferTags>? preferredTags { get; set; }
+        [JsonIgnore]
+        public IList<Recipe>? recipes { get; set; }
     }
 }
