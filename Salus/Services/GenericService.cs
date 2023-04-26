@@ -53,7 +53,7 @@ namespace Salus.Services
         }
         public UserProfile GetAuthenticatedUserProfile()
         {
-            var userProfile = _dataContext.Set<UserProfile>().Include(up => up.auth).FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId()).Result;
+            var userProfile = _dataContext.Set<UserProfile>().FirstOrDefaultAsync(u => u.authOfProfileId == GetAuthId()).Result;
             if (userProfile == null)
                 throw new EUserNotFound();
             return userProfile;

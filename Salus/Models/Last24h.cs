@@ -5,6 +5,7 @@ namespace Salus.Models
     public class Last24h
     {
         public int id { get; set; }
+        public int gramm { get; set; }
         public int kcal { get; set; }
         public int protein { get; set; }
         public int fat { get; set; }
@@ -14,7 +15,6 @@ namespace Salus.Models
         [Required, JsonIgnore]
         public UserProfile? userProfile { get; set; }
         public int userProfileId { get; set; }
-        [JsonIgnore]
-        public IList<Recipe>? recipes { get; set; }
+        public List<Recipe>? recipes { get; set; }
     }
 }

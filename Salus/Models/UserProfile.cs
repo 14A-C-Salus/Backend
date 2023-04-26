@@ -41,5 +41,7 @@ namespace Salus.Models
         public IList<UsersLikeRecipes>? likedRecipes { get; set; }
         [JsonIgnore]
         public IList<UsersPreferTags>? preferredTags { get; set; }
+        [JsonIgnore]
+        public IList<Recipe>? recipes { get; set; }
     }
 }

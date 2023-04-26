@@ -201,6 +201,7 @@ namespace Salus.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    gramm = table.Column<int>(type: "int", nullable: false),
                     kcal = table.Column<int>(type: "int", nullable: false),
                     protein = table.Column<int>(type: "int", nullable: false),
                     fat = table.Column<int>(type: "int", nullable: false),
@@ -265,7 +266,7 @@ namespace Salus.Migrations
                     name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     method = table.Column<int>(type: "int", nullable: false),
-                    Authorid = table.Column<int>(type: "int", nullable: false),
+                    userProfileid = table.Column<int>(type: "int", nullable: true),
                     oilId = table.Column<int>(type: "int", nullable: true),
                     last24hid = table.Column<int>(type: "int", nullable: true)
                 },
@@ -283,11 +284,10 @@ namespace Salus.Migrations
                         principalTable: "oils",
                         principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_recipes_userProfiles_Authorid",
-                        column: x => x.Authorid,
+                        name: "FK_recipes_userProfiles_userProfileid",
+                        column: x => x.userProfileid,
                         principalTable: "userProfiles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -397,11 +397,6 @@ namespace Salus.Migrations
                 column: "tagId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_recipes_Authorid",
-                table: "recipes",
-                column: "Authorid");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_recipes_last24hid",
                 table: "recipes",
                 column: "last24hid");
@@ -410,6 +405,11 @@ namespace Salus.Migrations
                 name: "IX_recipes_oilId",
                 table: "recipes",
                 column: "oilId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_recipes_userProfileid",
+                table: "recipes",
+                column: "userProfileid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RecipesIncludeIngredients_ingredientId",

@@ -171,6 +171,9 @@ namespace Salus.Migrations
                     b.Property<int>("fat")
                         .HasColumnType("int");
 
+                    b.Property<int>("gramm")
+                        .HasColumnType("int");
+
                     b.Property<int>("kcal")
                         .HasColumnType("int");
 
@@ -233,9 +236,6 @@ namespace Salus.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Authorid")
-                        .HasColumnType("int");
-
                     b.Property<int>("carbohydrate")
                         .HasColumnType("int");
 
@@ -274,16 +274,19 @@ namespace Salus.Migrations
                     b.Property<int>("timeInMinute")
                         .HasColumnType("int");
 
+                    b.Property<int?>("userProfileid")
+                        .HasColumnType("int");
+
                     b.Property<bool>("verifeid")
                         .HasColumnType("tinyint(1)");
 
                     b.HasKey("id");
 
-                    b.HasIndex("Authorid");
-
                     b.HasIndex("last24hid");
 
                     b.HasIndex("oilId");
+
+                    b.HasIndex("userProfileid");
 
                     b.ToTable("recipes");
                 });
@@ -492,12 +495,6 @@ namespace Salus.Migrations
 
             modelBuilder.Entity("Salus.Models.Recipe", b =>
                 {
-                    b.HasOne("Salus.Models.UserProfile", "Author")
-                        .WithMany()
-                        .HasForeignKey("Authorid")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Salus.Models.Last24h", "last24h")
                         .WithMany("recipes")
                         .HasForeignKey("last24hid");
@@ -506,11 +503,15 @@ namespace Salus.Migrations
                         .WithMany("recipes")
                         .HasForeignKey("oilId");
 
-                    b.Navigation("Author");
+                    b.HasOne("Salus.Models.UserProfile", "userProfile")
+                        .WithMany("recipes")
+                        .HasForeignKey("userProfileid");
 
                     b.Navigation("last24h");
 
                     b.Navigation("oil");
+
+                    b.Navigation("userProfile");
                 });
 
             modelBuilder.Entity("Salus.Models.RecipesIncludeIngredients", b =>
@@ -640,6 +641,8 @@ namespace Salus.Migrations
                     b.Navigation("likedRecipes");
 
                     b.Navigation("preferredTags");
+
+                    b.Navigation("recipes");
                 });
 #pragma warning restore 612, 618
         }

@@ -69,6 +69,10 @@ namespace Salus.Data
                 .HasOne<Last24h>(f => f.last24h)
                 .WithMany(l24h => l24h.recipes);
 
+            modelBuilder.Entity<Recipe>()
+                .HasOne<UserProfile>(r => r.userProfile)
+                .WithMany(up => up.recipes);
+
             //many-to-many unable duplicate relationships
             //self join
             modelBuilder

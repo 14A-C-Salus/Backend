@@ -18,12 +18,12 @@ namespace Salus.Models
         public string description { get; set; } = string.Empty;
         public string name { get; set; } = string.Empty;
         public makeingMethodEnum method { get; set; }
-        [Required, JsonIgnore]
-        public UserProfile author { get; set; } = new ();
+        [JsonIgnore]
+        public UserProfile? userProfile { get; set; } = new ();
 
         //Connections
-        public List<RecipesIncludeIngredients> ingredients { get; set; } = new();
-        public List<UsersLikeRecipes> usersWhoLiked { get; set; } = new();
+        public List<RecipesIncludeIngredients>? ingredients { get; set; }
+        public List<UsersLikeRecipes>? usersWhoLiked { get; set; }
 
         public int? oilId { get; set; }
         [ForeignKey("oilId")]
