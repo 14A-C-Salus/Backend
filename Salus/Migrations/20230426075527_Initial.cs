@@ -113,8 +113,6 @@ namespace Salus.Migrations
                     birthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     gender = table.Column<int>(type: "int", nullable: false),
                     goalWeight = table.Column<double>(type: "double", nullable: false),
-                    maxKcal = table.Column<int>(type: "int", nullable: true),
-                    minDl = table.Column<int>(type: "int", nullable: true),
                     hairIndex = table.Column<int>(type: "int", nullable: false),
                     skinIndex = table.Column<int>(type: "int", nullable: false),
                     eyesIndex = table.Column<int>(type: "int", nullable: false),
@@ -267,6 +265,7 @@ namespace Salus.Migrations
                     name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     method = table.Column<int>(type: "int", nullable: false),
+                    Authorid = table.Column<int>(type: "int", nullable: false),
                     oilId = table.Column<int>(type: "int", nullable: true),
                     last24hid = table.Column<int>(type: "int", nullable: true)
                 },
@@ -283,6 +282,12 @@ namespace Salus.Migrations
                         column: x => x.oilId,
                         principalTable: "oils",
                         principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_recipes_userProfiles_Authorid",
+                        column: x => x.Authorid,
+                        principalTable: "userProfiles",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -390,6 +395,11 @@ namespace Salus.Migrations
                 name: "IX_RecepiesHaveTags_tagId",
                 table: "RecepiesHaveTags",
                 column: "tagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_recipes_Authorid",
+                table: "recipes",
+                column: "Authorid");
 
             migrationBuilder.CreateIndex(
                 name: "IX_recipes_last24hid",

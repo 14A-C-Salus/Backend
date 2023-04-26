@@ -18,8 +18,8 @@ namespace Salus.Models
         public string description { get; set; } = string.Empty;
         public string name { get; set; } = string.Empty;
         public makeingMethodEnum method { get; set; }
-        [Required, NotMapped]
-        public UserProfile Author { get; set; } = new ();
+        [Required, JsonIgnore]
+        public UserProfile author { get; set; } = new ();
 
         //Connections
         public List<RecipesIncludeIngredients> ingredients { get; set; } = new();

@@ -112,18 +112,18 @@ namespace Salus.Services.RecipeServices
         //--------- CRUD Start ----------//
         public List<Recipe> GetAllByAuthId(int authId) 
         {
-            return _genericServices.ReadAll().Where(r => r.Author.id == authId).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.author).Where(r => r.author.id == authId).ToList();
         }
         public List<Recipe> GetAll()
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.author).ToList();
         }
         public void Delete(int recipeId)
         {
-            var recipe = _genericServices.Read(recipeId);
+            var recipe = _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.author).FirstOrDefault(r => r.id == recipeId);
             if (recipe == null)
                 throw new ERecipeNotFound();
-            if (recipe.Author != _genericServices.GetAuthenticatedUserProfile())
+            if (recipe.author != _genericServices.GetAuthenticatedUserProfile())
                 throw new EUnauthorized();
             _genericServices.Delete(recipe);
         }
@@ -148,7 +148,7 @@ namespace Salus.Services.RecipeServices
 
             var recipe = new Recipe()
             {
-                Author = userProfile,
+                author = userProfile,
                 name = request.name,
                 method = request.method,
                 timeInMinute = request.timeInMinutes,
@@ -232,9 +232,9 @@ namespace Salus.Services.RecipeServices
 
             UpdateCheck(request);
 
-            if (request.saveAs == false && recipe.Author != userProfile)
+            if (request.saveAs == false && recipe.author.id != userProfile.id)
                 throw new EOnlyAuthorCanModifyRecipe();
-            recipe.Author = userProfile;
+            recipe.author = userProfile;
             recipe.name = request.name == string.Empty ? recipe.name : request.name;
             recipe.method = request.method == RecipeEnums.makeingMethodEnum.nondefined ? recipe.method : request.method;
             recipe.fat = 0;
@@ -446,7 +446,7 @@ namespace Salus.Services.RecipeServices
 
         public List<Recipe> GetRecipesByName(string name)
         {
-            return _genericServices.ReadAll().Where(r => r.name.Contains(name)).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24h).Include(r => r.author).Where(r => r.name.ToLower().Contains(name.ToLower())).ToList();
         }
 
 
