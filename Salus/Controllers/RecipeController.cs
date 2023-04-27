@@ -1,4 +1,5 @@
-﻿using Salus.Services;
+﻿using Salus.Models;
+using Salus.Services;
 using Salus.WebAPI;
 
 namespace Salus.Controllers
@@ -76,15 +77,16 @@ namespace Salus.Controllers
             });
         }
 
-        [HttpGet("get-all-recipe-by-auth-id")]
-        public IActionResult GetAllRecipe(int authId)
+        [HttpGet("get-all-recipe-by-user-id")]
+        public IActionResult GetAllRecipe(int userProfileId)
         {
             return this.Run(() =>
             {
-                return Ok(_recipeService.GetAllByAuthId(authId));
+                return Ok(_recipeService.GetAllByUserProfileId(userProfileId));
             });
         }
         [HttpGet("get-all")]
+
         public IActionResult GetAll()
         {
             return this.Run(() =>
