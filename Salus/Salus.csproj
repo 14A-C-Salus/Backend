@@ -7,11 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="Templates\badwords.json" />
+    <Compile Remove=".github\**" />
+    <Content Remove=".github\**" />
+    <EmbeddedResource Remove=".github\**" />
+    <None Remove=".github\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include=".github\workflows\main.yml" />
+    <Content Remove="Templates\badwords.json" />
   </ItemGroup>
 
   <ItemGroup>
