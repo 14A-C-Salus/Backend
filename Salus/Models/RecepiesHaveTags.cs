@@ -7,7 +7,7 @@ namespace Salus.Models
         [Required, JsonIgnore]
         public Recipe? recipe { get; set; }
         public int recipeId { get; set; }
-        [Required, JsonIgnore]
+        [Required]
         public Tag? tag { get; set; }
         public int tagId { get; set; }
     }

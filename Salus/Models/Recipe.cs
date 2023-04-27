@@ -18,7 +18,6 @@ namespace Salus.Models
         public string description { get; set; } = string.Empty;
         public string name { get; set; } = string.Empty;
         public makeingMethodEnum method { get; set; }
-        [JsonIgnore]
         public UserProfile? userProfile { get; set; } = new ();
 
         //Connections
