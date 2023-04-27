@@ -1,4 +1,5 @@
 ﻿using Salus.Exceptions;
+using Salus.Models;
 using System.Linq;
 using System.Xml.Linq;
  
@@ -112,13 +113,13 @@ namespace Salus.Services.RecipeServices
 
 
         //--------- CRUD Start ----------//
-        public List<Recipe> GetAllByAuthId(int authId) 
+        public List<Recipe> GetAllByUserProfileId(int userProfileId) 
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.userProfile.id == authId).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).ThenInclude(t => t.tag).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.userProfile.id == userProfileId).ToList();
         }
         public List<Recipe> GetAll()
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).ThenInclude(t => t.tag).Include(r => r.last24hs).Include(r => r.userProfile).ToList();
         }
         public void Delete(int recipeId)
         {
