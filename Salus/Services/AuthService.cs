@@ -171,13 +171,13 @@ namespace Salus.Services.AuthServices
             string password = _configuration.GetSection("MailSettings:Password").Value;
             string subject = "Verify your account";
 
-            string url = $"http://localhost:4200/Verify?verify?token={auth.verificationToken}";
+            string url = $"https://salus-healthy-lifestyle.netlify.app/Verify?verify?token={auth.verificationToken}";
             string imgUrl = "https://i.ibb.co/Dg5h4zK/logo.png";
             string body = File.ReadAllText("./Templates/EmailBody.html").Replace("IMAGEURL", imgUrl).Replace("USERNAME", auth.username).Replace("URL", url);
 
             if (!isRegister)
             {
-                url = $"http://localhost:4200/ResetPassword?token={auth.verificationToken}";
+                url = $"https://salus-healthy-lifestyle.netlify.app/ResetPassword?token={auth.verificationToken}";
                 body = File.ReadAllText("./Templates/ResetPassword.html").Replace("IMAGEURL", imgUrl).Replace("USERNAME", auth.username).Replace("URL", url);
             }
 
