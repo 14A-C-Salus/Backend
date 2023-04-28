@@ -1,4 +1,5 @@
-﻿using Salus.Exceptions;
+﻿using Salus.Data;
+using Salus.Exceptions;
 using Salus.Models;
 using System.Linq;
 using System.Xml.Linq;
@@ -115,25 +116,30 @@ namespace Salus.Services.RecipeServices
         //--------- CRUD Start ----------//
         public List<Recipe> GetAllByUserProfileId(int userProfileId) 
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).ThenInclude(t => t.tag).Include(r => r.last24hs).Include(r => r.userProfile).Where(r => r.userProfile.id == userProfileId).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).ThenInclude(t => t.tag).Include(r => r.last24hs).Include(r => r.userProfile).Include(r => r.usersWhoLiked).Where(r => r.userProfile.id == userProfileId).ToList();
         }
         public List<Recipe> GetAll()
         {
-            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).ThenInclude(t => t.tag).Include(r => r.last24hs).Include(r => r.userProfile).ToList();
+            return _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).ThenInclude(t => t.tag).Include(r => r.last24hs).Include(r => r.userProfile).Include(r => r.usersWhoLiked).ToList();
         }
         public void Delete(int recipeId)
         {
             var recipe = _dataContext.Set<Recipe>().Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).FirstOrDefault(r => r.id == recipeId);
             if (recipe == null)
                 throw new ERecipeNotFound();
-            if (recipe.userProfile != _genericServices.GetAuthenticatedUserProfile())
+            if (_dataContext.Set<Auth>().First(a => a.id == _genericServices.GetAuthId()).isAdmin)
+            {
+                _genericServices.Delete(recipe);
+                return;
+            }
+            if (recipe.userProfile.id != _genericServices.GetAuthenticatedUserProfile().id)
                 throw new EUnauthorized();
             _genericServices.Delete(recipe);
         }
         public List<Recipe> GetAllByTagId(int tagId)
         {
             var tag = _dataContext.Set<Tag>().First(t => t.id == tagId);
-            var recipes = _dataContext.Set<RecepiesHaveTags>().Where(rht => rht.tag == tag).Select(r => r.recipe).ToList();
+            var recipes = _dataContext.Set<RecepiesHaveTags>().Where(rht => rht.tag == tag).Select(r => r.recipe).Include(r => r.ingredients).Include(r => r.tags).Include(r => r.last24hs).Include(r => r.userProfile).ToList();
 #pragma warning disable CS8619 // Nullability of reference types in value doesn't match target type.
             return recipes;
 #pragma warning restore CS8619 // Nullability of reference types in value doesn't match target type.

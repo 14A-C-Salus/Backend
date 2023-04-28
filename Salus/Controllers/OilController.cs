@@ -13,6 +13,14 @@ namespace Salus.Controllers
         {
             _oilService = oilService;
         }
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            return this.Run(() =>
+            {
+                return Ok(_oilService.GetAll());
+            });
+        }
         [Authorize(Roles = "Admin")]
         [HttpPut("create")]
         public IActionResult Create(OilCreateRequest request)
@@ -22,14 +30,7 @@ namespace Salus.Controllers
                 return Ok(_oilService.Create(request));
             });
         }
-        [HttpGet("get-all")]
-        public IActionResult GetAll()
-        {
-            return this.Run(() =>
-            {
-                return Ok(_oilService.GetAll());
-            });
-        }
+
         [Authorize(Roles = "Admin")]
         [HttpPatch("update")]
         public IActionResult Update(OilUpdateRequest request)

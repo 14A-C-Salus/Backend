@@ -49,15 +49,6 @@ namespace Salus.Controllers
             });
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPatch("verify")]
-        public IActionResult Verify(int id)
-        {
-            return this.Run(() =>
-            {
-                return Ok(_recipeService.VerifyUnVerify(id));
-            });
-        }
 
         [HttpPatch("add-tags")]
         public IActionResult AddTags(AddTagsToRecipeRequest request)
@@ -127,6 +118,15 @@ namespace Salus.Controllers
             {
                 _recipeService.Delete(id);
                 return Ok();
+            });
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("verify")]
+        public IActionResult Verify(int id)
+        {
+            return this.Run(() =>
+            {
+                return Ok(_recipeService.VerifyUnVerify(id));
             });
         }
 
